@@ -1,6 +1,0 @@
-{
-  "buildCommand": "cd horse-betting-frontend && npm run build",
-  "outputDirectory": "horse-betting-frontend/build",
-  "installCommand": "cd horse-betting-frontend && npm install",
-  "framework": "create-react-app"
-} 
