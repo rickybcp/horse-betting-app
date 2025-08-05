@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Users, Trophy, Calendar, Settings, Plus, RefreshCw, Save, Clock, Star, Download } from 'lucide-react';
 
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_BASE = "https://horse-betting-backend.onrender.com/api/users"
+//const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 // Debug: Log the API URL being used
 console.log('API_BASE URL:', API_BASE);
