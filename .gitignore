@@ -10,9 +10,6 @@ ENV/
 env.bak/
 venv.bak/
 
-# Data files (optional - remove if you want to include initial data)
-data/*.json
-
 # IDE
 .vscode/
 .idea/
