@@ -12,7 +12,7 @@ import time
 import re
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins="*", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], allow_headers=["Content-Type", "Authorization"])
 
 # Data file paths
 DATA_DIR = 'data'
