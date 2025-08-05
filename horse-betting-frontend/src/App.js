@@ -5,6 +5,10 @@ import { Users, Trophy, Calendar, Settings, Plus, RefreshCw, Save, Clock, Star, 
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
+// Debug: Log the API URL being used
+console.log('API_BASE URL:', API_BASE);
+console.log('Environment variable:', process.env.REACT_APP_API_URL);
+
 // --- Reusable Confirmation Modal Component ---
 const ConfirmationModal = ({ show, message, onConfirm, onCancel }) => {
   if (!show) return null;
