@@ -1,70 +1,122 @@
-# Getting Started with Create React App
+# Horse Betting Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A React-based frontend for the Family Horse Betting application with optimized loading and performance features.
 
-## Available Scripts
+## Performance Improvements
 
-In the project directory, you can run:
+### 🚀 Loading Optimizations
+- **Progressive Loading**: Data is loaded sequentially to avoid overwhelming the server
+- **Individual Loading States**: Each data type (users, races, bets, bankers) has its own loading state
+- **Skeleton Screens**: Beautiful loading placeholders while data is being fetched
+- **Request Timeouts**: 15-second timeout for all API requests to prevent hanging
 
-### `npm start`
+### 💾 Caching System
+- **Smart Caching**: API responses are cached for 5 minutes to reduce server load
+- **Cache Validation**: Automatic cache invalidation and refresh
+- **Force Refresh**: Manual refresh option to bypass cache when needed
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 🔄 Retry Mechanism
+- **Automatic Retries**: Failed requests are automatically retried up to 2 times
+- **Progressive Delays**: 2-second delay between retry attempts
+- **Smart Error Handling**: Different error messages for timeouts vs. connection issues
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 📱 User Experience
+- **Loading Progress Bar**: Visual progress indicator for data loading
+- **Connection Status**: Real-time server connection status display
+- **Offline State**: Graceful handling when server is unavailable
+- **Loading Indicators**: Spinning indicators in tabs and buttons during operations
 
-### `npm test`
+### 🎯 Performance Features
+- **Request Batching**: Related requests are grouped to reduce server load
+- **Debounced Updates**: Prevents excessive API calls during rapid interactions
+- **Memory Management**: Efficient state management and cleanup
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Usage
 
-### `npm run build`
+### Loading States
+The app shows different loading states for each section:
+- **Leaderboard**: Shows skeleton cards while users load
+- **Races**: Shows skeleton race cards while race data loads
+- **User Bets**: Shows loading spinner with specific loading messages
+- **Admin Panel**: Shows loading spinner with detailed status
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Cache Management
+- Cache automatically expires after 5 minutes
+- Use the refresh button to force a fresh data fetch
+- Cache status is displayed in the header
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Connection Handling
+- Green indicator when connected
+- Red indicator when disconnected
+- Automatic retry on connection loss
+- Manual retry button available
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Technical Details
 
-### `npm run eject`
+### API Endpoints
+- Users: `/api/users`
+- Races: `/api/races`
+- Bets: `/api/bets`
+- Bankers: `/api/bankers`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Timeout Configuration
+- Request timeout: 15 seconds
+- Retry attempts: 2
+- Retry delay: 2 seconds
+- Cache duration: 5 minutes
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Error Handling
+- Network timeouts
+- Server errors (4xx, 5xx)
+- Connection failures
+- Data validation errors
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Development
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Prerequisites
+- Node.js 14+
+- npm or yarn
 
-## Learn More
+### Installation
+```bash
+cd horse-betting-frontend
+npm install
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Running
+```bash
+npm start
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Building
+```bash
+npm run build
+```
 
-### Code Splitting
+## Performance Monitoring
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+The app includes built-in performance monitoring:
+- Loading progress tracking
+- Cache hit/miss statistics
+- Connection status monitoring
+- Request timing information
 
-### Analyzing the Bundle Size
+## Troubleshooting
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Slow Loading
+1. Check server status in the header
+2. Use the refresh button to force reload
+3. Check network connectivity
+4. Verify backend server is running
 
-### Making a Progressive Web App
+### Connection Issues
+1. Look for red connection indicator
+2. Click retry button
+3. Check backend server logs
+4. Verify API endpoint accessibility
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Data Not Updating
+1. Check cache status in header
+2. Use force refresh button
+3. Verify backend data changes
+4. Check browser console for errors

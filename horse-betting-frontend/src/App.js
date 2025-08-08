@@ -1,14 +1,69 @@
 // App.js (Revised script)
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Users, Trophy, Calendar, Settings, Plus, RefreshCw, Save, Clock, Star, Download } from 'lucide-react';
+import { Users, Trophy, Calendar, Settings, Plus, RefreshCw, Save, Clock, Star, Download, AlertCircle } from 'lucide-react';
 
-const API_BASE = "https://horse-betting-backend.onrender.com/api"
-//const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_BASE = process.env.NODE_ENV === 'development' 
+  ? 'http://localhost:5000/api'
+  : "https://horse-betting-backend.onrender.com/api";
 
 // Debug: Log the API URL being used
+console.log('NODE_ENV:', process.env.NODE_ENV);
 console.log('API_BASE URL:', API_BASE);
 console.log('Environment variable:', process.env.REACT_APP_API_URL);
+
+// --- Loading Skeleton Components ---
+const SkeletonCard = () => (
+  <div className="bg-white p-4 rounded-lg shadow animate-pulse">
+    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+  </div>
+);
+
+const SkeletonLeaderboard = () => (
+  <div className="space-y-4">
+    <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white p-6 rounded-lg">
+      <h2 className="text-2xl font-bold flex items-center gap-2">
+        <Trophy className="w-6 h-6" />
+        Leaderboard
+      </h2>
+    </div>
+    {[1, 2, 3, 4, 5].map(i => (
+      <div key={i} className="bg-white p-4 rounded-lg shadow flex justify-between items-center animate-pulse">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+          <div className="h-4 bg-gray-200 rounded w-24"></div>
+        </div>
+        <div className="h-4 bg-gray-200 rounded w-16"></div>
+      </div>
+    ))}
+  </div>
+);
+
+const SkeletonRaces = () => (
+  <div className="space-y-4">
+    <div className="bg-gradient-to-r from-green-400 to-green-600 text-white p-6 rounded-lg">
+      <h2 className="text-2xl font-bold flex items-center gap-2">
+        <Calendar className="w-6 h-6" />
+        Today's Races
+      </h2>
+    </div>
+    {[1, 2, 3].map(i => (
+      <div key={i} className="bg-white p-6 rounded-lg shadow animate-pulse">
+        <div className="h-5 bg-gray-200 rounded w-32 mb-3"></div>
+        <div className="grid grid-cols-3 gap-4">
+          {[1, 2, 3].map(j => (
+            <div key={j} className="text-center">
+              <div className="h-4 bg-gray-200 rounded w-16 mx-auto mb-2"></div>
+              <div className="h-3 bg-gray-200 rounded w-12 mx-auto mb-1"></div>
+              <div className="h-3 bg-gray-200 rounded w-8 mx-auto"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+);
 
 // --- Reusable Confirmation Modal Component ---
 const ConfirmationModal = ({ show, message, onConfirm, onCancel }) => {
@@ -54,6 +109,30 @@ const MessageDisplay = ({ message }) => {
     </div>
   );
 };
+
+// --- Connection Status Component ---
+const ConnectionStatus = ({ serverConnected, retryConnection }) => (
+  <div className={`fixed top-4 left-4 px-4 py-2 rounded-lg shadow-lg z-50 border ${
+    serverConnected 
+      ? 'bg-green-100 text-green-800 border-green-200' 
+      : 'bg-red-100 text-red-800 border-red-200'
+  }`}>
+    <div className="flex items-center gap-2">
+      <div className={`w-2 h-2 rounded-full ${serverConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+      <span className="text-sm font-medium">
+        {serverConnected ? 'Connected' : 'Disconnected'}
+      </span>
+      {!serverConnected && (
+        <button
+          onClick={retryConnection}
+          className="ml-2 px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition-colors"
+        >
+          Retry
+        </button>
+      )}
+    </div>
+  </div>
+);
 
 // --- Leaderboard Tab Component ---
 const LeaderboardTab = ({ users, calculateUserScore, bankers, setActiveTab }) => (
@@ -503,6 +582,45 @@ const HorseBettingApp = () => {
   const [message, setMessage] = useState('');
   const [serverConnected, setServerConnected] = useState(true);
 
+  // Individual loading states for better UX
+  const [loadingStates, setLoadingStates] = useState({
+    users: false,
+    races: false,
+    bets: false,
+    bankers: false
+  });
+
+  // Cache for API responses to reduce unnecessary calls
+  const [dataCache, setDataCache] = useState({
+    users: { data: null, timestamp: 0 },
+    races: { data: null, timestamp: 0 },
+    bets: { data: null, timestamp: 0 },
+    bankers: { data: null, timestamp: 0 }
+  });
+
+  // Cache duration in milliseconds (5 minutes)
+  const CACHE_DURATION = 5 * 60 * 1000;
+
+  // Check if cached data is still valid
+  const isCacheValid = useCallback((cacheKey) => {
+    const cache = dataCache[cacheKey];
+    return cache && (Date.now() - cache.timestamp) < CACHE_DURATION;
+  }, [dataCache]);
+
+  // Get cached data if valid
+  const getCachedData = useCallback((cacheKey) => {
+    const cache = dataCache[cacheKey];
+    return isCacheValid(cacheKey) ? cache.data : null;
+  }, [dataCache, isCacheValid]);
+
+  // Update cache with new data
+  const updateCache = useCallback((cacheKey, data) => {
+    setDataCache(prev => ({
+      ...prev,
+      [cacheKey]: { data, timestamp: Date.now() }
+    }));
+  }, []);
+
   // State for confirmation modal
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmModalContent, setConfirmModalContent] = useState('');
@@ -514,82 +632,214 @@ const HorseBettingApp = () => {
     setTimeout(() => setMessage(''), 3000);
   }, []);
 
-  // API calls (wrapped in useCallback for memoization)
-  const fetchUsers = useCallback(async () => {
+  // Update individual loading state
+  const setLoadingState = useCallback((key, value) => {
+    setLoadingStates(prev => ({ ...prev, [key]: value }));
+  }, []);
+
+  // API calls with individual loading states, retry logic, and caching
+  const fetchUsers = useCallback(async (retryCount = 0, forceRefresh = false) => {
+    // Check cache first
+    if (!forceRefresh) {
+      const cachedData = getCachedData('users');
+      if (cachedData) {
+        setUsers(cachedData);
+        setServerConnected(true);
+        return;
+      }
+    }
+
+    setLoadingState('users', true);
     try {
-      const response = await fetch(`${API_BASE}/users`);
+      const response = await fetch(`${API_BASE}/users`, {
+        signal: AbortSignal.timeout(15000) // 15 second timeout
+      });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      setUsers(Array.isArray(data) ? data : []);
+      const usersData = Array.isArray(data) ? data : [];
+      setUsers(usersData);
+      updateCache('users', usersData);
       setServerConnected(true);
     } catch (error) {
       console.error('Error fetching users:', error);
+      if (retryCount < 2 && error.name !== 'AbortError') {
+        // Retry after 2 seconds
+        setTimeout(() => fetchUsers(retryCount + 1, forceRefresh), 2000);
+        return;
+      }
       showMessage('Error connecting to server', 'error');
       setUsers([]);
       setServerConnected(false);
+    } finally {
+      setLoadingState('users', false);
     }
-  }, [showMessage]);
+  }, [showMessage, setLoadingState, getCachedData, updateCache]);
 
-  const fetchRaces = useCallback(async () => {
+  const fetchRaces = useCallback(async (retryCount = 0, forceRefresh = false) => {
+    // Check cache first
+    if (!forceRefresh) {
+      const cachedData = getCachedData('races');
+      if (cachedData) {
+        setRaces(cachedData);
+        setServerConnected(true);
+        return;
+      }
+    }
+
+    setLoadingState('races', true);
     try {
-      const response = await fetch(`${API_BASE}/races`);
+      const response = await fetch(`${API_BASE}/races`, {
+        signal: AbortSignal.timeout(15000) // 15 second timeout
+      });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
       setRaces(data);
+      updateCache('races', data);
       setServerConnected(true);
     } catch (error) {
       console.error('Error fetching races:', error);
+      if (retryCount < 2 && error.name !== 'AbortError') {
+        // Retry after 2 seconds
+        setTimeout(() => fetchRaces(retryCount + 1, forceRefresh), 2000);
+        return;
+      }
       showMessage('Error fetching races', 'error');
       setRaces([]);
       setServerConnected(false);
+    } finally {
+      setLoadingState('races', false);
     }
-  }, [showMessage]);
+  }, [showMessage, setLoadingState, getCachedData, updateCache]);
 
-  const fetchBets = useCallback(async () => {
+  const fetchBets = useCallback(async (retryCount = 0, forceRefresh = false) => {
+    // Check cache first
+    if (!forceRefresh) {
+      const cachedData = getCachedData('bets');
+      if (cachedData) {
+        setBets(cachedData);
+        setServerConnected(true);
+        return;
+      }
+    }
+
+    setLoadingState('bets', true);
     try {
-      const response = await fetch(`${API_BASE}/bets`);
+      const response = await fetch(`${API_BASE}/bets`, {
+        signal: AbortSignal.timeout(15000) // 15 second timeout
+      });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
       setBets(data);
+      updateCache('bets', data);
       setServerConnected(true);
     } catch (error) {
       console.error('Error fetching bets:', error);
+      if (retryCount < 2 && error.name !== 'AbortError') {
+        // Retry after 2 seconds
+        setTimeout(() => fetchBets(retryCount + 1, forceRefresh), 2000);
+        return;
+      }
       showMessage('Error fetching bets', 'error');
       setBets({});
       setServerConnected(false);
+    } finally {
+      setLoadingState('bets', false);
     }
-  }, [showMessage]);
+  }, [showMessage, setLoadingState, getCachedData, updateCache]);
 
-  const fetchBankers = useCallback(async () => {
+  const fetchBankers = useCallback(async (retryCount = 0, forceRefresh = false) => {
+    // Check cache first
+    if (!forceRefresh) {
+      const cachedData = getCachedData('bankers');
+      if (cachedData) {
+        setBankers(cachedData);
+        setServerConnected(true);
+        return;
+      }
+    }
+
+    setLoadingState('bankers', true);
     try {
-      const response = await fetch(`${API_BASE}/bankers`);
+      const response = await fetch(`${API_BASE}/bankers`, {
+        signal: AbortSignal.timeout(15000) // 15 second timeout
+      });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
       setBankers(data);
+      updateCache('bankers', data);
       setServerConnected(true);
     } catch (error) {
       console.error('Error fetching bankers:', error);
+      if (retryCount < 2 && error.name !== 'AbortError') {
+        // Retry after 2 seconds
+        setTimeout(() => fetchBankers(retryCount + 1, forceRefresh), 2000);
+        return;
+      }
       showMessage('Error connecting to server', 'error');
       setBankers({});
       setServerConnected(false);
+    } finally {
+      setLoadingState('bankers', false);
     }
-  }, [showMessage]);
+  }, [showMessage, setLoadingState, getCachedData, updateCache]);
+
+  // Progressive loading - load data in sequence to avoid overwhelming the server
+  const loadAllData = useCallback(async (forceRefresh = false) => {
+    setLoading(true);
+    try {
+      // Load users first (most important for UI)
+      await fetchUsers(0, forceRefresh);
+      
+      // Then load races
+      await fetchRaces(0, forceRefresh);
+      
+      // Finally load bets and bankers
+      await Promise.all([fetchBets(0, forceRefresh), fetchBankers(0, forceRefresh)]);
+      
+      setServerConnected(true);
+      if (forceRefresh) {
+        showMessage('Data refreshed successfully!', 'success');
+      } else {
+        showMessage('Data loaded successfully!', 'success');
+      }
+    } catch (error) {
+      console.error('Error loading data:', error);
+      setServerConnected(false);
+      showMessage('Failed to load some data. Check connection and try again.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchUsers, fetchRaces, fetchBets, fetchBankers, showMessage]);
+
+  // Force refresh all data (bypass cache)
+  const forceRefreshAllData = useCallback(() => {
+    loadAllData(true);
+  }, [loadAllData]);
+
+  // Calculate overall loading progress
+  const loadingProgress = useCallback(() => {
+    const total = 4; // users, races, bets, bankers
+    const loaded = Object.values(loadingStates).filter(state => !state).length;
+    return Math.round((loaded / total) * 100);
+  }, [loadingStates]);
+
+  // Check if any data is still loading
+  const isAnyDataLoading = useCallback(() => {
+    return Object.values(loadingStates).some(state => state);
+  }, [loadingStates]);
 
   // Load all data on component mount
   useEffect(() => {
-    fetchUsers();
-    fetchRaces();
-    fetchBets();
-    fetchBankers();
-  }, [fetchUsers, fetchRaces, fetchBets, fetchBankers]);
+    loadAllData();
+  }, [loadAllData]);
 
   // Check if betting is still allowed for a race
   const isBettingAllowed = useCallback((raceTime) => {
@@ -650,7 +900,8 @@ const HorseBettingApp = () => {
           userId: String(userId),
           raceId: String(raceId),
           horseNumber: Number(horseNumber)
-        })
+        }),
+        signal: AbortSignal.timeout(15000) // 15 second timeout
       });
 
       if (response.ok) {
@@ -662,7 +913,11 @@ const HorseBettingApp = () => {
       }
     } catch (error) {
       console.error('Bet placement error:', error);
-      showMessage('Error connecting to server', 'error');
+      if (error.name === 'AbortError') {
+        showMessage('Request timed out. Please try again.', 'error');
+      } else {
+        showMessage('Error connecting to server', 'error');
+      }
     }
   }, [fetchBets, isBettingAllowed, races, showMessage]);
 
@@ -686,7 +941,8 @@ const HorseBettingApp = () => {
         body: JSON.stringify({
           userId,
           raceId
-        })
+        }),
+        signal: AbortSignal.timeout(15000) // 15 second timeout
       });
 
       if (response.ok) {
@@ -696,9 +952,13 @@ const HorseBettingApp = () => {
         showMessage('Error setting banker', 'error');
       }
     } catch (error) {
-      showMessage('Error connecting to server', 'error');
+      if (error.name === 'AbortError') {
+        showMessage('Request timed out. Please try again.', 'error');
+      } else {
+        showMessage('Error connecting to server', 'error');
+      }
     }
-  }, [bets, fetchBankers, showMessage]);
+  }, [fetchBankers, bets, showMessage]);
 
   // Add new user
   const addUser = useCallback(async () => {
@@ -854,16 +1114,91 @@ const HorseBettingApp = () => {
           setOnConfirmAction(null);
         }}
       />
+      <ConnectionStatus serverConnected={serverConnected} retryConnection={() => {
+        setServerConnected(false);
+        fetchUsers(); // Attempt to re-establish connection by fetching users
+      }} />
       <div className="max-w-4xl mx-auto p-4">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6">
             <h1 className="text-3xl font-bold text-center">🐎 Family Horse Betting</h1>
-            {loading && (
-              <div className="text-center mt-2">
-                <div className="inline-flex items-center gap-2 text-sm">
+            <div className="flex items-center justify-center gap-4 mt-4">
+              {loading && (
+                <div className="flex items-center gap-2 text-sm">
                   <RefreshCw className="w-4 h-4 animate-spin" />
-                  Processing...
+                  <span>Loading data...</span>
+                </div>
+              )}
+              {!loading && !serverConnected && (
+                <div className="flex items-center gap-2 text-sm bg-red-500 bg-opacity-20 px-3 py-1 rounded-full">
+                  <AlertCircle className="w-4 h-4" />
+                  <span>Server disconnected</span>
+                </div>
+              )}
+              {!loading && serverConnected && (
+                <div className="flex items-center gap-2 text-sm bg-green-500 bg-opacity-20 px-3 py-1 rounded-full">
+                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                  <span>Connected</span>
+                </div>
+              )}
+              <button
+                onClick={forceRefreshAllData}
+                disabled={loading}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  loading 
+                    ? 'bg-gray-400 cursor-not-allowed' 
+                    : 'bg-white bg-opacity-20 hover:bg-opacity-30 text-white'
+                }`}
+              >
+                <RefreshCw className={`w-4 h-4 inline mr-2 ${loading ? 'animate-spin' : ''}`} />
+                Refresh
+              </button>
+            </div>
+            
+            {/* Loading Progress Bar */}
+            {isAnyDataLoading() && (
+              <div className="mt-4">
+                <div className="flex justify-between text-xs mb-1">
+                  <span>Loading progress</span>
+                  <span>{loadingProgress()}%</span>
+                </div>
+                <div className="w-full bg-white bg-opacity-20 rounded-full h-2">
+                  <div 
+                    className="bg-white h-2 rounded-full transition-all duration-300 ease-out"
+                    style={{ width: `${loadingProgress()}%` }}
+                  ></div>
+                </div>
+                <div className="flex justify-center gap-4 mt-2 text-xs">
+                  <span className={`${loadingStates.users ? 'text-yellow-200' : 'text-green-200'}`}>
+                    {loadingStates.users ? '⏳' : '✅'} Users
+                  </span>
+                  <span className={`${loadingStates.races ? 'text-yellow-200' : 'text-green-200'}`}>
+                    {loadingStates.races ? '⏳' : '✅'} Races
+                  </span>
+                  <span className={`${loadingStates.bets ? 'text-yellow-200' : 'text-green-200'}`}>
+                    {loadingStates.bets ? '⏳' : '✅'} Bets
+                  </span>
+                  <span className={`${loadingStates.bankers ? 'text-yellow-200' : 'text-green-200'}`}>
+                    {loadingStates.bankers ? '⏳' : '✅'} Bankers
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Cache Status */}
+            {!isAnyDataLoading() && serverConnected && (
+              <div className="mt-4 text-center">
+                <div className="inline-flex items-center gap-2 text-xs bg-white bg-opacity-10 px-3 py-1 rounded-full">
+                  <span>💾</span>
+                  <span>Cache: {Object.values(dataCache).filter(cache => isCacheValid(Object.keys(dataCache).find(key => dataCache[key] === cache))).length}/4 valid</span>
+                  <button
+                    onClick={forceRefreshAllData}
+                    className="ml-2 px-2 py-1 bg-white bg-opacity-20 hover:bg-opacity-30 rounded text-xs transition-colors"
+                    title="Force refresh all data"
+                  >
+                    🔄
+                  </button>
                 </div>
               </div>
             )}
@@ -879,6 +1214,18 @@ const HorseBettingApp = () => {
                 { id: 'admin', label: 'Admin', icon: Settings }
               ].map(tab => {
                 const Icon = tab.icon;
+                // Show loading indicator for tabs that depend on specific data
+                let loadingIndicator = null;
+                if (tab.id === 'leaderboard' && loadingStates.users) {
+                  loadingIndicator = <RefreshCw className="w-3 h-3 animate-spin ml-1" />;
+                } else if (tab.id === 'races' && loadingStates.races) {
+                  loadingIndicator = <RefreshCw className="w-3 h-3 animate-spin ml-1" />;
+                } else if (tab.id === 'bets' && (loadingStates.users || loadingStates.races || loadingStates.bets)) {
+                  loadingIndicator = <RefreshCw className="w-3 h-3 animate-spin ml-1" />;
+                } else if (tab.id === 'admin' && (loadingStates.users || loadingStates.races || loadingStates.bets || loadingStates.bankers)) {
+                  loadingIndicator = <RefreshCw className="w-3 h-3 animate-spin ml-1" />;
+                }
+                
                 return (
                   <button
                     key={tab.id}
@@ -891,6 +1238,7 @@ const HorseBettingApp = () => {
                   >
                     <Icon className="w-4 h-4" />
                     <span className="hidden sm:inline">{tab.label}</span>
+                    {loadingIndicator}
                   </button>
                 );
               })}
@@ -899,53 +1247,133 @@ const HorseBettingApp = () => {
 
           {/* Tab Content */}
           <div className="p-6">
-            {activeTab === 'leaderboard' && (
-              <LeaderboardTab
-                users={users}
-                calculateUserScore={calculateUserScore}
-                bankers={bankers}
-                setActiveTab={setActiveTab}
-              />
-            )}
-            {activeTab === 'races' && (
-              <RaceDayTab
-                races={races}
-                isBettingAllowed={isBettingAllowed}
-                setActiveTab={setActiveTab}
-              />
-            )}
-            {activeTab === 'bets' && (
-              <UserBetsTab
-                users={users}
-                selectedUser={selectedUser}
-                setSelectedUser={setSelectedUser}
-                races={races}
-                bets={bets}
-                bankers={bankers}
-                placeBet={placeBet}
-                setBanker={setBanker}
-                showMessage={showMessage}
-                isBettingAllowed={isBettingAllowed}
-                calculateUserScore={calculateUserScore}
-                setActiveTab={setActiveTab}
-              />
-            )}
-            {activeTab === 'admin' && (
-              <AdminTab
-                newUserName={newUserName}
-                setNewUserName={setNewUserName}
-                addUser={addUser}
-                loading={loading}
-                scrapeRaces={scrapeRaces}
-                scrapeResults={scrapeResults}
-                resetForNewDay={resetForNewDay}
-                races={races}
-                setRaceResult={setRaceResult}
-                users={users}
-                bets={bets}
-                bankers={bankers}
-                serverConnected={serverConnected}
-              />
+            {!serverConnected && !isAnyDataLoading() ? (
+              // Show offline state when server is disconnected and no data is loading
+              <div className="text-center py-12">
+                <div className="text-gray-400 mb-6">
+                  <AlertCircle className="w-24 h-24 mx-auto mb-4" />
+                </div>
+                <h2 className="text-2xl font-semibold text-gray-600 mb-4">Server Connection Lost</h2>
+                <p className="text-gray-500 mb-6 max-w-md mx-auto">
+                  Unable to connect to the server. This could be due to:
+                </p>
+                <ul className="text-gray-500 mb-8 text-left max-w-md mx-auto space-y-2">
+                  <li>• Server is starting up (common with free hosting services)</li>
+                  <li>• Network connectivity issues</li>
+                  <li>• Server maintenance or downtime</li>
+                </ul>
+                <div className="space-x-4">
+                  <button
+                    onClick={forceRefreshAllData}
+                    className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
+                  >
+                    <RefreshCw className="w-5 h-5 inline mr-2" />
+                    Try Again
+                  </button>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium"
+                  >
+                    Reload Page
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                {activeTab === 'leaderboard' && (
+                  loadingStates.users ? <SkeletonLeaderboard /> : <LeaderboardTab
+                    users={users}
+                    calculateUserScore={calculateUserScore}
+                    bankers={bankers}
+                    setActiveTab={setActiveTab}
+                  />
+                )}
+                {activeTab === 'races' && (
+                  loadingStates.races ? <SkeletonRaces /> : <RaceDayTab
+                    races={races}
+                    isBettingAllowed={isBettingAllowed}
+                    setActiveTab={setActiveTab}
+                  />
+                )}
+                {activeTab === 'bets' && (
+                  (loadingStates.users || loadingStates.races || loadingStates.bets) ? (
+                    <div className="space-y-4">
+                      <div className="bg-gradient-to-r from-blue-400 to-blue-600 text-white p-6 rounded-lg">
+                        <h2 className="text-2xl font-bold flex items-center gap-2">
+                          <Users className="w-6 h-6" />
+                          User Bets
+                        </h2>
+                      </div>
+                      <div className="bg-white p-6 rounded-lg shadow text-center">
+                        <div className="text-gray-400 mb-4">
+                          <RefreshCw className="w-16 h-16 mx-auto mb-2 animate-spin" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-600 mb-2">Loading User Bets</h3>
+                        <p className="text-gray-500">
+                          {loadingStates.users ? 'Loading users...' : 
+                           loadingStates.races ? 'Loading races...' : 
+                           loadingStates.bets ? 'Loading bets...' : 'Loading...'}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <UserBetsTab
+                      users={users}
+                      selectedUser={selectedUser}
+                      setSelectedUser={setSelectedUser}
+                      races={races}
+                      bets={bets}
+                      bankers={bankers}
+                      placeBet={placeBet}
+                      setBanker={setBanker}
+                      showMessage={showMessage}
+                      isBettingAllowed={isBettingAllowed}
+                      calculateUserScore={calculateUserScore}
+                      setActiveTab={setActiveTab}
+                    />
+                  )
+                )}
+                {activeTab === 'admin' && (
+                  (loadingStates.users || loadingStates.races || loadingStates.bets || loadingStates.bankers) ? (
+                    <div className="space-y-4">
+                      <div className="bg-gradient-to-r from-purple-400 to-purple-600 text-white p-6 rounded-lg">
+                        <h2 className="text-2xl font-bold flex items-center gap-2">
+                          <Settings className="w-6 h-6" />
+                          Admin Panel
+                        </h2>
+                      </div>
+                      <div className="bg-white p-6 rounded-lg shadow text-center">
+                        <div className="text-gray-400 mb-4">
+                          <RefreshCw className="w-16 h-16 mx-auto mb-2 animate-spin" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-600 mb-2">Loading Admin Panel</h3>
+                        <p className="text-gray-500">
+                          {loadingStates.users ? 'Loading users...' : 
+                           loadingStates.races ? 'Loading races...' : 
+                           loadingStates.bets ? 'Loading bets...' : 
+                           loadingStates.bankers ? 'Loading bankers...' : 'Loading...'}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <AdminTab
+                      newUserName={newUserName}
+                      setNewUserName={setNewUserName}
+                      addUser={addUser}
+                      loading={loading}
+                      scrapeRaces={scrapeRaces}
+                      scrapeResults={scrapeResults}
+                      resetForNewDay={resetForNewDay}
+                      races={races}
+                      setRaceResult={setRaceResult}
+                      users={users}
+                      bets={bets}
+                      bankers={bankers}
+                      serverConnected={serverConnected}
+                    />
+                  )
+                )}
+              </>
             )}
           </div>
         </div>

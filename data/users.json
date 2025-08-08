@@ -53,5 +53,10 @@
     "id": "11",
     "name": "Leana",
     "totalScore": 0
+  },
+  {
+    "id": "12",
+    "name": "Test User",
+    "totalScore": 0
   }
 ]
