@@ -905,8 +905,20 @@ const HorseBettingApp = () => {
       });
 
       if (response.ok) {
-        fetchBets();
+        // Optimistic update: update state and cache immediately
+        setBets(prevBets => {
+          const userKey = String(userId);
+          const raceKey = String(raceId);
+          const nextBets = {
+            ...prevBets,
+            [userKey]: { ...(prevBets[userKey] || {}), [raceKey]: Number(horseNumber) }
+          };
+          updateCache('bets', nextBets);
+          return nextBets;
+        });
         showMessage('Bet placed successfully!', 'success');
+        // Optionally reconcile with server in background without harming perceived responsiveness
+        // fetchBets(0, true);
       } else {
         const errorData = await response.json();
         showMessage(`Error placing bet: ${errorData.error || 'Unknown error'}`, 'error');
@@ -919,13 +931,13 @@ const HorseBettingApp = () => {
         showMessage('Error connecting to server', 'error');
       }
     }
-  }, [fetchBets, isBettingAllowed, races, showMessage]);
+  }, [isBettingAllowed, races, showMessage, updateCache]);
 
   // Set banker
   const setBanker = useCallback(async (userId, raceId) => {
     // Check if user has bet on this race
     const userBets = bets[userId] || {};
-    const hasBetOnRace = userBets.hasOwnProperty(raceId);
+    const hasBetOnRace = userBets.hasOwnProperty(String(raceId));
     
     if (!hasBetOnRace) {
       showMessage('You can only select a banker from races you have bet on!', 'error');
@@ -946,8 +958,15 @@ const HorseBettingApp = () => {
       });
 
       if (response.ok) {
-        fetchBankers();
+        // Optimistic update: update state and cache immediately
+        setBankers(prevBankers => {
+          const nextBankers = { ...prevBankers, [String(userId)]: String(raceId) };
+          updateCache('bankers', nextBankers);
+          return nextBankers;
+        });
         showMessage('Banker set successfully!', 'success');
+        // Optionally reconcile with server in background
+        // fetchBankers(0, true);
       } else {
         showMessage('Error setting banker', 'error');
       }
@@ -958,7 +977,7 @@ const HorseBettingApp = () => {
         showMessage('Error connecting to server', 'error');
       }
     }
-  }, [fetchBankers, bets, showMessage]);
+  }, [bets, showMessage, updateCache]);
 
   // Add new user
   const addUser = useCallback(async () => {
@@ -976,7 +995,12 @@ const HorseBettingApp = () => {
       });
 
       if (response.ok) {
-        fetchUsers();
+        const createdUser = await response.json();
+        setUsers(prevUsers => {
+          const nextUsers = [...prevUsers, createdUser];
+          updateCache('users', nextUsers);
+          return nextUsers;
+        });
         setNewUserName('');
         showMessage('User added successfully!', 'success');
         setServerConnected(true);
@@ -987,7 +1011,7 @@ const HorseBettingApp = () => {
       showMessage('Error connecting to server', 'error');
       setServerConnected(false);
     }
-  }, [newUserName, fetchUsers, showMessage]);
+  }, [newUserName, showMessage, updateCache]);
 
   // Set race result
   const setRaceResult = useCallback(async (raceId, winnerNumber) => {
