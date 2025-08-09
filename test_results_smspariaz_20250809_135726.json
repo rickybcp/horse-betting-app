@@ -1,0 +1,44 @@
+[
+  {
+    "id": "race_1_dummy",
+    "name": "Dummy Race 1",
+    "time": "14:00",
+    "horses": [
+      {
+        "number": 1,
+        "name": "Dummy Horse A",
+        "odds": 2.5,
+        "points": 1
+      },
+      {
+        "number": 2,
+        "name": "Dummy Horse B",
+        "odds": 3.0,
+        "points": 1
+      }
+    ],
+    "winner": null,
+    "status": "upcoming"
+  },
+  {
+    "id": "race_2_dummy",
+    "name": "Dummy Race 2",
+    "time": "15:00",
+    "horses": [
+      {
+        "number": 1,
+        "name": "Dummy Horse X",
+        "odds": 4.0,
+        "points": 1
+      },
+      {
+        "number": 2,
+        "name": "Dummy Horse Y",
+        "odds": 2.0,
+        "points": 1
+      }
+    ],
+    "winner": null,
+    "status": "upcoming"
+  }
+]
