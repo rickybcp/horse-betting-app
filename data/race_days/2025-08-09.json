@@ -1,240 +1,270 @@
 {
   "date": "2025-08-09",
-  "totalRaces": 2,
-  "completedRaces": 2,
+  "totalRaces": 7,
+  "completedRaces": 0,
   "status": "completed",
-  "completedAt": "2025-08-09T16:22:35.900420",
+  "completedAt": "2025-08-09T17:00:09.563943",
   "races": [
     {
-      "id": "test_1",
-      "name": "Test Race 1 - Beginner Stakes",
-      "time": "14:00",
-      "winner": 2,
-      "totalHorses": 3,
+      "id": 1,
+      "name": "THE HAVE MERCY PLATE -  Benchmark 46 - 1365m",
+      "time": "12:30",
       "status": "completed",
-      "winningHorse": {
-        "number": 2,
-        "name": "Slow Horse",
-        "odds": 8.0,
-        "points": 2
-      }
+      "horses": [
+        {
+          "number": 1,
+          "name": "ONE AND ALL",
+          "odds": 6.5
+        },
+        {
+          "number": 2,
+          "name": "OPAGUE",
+          "odds": 4.6
+        },
+        {
+          "number": 3,
+          "name": "COLOUR OF MONEY",
+          "odds": 4.0
+        },
+        {
+          "number": 4,
+          "name": "ALPINE CHALLENGE",
+          "odds": 1.9
+        }
+      ],
+      "winner": null,
+      "totalHorses": 4
     },
     {
-      "id": "test_2",
-      "name": "Test Race 2 - Championship",
-      "time": "15:00",
-      "winner": 3,
-      "totalHorses": 3,
+      "id": 2,
+      "name": "THE SPEARFIN FUND ADMINISTRATION CUP -  [0-26] - 990m",
+      "time": "13:05",
       "status": "completed",
-      "winningHorse": {
-        "number": 3,
-        "name": "Dark Horse",
-        "odds": 12.0,
-        "points": 3
-      }
+      "horses": [
+        {
+          "number": 1,
+          "name": "DUNZIE",
+          "odds": 15.0
+        },
+        {
+          "number": 2,
+          "name": "NOT IN DOUBT",
+          "odds": 8.0
+        },
+        {
+          "number": 3,
+          "name": "FENCING CAPTAIN",
+          "odds": 2.9
+        },
+        {
+          "number": 4,
+          "name": "NORDIC PRINCE",
+          "odds": 2.6
+        },
+        {
+          "number": 5,
+          "name": "PAVED WITH GOLD",
+          "odds": 6.0
+        },
+        {
+          "number": 6,
+          "name": "UNSUNG HERO",
+          "odds": 20.0
+        }
+      ],
+      "winner": null,
+      "totalHorses": 6
+    },
+    {
+      "id": 3,
+      "name": "THE SPEARFIN SOCIAL COMMITTEE CUP - Benchmark 31 - 1450m",
+      "time": "13:40",
+      "status": "completed",
+      "horses": [
+        {
+          "number": 1,
+          "name": "KALGOORLIE",
+          "odds": 7.0
+        },
+        {
+          "number": 2,
+          "name": "LIQUID",
+          "odds": 6.5
+        },
+        {
+          "number": 3,
+          "name": "OVERDOSE",
+          "odds": 20.0
+        },
+        {
+          "number": 4,
+          "name": "CUMBRE VIEJA",
+          "odds": 1.6
+        },
+        {
+          "number": 5,
+          "name": "AMANDLA",
+          "odds": 5.5
+        }
+      ],
+      "winner": null,
+      "totalHorses": 5
+    },
+    {
+      "id": 4,
+      "name": "THE SPEARFIN CORPORATE SERVICES CUP - Benchmark 41 - 1500m",
+      "time": "14:15",
+      "status": "completed",
+      "horses": [
+        {
+          "number": 1,
+          "name": "MONUMENTAL",
+          "odds": 10.0
+        },
+        {
+          "number": 2,
+          "name": "GLOBAL DOLLAR",
+          "odds": 2.0
+        },
+        {
+          "number": 3,
+          "name": "SPIRIT'S UNITE",
+          "odds": 5.7
+        },
+        {
+          "number": 4,
+          "name": "FIREFLARE",
+          "odds": 12.0
+        },
+        {
+          "number": 5,
+          "name": "ROYAL SOVEREIGN",
+          "odds": 3.1
+        }
+      ],
+      "winner": null,
+      "totalHorses": 5
+    },
+    {
+      "id": 5,
+      "name": "THE SPEARFIN COMPLIANCE SUPPORT CUP - Benchmark 46 - 1365m",
+      "time": "14:50",
+      "status": "completed",
+      "horses": [
+        {
+          "number": 1,
+          "name": "KAROO LARK",
+          "odds": 25.0
+        },
+        {
+          "number": 2,
+          "name": "HARDFALLINGRAIN",
+          "odds": 4.7
+        },
+        {
+          "number": 3,
+          "name": "WUGUG",
+          "odds": 3.2
+        },
+        {
+          "number": 4,
+          "name": "FURIE NOCTURNE",
+          "odds": 2.0
+        },
+        {
+          "number": 5,
+          "name": "MASSIMO",
+          "odds": 13.0
+        }
+      ],
+      "winner": null,
+      "totalHorses": 5
+    },
+    {
+      "id": 6,
+      "name": "THE SPEARFIN - LA COUPE DU CENT CINQUANTENAIRE - G3 [HCP] - 1365m",
+      "time": "15:25",
+      "status": "completed",
+      "horses": [
+        {
+          "number": 1,
+          "name": "WALLS OF DUBROVNIK",
+          "odds": 2.0
+        },
+        {
+          "number": 2,
+          "name": "BLESS MY PATH",
+          "odds": 7.5
+        },
+        {
+          "number": 3,
+          "name": "XAVION",
+          "odds": 4.0
+        },
+        {
+          "number": 4,
+          "name": "BETATHANTHEREST",
+          "odds": 13.0
+        },
+        {
+          "number": 5,
+          "name": "ZIL MORIS",
+          "odds": 8.0
+        },
+        {
+          "number": 6,
+          "name": "CAPTAIN LANNISTER",
+          "odds": 11.0
+        }
+      ],
+      "winner": null,
+      "totalHorses": 6
+    },
+    {
+      "id": 7,
+      "name": "THE SPEARFIN (SINGAPORE) PTE LTD CUP - Benchmark 61 - 1500m",
+      "time": "16:00",
+      "status": "completed",
+      "horses": [
+        {
+          "number": 1,
+          "name": "FAVOUR",
+          "odds": 40.0
+        },
+        {
+          "number": 2,
+          "name": "FREE TO WIN",
+          "odds": 6.0
+        },
+        {
+          "number": 3,
+          "name": "MANHATTEN CAFE",
+          "odds": 7.0
+        },
+        {
+          "number": 4,
+          "name": "VAN HUNKS",
+          "odds": 2.6
+        },
+        {
+          "number": 5,
+          "name": "SECRET GIVER",
+          "odds": 45.0
+        },
+        {
+          "number": 6,
+          "name": "SHAH AKBAR",
+          "odds": 10.0
+        },
+        {
+          "number": 7,
+          "name": "JOIN THE DOTS",
+          "odds": 3.0
+        }
+      ],
+      "winner": null,
+      "totalHorses": 7
     }
   ],
-  "userScores": [
-    {
-      "userId": "1",
-      "userName": "Ben",
-      "dailyScore": 2,
-      "basePoints": 2,
-      "bankerRaceId": "test_2",
-      "bankerWon": false,
-      "bankerMultiplierApplied": false,
-      "bets": [
-        {
-          "raceId": "test_1",
-          "raceName": "Test Race 1 - Beginner Stakes",
-          "horseNumber": 2,
-          "won": true,
-          "points": 2
-        },
-        {
-          "raceId": "test_2",
-          "raceName": "Test Race 2 - Championship",
-          "horseNumber": 1,
-          "won": false,
-          "points": 0
-        }
-      ],
-      "betsWon": 1,
-      "totalBets": 2,
-      "winRate": 0.5
-    },
-    {
-      "userId": "2",
-      "userName": "Michelle",
-      "dailyScore": 6,
-      "basePoints": 3,
-      "bankerRaceId": "test_2",
-      "bankerWon": true,
-      "bankerMultiplierApplied": true,
-      "bets": [
-        {
-          "raceId": "test_1",
-          "raceName": "Test Race 1 - Beginner Stakes",
-          "horseNumber": 1,
-          "won": false,
-          "points": 0
-        },
-        {
-          "raceId": "test_2",
-          "raceName": "Test Race 2 - Championship",
-          "horseNumber": 3,
-          "won": true,
-          "points": 3
-        }
-      ],
-      "betsWon": 1,
-      "totalBets": 2,
-      "winRate": 0.5
-    },
-    {
-      "userId": "3",
-      "userName": "Conrad",
-      "dailyScore": 0,
-      "basePoints": 0,
-      "bankerRaceId": null,
-      "bankerWon": false,
-      "bankerMultiplierApplied": false,
-      "bets": [
-        {
-          "raceId": "test_1",
-          "raceName": "Test Race 1 - Beginner Stakes",
-          "horseNumber": 3,
-          "won": false,
-          "points": 0
-        },
-        {
-          "raceId": "test_2",
-          "raceName": "Test Race 2 - Championship",
-          "horseNumber": 2,
-          "won": false,
-          "points": 0
-        }
-      ],
-      "betsWon": 0,
-      "totalBets": 2,
-      "winRate": 0.0
-    },
-    {
-      "userId": "4",
-      "userName": "Jason",
-      "dailyScore": 0,
-      "basePoints": 0,
-      "bankerRaceId": null,
-      "bankerWon": false,
-      "bankerMultiplierApplied": false,
-      "bets": [],
-      "betsWon": 0,
-      "totalBets": 0,
-      "winRate": 0.0
-    },
-    {
-      "userId": "5",
-      "userName": "Ricky",
-      "dailyScore": 0,
-      "basePoints": 0,
-      "bankerRaceId": null,
-      "bankerWon": false,
-      "bankerMultiplierApplied": false,
-      "bets": [],
-      "betsWon": 0,
-      "totalBets": 0,
-      "winRate": 0.0
-    },
-    {
-      "userId": "6",
-      "userName": "Caroline",
-      "dailyScore": 0,
-      "basePoints": 0,
-      "bankerRaceId": null,
-      "bankerWon": false,
-      "bankerMultiplierApplied": false,
-      "bets": [],
-      "betsWon": 0,
-      "totalBets": 0,
-      "winRate": 0.0
-    },
-    {
-      "userId": "7",
-      "userName": "Shaun",
-      "dailyScore": 0,
-      "basePoints": 0,
-      "bankerRaceId": null,
-      "bankerWon": false,
-      "bankerMultiplierApplied": false,
-      "bets": [],
-      "betsWon": 0,
-      "totalBets": 0,
-      "winRate": 0.0
-    },
-    {
-      "userId": "8",
-      "userName": "Sarah",
-      "dailyScore": 0,
-      "basePoints": 0,
-      "bankerRaceId": null,
-      "bankerWon": false,
-      "bankerMultiplierApplied": false,
-      "bets": [],
-      "betsWon": 0,
-      "totalBets": 0,
-      "winRate": 0.0
-    },
-    {
-      "userId": "9",
-      "userName": "Grand-m\u00e8re",
-      "dailyScore": 0,
-      "basePoints": 0,
-      "bankerRaceId": null,
-      "bankerWon": false,
-      "bankerMultiplierApplied": false,
-      "bets": [],
-      "betsWon": 0,
-      "totalBets": 0,
-      "winRate": 0.0
-    },
-    {
-      "userId": "10",
-      "userName": "Ma\u00eblle",
-      "dailyScore": 0,
-      "basePoints": 0,
-      "bankerRaceId": null,
-      "bankerWon": false,
-      "bankerMultiplierApplied": false,
-      "bets": [],
-      "betsWon": 0,
-      "totalBets": 0,
-      "winRate": 0.0
-    },
-    {
-      "userId": "11",
-      "userName": "Leana",
-      "dailyScore": 0,
-      "basePoints": 0,
-      "bankerRaceId": null,
-      "bankerWon": false,
-      "bankerMultiplierApplied": false,
-      "bets": [],
-      "betsWon": 0,
-      "totalBets": 0,
-      "winRate": 0.0
-    },
-    {
-      "userId": "12",
-      "userName": "Test User",
-      "dailyScore": 0,
-      "basePoints": 0,
-      "bankerRaceId": null,
-      "bankerWon": false,
-      "bankerMultiplierApplied": false,
-      "bets": [],
-      "betsWon": 0,
-      "totalBets": 0,
-      "winRate": 0.0
-    }
-  ]
+  "userScores": []
 }
