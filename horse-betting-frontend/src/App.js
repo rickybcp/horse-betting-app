@@ -1,7 +1,7 @@
 // App.js (Revised script)
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Users, Trophy, Calendar, Settings, Plus, RefreshCw, Save, Clock, Star, Download, AlertCircle } from 'lucide-react';
+import { Users, Trophy, Calendar, Settings, Plus, RefreshCw, Clock, Star, Download, AlertCircle } from 'lucide-react';
 
 const API_BASE = process.env.NODE_ENV === 'development' 
   ? 'http://localhost:5000/api'
@@ -581,6 +581,11 @@ const HorseBettingApp = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [serverConnected, setServerConnected] = useState(true);
+  
+  // Race Day Management State
+  const [raceDays, setRaceDays] = useState([]);
+  const [currentRaceDay, setCurrentRaceDay] = useState('');
+  const [loadingRaceDays, setLoadingRaceDays] = useState(false);
 
   // Individual loading states for better UX
   const [loadingStates, setLoadingStates] = useState({
@@ -791,6 +796,8 @@ const HorseBettingApp = () => {
     }
   }, [showMessage, setLoadingState, getCachedData, updateCache]);
 
+
+
   // Progressive loading - load data in sequence to avoid overwhelming the server
   const loadAllData = useCallback(async (forceRefresh = false) => {
     setLoading(true);
@@ -836,10 +843,85 @@ const HorseBettingApp = () => {
     return Object.values(loadingStates).some(state => state);
   }, [loadingStates]);
 
+  // Race Day Management Functions
+  const fetchRaceDays = useCallback(async () => {
+    setLoadingRaceDays(true);
+    try {
+      const response = await fetch(`${API_BASE}/race-days`, {
+        signal: AbortSignal.timeout(15000)
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setRaceDays(data.race_days);
+      setCurrentRaceDay(data.current_race_day);
+      setServerConnected(true);
+    } catch (error) {
+      console.error('Error fetching race days:', error);
+      showMessage('Error loading race days', 'error');
+      setServerConnected(false);
+    } finally {
+      setLoadingRaceDays(false);
+    }
+  }, [showMessage]);
+
+  const switchRaceDay = useCallback(async (raceDay) => {
+    setLoadingRaceDays(true);
+    try {
+      const response = await fetch(`${API_BASE}/race-days/current`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ race_day: raceDay }),
+        signal: AbortSignal.timeout(15000)
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      setCurrentRaceDay(raceDay);
+      
+      // Refresh all data after switching race day
+      loadAllData(true);
+      
+      showMessage(`Switched to race day: ${raceDay}`, 'success');
+    } catch (error) {
+      console.error('Error switching race day:', error);
+      showMessage('Error switching race day', 'error');
+    } finally {
+      setLoadingRaceDays(false);
+    }
+  }, [showMessage, loadAllData]);
+
+  const createDummyRaceDays = useCallback(async () => {
+    setLoadingRaceDays(true);
+    try {
+      const response = await fetch(`${API_BASE}/race-days/create-dummy`, {
+        method: 'POST',
+        signal: AbortSignal.timeout(15000)
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      showMessage(`Created ${data.created_days.length} dummy race days`, 'success');
+      
+      // Refresh race days list
+      await fetchRaceDays();
+    } catch (error) {
+      console.error('Error creating dummy race days:', error);
+      showMessage('Error creating dummy race days', 'error');
+    } finally {
+      setLoadingRaceDays(false);
+    }
+  }, [showMessage, fetchRaceDays]);
+
   // Load all data on component mount
   useEffect(() => {
     loadAllData();
-  }, [loadAllData]);
+    fetchRaceDays(); // Also load race days on mount
+  }, [loadAllData, fetchRaceDays]);
 
   // Check if betting is still allowed for a race
   const isBettingAllowed = useCallback((raceTime) => {
@@ -1147,6 +1229,47 @@ const HorseBettingApp = () => {
           {/* Header */}
           <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6">
             <h1 className="text-3xl font-bold text-center">🐎 Family Horse Betting</h1>
+            
+            {/* Race Day Selector */}
+            <div className="mt-4 text-center">
+              <div className="inline-flex items-center gap-4 bg-white bg-opacity-10 px-4 py-2 rounded-lg">
+                <span className="text-sm font-medium">Race Day:</span>
+                <select
+                  value={currentRaceDay}
+                  onChange={(e) => switchRaceDay(e.target.value)}
+                  disabled={loadingRaceDays}
+                  className="bg-white bg-opacity-20 border border-white border-opacity-30 rounded px-3 py-1 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
+                >
+                  {raceDays.map(day => (
+                    <option key={day.date} value={day.date} className="text-black">
+                      {day.date} {day.completed ? '(Completed)' : ''} ({day.race_count} races)
+                    </option>
+                  ))}
+                </select>
+                {loadingRaceDays && <RefreshCw className="w-4 h-4 animate-spin" />}
+                
+                {/* Admin buttons for race day management */}
+                <div className="flex gap-2 ml-4">
+                  <button
+                    onClick={createDummyRaceDays}
+                    disabled={loadingRaceDays}
+                    className="px-3 py-1 bg-yellow-500 bg-opacity-80 hover:bg-opacity-100 rounded text-xs font-medium transition-colors disabled:opacity-50"
+                    title="Create dummy race days for testing"
+                  >
+                    Create Test Days
+                  </button>
+                  <button
+                    onClick={fetchRaceDays}
+                    disabled={loadingRaceDays}
+                    className="px-3 py-1 bg-white bg-opacity-20 hover:bg-opacity-30 rounded text-xs font-medium transition-colors disabled:opacity-50"
+                    title="Refresh race days"
+                  >
+                    Refresh Days
+                  </button>
+                </div>
+              </div>
+            </div>
+            
             <div className="flex items-center justify-center gap-4 mt-4">
               {loading && (
                 <div className="flex items-center gap-2 text-sm">

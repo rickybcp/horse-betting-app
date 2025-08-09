@@ -1,0 +1,1165 @@
+{
+  "2025-08-09": {
+    "date": "2025-08-09",
+    "races": [
+      {
+        "id": 1,
+        "name": "R1 - FASHION HEIGHTS - MIA BIJOUX CUP - [0 - 25] - 1400m",
+        "time": "12:45",
+        "status": "completed",
+        "horses": [
+          {
+            "number": 1,
+            "name": "CAPTAIN'S CONCORT",
+            "odds": 3.1
+          },
+          {
+            "number": 2,
+            "name": "CYBOTIX",
+            "odds": 4.0
+          },
+          {
+            "number": 3,
+            "name": "KAISARISSA",
+            "odds": 4.7
+          },
+          {
+            "number": 4,
+            "name": "MYSTERY CACHE",
+            "odds": 2.9
+          },
+          {
+            "number": 5,
+            "name": "RAINWATER",
+            "odds": 33.0
+          },
+          {
+            "number": 6,
+            "name": "LE QUARTIER",
+            "odds": 16.0
+          }
+        ],
+        "winner": 3
+      },
+      {
+        "id": 2,
+        "name": "R2 - FASHION HEIGHTS - GONG CHA CUP - [0 - 26] - 990m",
+        "time": "13:20",
+        "status": "completed",
+        "horses": [
+          {
+            "number": 1,
+            "name": "CIDER HOUSE RULES",
+            "odds": 5.0
+          },
+          {
+            "number": 2,
+            "name": "CRESCENT",
+            "odds": 5.0
+          },
+          {
+            "number": 3,
+            "name": "KRIM",
+            "odds": 1.5
+          },
+          {
+            "number": 4,
+            "name": "MIND MAP",
+            "odds": 12.0
+          },
+          {
+            "number": 5,
+            "name": "STEPPING OUT",
+            "odds": 20.0
+          }
+        ],
+        "winner": 4
+      },
+      {
+        "id": 3,
+        "name": "R3 - FASHION HEIGHTS ETAM - GROUP CUP - Benchmark 36 - 1365m",
+        "time": "13:55",
+        "status": "completed",
+        "horses": [
+          {
+            "number": 1,
+            "name": "CHARLIE SQUADRON",
+            "odds": 8.0
+          },
+          {
+            "number": 2,
+            "name": "MASTER POINT",
+            "odds": 8.0
+          },
+          {
+            "number": 3,
+            "name": "BABYLON",
+            "odds": 2.6
+          },
+          {
+            "number": 4,
+            "name": "CITADEL",
+            "odds": 33.0
+          },
+          {
+            "number": 5,
+            "name": "ORANGE RED",
+            "odds": 2.3
+          },
+          {
+            "number": 6,
+            "name": "ZOOBERI",
+            "odds": 13.0
+          }
+        ],
+        "winner": 3
+      },
+      {
+        "id": 4,
+        "name": "R4 - FASHION HEIGHTS - COTE SUSHI CUP - Benchmark 56 - 990m",
+        "time": "14:30",
+        "status": "completed",
+        "horses": [
+          {
+            "number": 1,
+            "name": "EMERALD BAND",
+            "odds": 25.0
+          },
+          {
+            "number": 2,
+            "name": "AMPERSAND",
+            "odds": 7.5
+          },
+          {
+            "number": 3,
+            "name": "CAPTAIN MIKE",
+            "odds": 1.4
+          },
+          {
+            "number": 4,
+            "name": "QUATRO FIVE SIX",
+            "odds": 25.0
+          },
+          {
+            "number": 5,
+            "name": "GRAND BAY",
+            "odds": 4.0
+          }
+        ],
+        "winner": 3
+      },
+      {
+        "id": 5,
+        "name": "R5 - FASHION HEIGHTS - CELIO CUP - Benchmark 41 - 990m",
+        "time": "15:05",
+        "status": "completed",
+        "horses": [
+          {
+            "number": 1,
+            "name": "WARRIOR CAPTAIN",
+            "odds": 2.4
+          },
+          {
+            "number": 2,
+            "name": "ZIVA LA WINER",
+            "odds": 4.0
+          },
+          {
+            "number": 3,
+            "name": "BON BOYAGE",
+            "odds": 3.3
+          },
+          {
+            "number": 4,
+            "name": "SAN ANDREAS",
+            "odds": 7.0
+          },
+          {
+            "number": 5,
+            "name": "CLOUD SEEDER",
+            "odds": 14.0
+          }
+        ],
+        "winner": 3
+      },
+      {
+        "id": 6,
+        "name": "R6 - THE DUCHESS OF YORK CUP - G2 - WFA WITH PENALTIES - 1400m",
+        "time": "15:40",
+        "status": "completed",
+        "horses": [
+          {
+            "number": 1,
+            "name": "CAPTAIN BOMBSHELL",
+            "odds": 8.0
+          },
+          {
+            "number": 2,
+            "name": "ITSRAININGWILLIAM",
+            "odds": 2.35
+          },
+          {
+            "number": 3,
+            "name": "MERIDIUS",
+            "odds": 14.0
+          },
+          {
+            "number": 4,
+            "name": "SUGAR BLAST",
+            "odds": 60.0
+          },
+          {
+            "number": 5,
+            "name": "WOLF MOUNTAIN",
+            "odds": 6.5
+          },
+          {
+            "number": 6,
+            "name": "GOOD COUNCIL",
+            "odds": 40.0
+          },
+          {
+            "number": 7,
+            "name": "BRAVE BOMBER",
+            "odds": 50.0
+          },
+          {
+            "number": 8,
+            "name": "PORT LOUIS",
+            "odds": 7.5
+          },
+          {
+            "number": 9,
+            "name": "WILLIAM IRON ARM",
+            "odds": 7.0
+          },
+          {
+            "number": 10,
+            "name": "WILLIE JOHN",
+            "odds": 9.0
+          }
+        ],
+        "winner": 5
+      },
+      {
+        "id": 7,
+        "name": "R7 - APEX - APPLE RESELLER CUP - Benchmark 56 - 1400m",
+        "time": "16:15",
+        "status": "completed",
+        "horses": [
+          {
+            "number": 1,
+            "name": "GRAND VISION",
+            "odds": 4.0
+          },
+          {
+            "number": 2,
+            "name": "ZOOMIE",
+            "odds": 2.8
+          },
+          {
+            "number": 3,
+            "name": "SEA DANCE",
+            "odds": 20.0
+          },
+          {
+            "number": 4,
+            "name": "BALOUCHI",
+            "odds": 10.0
+          },
+          {
+            "number": 5,
+            "name": "CHOSEN WAY",
+            "odds": 25.0
+          },
+          {
+            "number": 6,
+            "name": "CAPTAIN COLA",
+            "odds": 5.0
+          },
+          {
+            "number": 7,
+            "name": "MENELAUS",
+            "odds": 5.5
+          }
+        ],
+        "winner": 6
+      },
+      {
+        "id": 8,
+        "name": "R8 - THE WORSHIPFUL DAY PLATE - Benchmark 31 - 1365m",
+        "time": "16:55",
+        "status": "upcoming",
+        "horses": [
+          {
+            "number": 1,
+            "name": "ARLINGTONS REVENGE",
+            "odds": 50.0
+          },
+          {
+            "number": 2,
+            "name": "AMANCIO",
+            "odds": 7.0
+          },
+          {
+            "number": 3,
+            "name": "BESTDAY OF MYLIFE",
+            "odds": 7.5
+          },
+          {
+            "number": 4,
+            "name": "DOUBLE SILVER",
+            "odds": 9.0
+          },
+          {
+            "number": 5,
+            "name": "MALINOIS",
+            "odds": 50.0
+          },
+          {
+            "number": 6,
+            "name": "SUMMER SNOW",
+            "odds": 6.0
+          },
+          {
+            "number": 7,
+            "name": "UNSUNG HERO",
+            "odds": 13.0
+          },
+          {
+            "number": 8,
+            "name": "HAVANA MOON",
+            "odds": 1.9
+          }
+        ],
+        "winner": 8
+      }
+    ],
+    "bets": {
+      "1": {
+        "1": 2,
+        "2": 3,
+        "3": 5,
+        "4": 3,
+        "5": 6
+      },
+      "3": {
+        "1": 3,
+        "2": 3,
+        "3": 5,
+        "4": 3,
+        "5": 2,
+        "6": 2,
+        "7": 2,
+        "8": 8
+      }
+    },
+    "bankers": {
+      "1": 2,
+      "3": 4,
+      "4": 8,
+      "5": 4,
+      "6": 2,
+      "7": 2,
+      "10": 6,
+      "11": 4
+    },
+    "completed": false
+  },
+  "2025-08-08": {
+    "date": "2025-08-08",
+    "races": [
+      {
+        "id": "dummy_R1_20250808",
+        "name": "Dummy Race 1 - 2025-08-08",
+        "time": "13:00",
+        "horses": [
+          {
+            "number": 1,
+            "name": "Horse 1 Day 2",
+            "odds": 2.7,
+            "points": 1
+          },
+          {
+            "number": 2,
+            "name": "Horse 2 Day 2",
+            "odds": 3.2,
+            "points": 1
+          },
+          {
+            "number": 3,
+            "name": "Horse 3 Day 2",
+            "odds": 3.7,
+            "points": 1
+          },
+          {
+            "number": 4,
+            "name": "Horse 4 Day 2",
+            "odds": 4.2,
+            "points": 1
+          },
+          {
+            "number": 5,
+            "name": "Horse 5 Day 2",
+            "odds": 4.7,
+            "points": 1
+          }
+        ],
+        "winner": 1,
+        "status": "completed"
+      },
+      {
+        "id": "dummy_R2_20250808",
+        "name": "Dummy Race 2 - 2025-08-08",
+        "time": "14:00",
+        "horses": [
+          {
+            "number": 1,
+            "name": "Horse 1 Day 2",
+            "odds": 2.7,
+            "points": 1
+          },
+          {
+            "number": 2,
+            "name": "Horse 2 Day 2",
+            "odds": 3.2,
+            "points": 1
+          },
+          {
+            "number": 3,
+            "name": "Horse 3 Day 2",
+            "odds": 3.7,
+            "points": 1
+          },
+          {
+            "number": 4,
+            "name": "Horse 4 Day 2",
+            "odds": 4.2,
+            "points": 1
+          },
+          {
+            "number": 5,
+            "name": "Horse 5 Day 2",
+            "odds": 4.7,
+            "points": 1
+          }
+        ],
+        "winner": 1,
+        "status": "completed"
+      },
+      {
+        "id": "dummy_R3_20250808",
+        "name": "Dummy Race 3 - 2025-08-08",
+        "time": "15:00",
+        "horses": [
+          {
+            "number": 1,
+            "name": "Horse 1 Day 2",
+            "odds": 2.7,
+            "points": 1
+          },
+          {
+            "number": 2,
+            "name": "Horse 2 Day 2",
+            "odds": 3.2,
+            "points": 1
+          },
+          {
+            "number": 3,
+            "name": "Horse 3 Day 2",
+            "odds": 3.7,
+            "points": 1
+          },
+          {
+            "number": 4,
+            "name": "Horse 4 Day 2",
+            "odds": 4.2,
+            "points": 1
+          },
+          {
+            "number": 5,
+            "name": "Horse 5 Day 2",
+            "odds": 4.7,
+            "points": 1
+          }
+        ],
+        "winner": 1,
+        "status": "completed"
+      }
+    ],
+    "bets": {
+      "1": {
+        "dummy_R1_20250808": 2,
+        "dummy_R2_20250808": 2,
+        "dummy_R3_20250808": 2
+      },
+      "2": {
+        "dummy_R1_20250808": 3,
+        "dummy_R2_20250808": 3,
+        "dummy_R3_20250808": 3
+      },
+      "3": {
+        "dummy_R1_20250808": 4,
+        "dummy_R2_20250808": 4,
+        "dummy_R3_20250808": 4
+      },
+      "4": {
+        "dummy_R1_20250808": 5,
+        "dummy_R2_20250808": 5,
+        "dummy_R3_20250808": 5
+      },
+      "5": {
+        "dummy_R1_20250808": 1,
+        "dummy_R2_20250808": 1,
+        "dummy_R3_20250808": 1
+      },
+      "6": {
+        "dummy_R1_20250808": 2,
+        "dummy_R2_20250808": 2,
+        "dummy_R3_20250808": 2
+      },
+      "7": {
+        "dummy_R1_20250808": 3,
+        "dummy_R2_20250808": 3,
+        "dummy_R3_20250808": 3
+      },
+      "8": {
+        "dummy_R1_20250808": 4,
+        "dummy_R2_20250808": 4,
+        "dummy_R3_20250808": 4
+      },
+      "9": {
+        "dummy_R1_20250808": 5,
+        "dummy_R2_20250808": 5,
+        "dummy_R3_20250808": 5
+      },
+      "10": {
+        "dummy_R1_20250808": 1,
+        "dummy_R2_20250808": 1,
+        "dummy_R3_20250808": 1
+      },
+      "11": {
+        "dummy_R1_20250808": 2,
+        "dummy_R2_20250808": 2,
+        "dummy_R3_20250808": 2
+      },
+      "12": {
+        "dummy_R1_20250808": 3,
+        "dummy_R2_20250808": 3,
+        "dummy_R3_20250808": 3
+      }
+    },
+    "bankers": {
+      "1": "dummy_R1_20250808",
+      "2": "dummy_R1_20250808",
+      "3": "dummy_R1_20250808",
+      "4": "dummy_R1_20250808",
+      "5": "dummy_R1_20250808",
+      "6": "dummy_R1_20250808",
+      "7": "dummy_R1_20250808",
+      "8": "dummy_R1_20250808",
+      "9": "dummy_R1_20250808",
+      "10": "dummy_R1_20250808",
+      "11": "dummy_R1_20250808",
+      "12": "dummy_R1_20250808"
+    },
+    "completed": true
+  },
+  "2025-08-07": {
+    "date": "2025-08-07",
+    "races": [
+      {
+        "id": "dummy_R1_20250807",
+        "name": "Dummy Race 1 - 2025-08-07",
+        "time": "13:00",
+        "horses": [
+          {
+            "number": 1,
+            "name": "Horse 1 Day 3",
+            "odds": 2.9,
+            "points": 1
+          },
+          {
+            "number": 2,
+            "name": "Horse 2 Day 3",
+            "odds": 3.4,
+            "points": 1
+          },
+          {
+            "number": 3,
+            "name": "Horse 3 Day 3",
+            "odds": 3.9,
+            "points": 1
+          },
+          {
+            "number": 4,
+            "name": "Horse 4 Day 3",
+            "odds": 4.4,
+            "points": 1
+          },
+          {
+            "number": 5,
+            "name": "Horse 5 Day 3",
+            "odds": 4.9,
+            "points": 1
+          }
+        ],
+        "winner": 1,
+        "status": "completed"
+      },
+      {
+        "id": "dummy_R2_20250807",
+        "name": "Dummy Race 2 - 2025-08-07",
+        "time": "14:00",
+        "horses": [
+          {
+            "number": 1,
+            "name": "Horse 1 Day 3",
+            "odds": 2.9,
+            "points": 1
+          },
+          {
+            "number": 2,
+            "name": "Horse 2 Day 3",
+            "odds": 3.4,
+            "points": 1
+          },
+          {
+            "number": 3,
+            "name": "Horse 3 Day 3",
+            "odds": 3.9,
+            "points": 1
+          },
+          {
+            "number": 4,
+            "name": "Horse 4 Day 3",
+            "odds": 4.4,
+            "points": 1
+          },
+          {
+            "number": 5,
+            "name": "Horse 5 Day 3",
+            "odds": 4.9,
+            "points": 1
+          }
+        ],
+        "winner": 1,
+        "status": "completed"
+      },
+      {
+        "id": "dummy_R3_20250807",
+        "name": "Dummy Race 3 - 2025-08-07",
+        "time": "15:00",
+        "horses": [
+          {
+            "number": 1,
+            "name": "Horse 1 Day 3",
+            "odds": 2.9,
+            "points": 1
+          },
+          {
+            "number": 2,
+            "name": "Horse 2 Day 3",
+            "odds": 3.4,
+            "points": 1
+          },
+          {
+            "number": 3,
+            "name": "Horse 3 Day 3",
+            "odds": 3.9,
+            "points": 1
+          },
+          {
+            "number": 4,
+            "name": "Horse 4 Day 3",
+            "odds": 4.4,
+            "points": 1
+          },
+          {
+            "number": 5,
+            "name": "Horse 5 Day 3",
+            "odds": 4.9,
+            "points": 1
+          }
+        ],
+        "winner": 1,
+        "status": "completed"
+      }
+    ],
+    "bets": {
+      "1": {
+        "dummy_R1_20250807": 2,
+        "dummy_R2_20250807": 2,
+        "dummy_R3_20250807": 2
+      },
+      "2": {
+        "dummy_R1_20250807": 3,
+        "dummy_R2_20250807": 3,
+        "dummy_R3_20250807": 3
+      },
+      "3": {
+        "dummy_R1_20250807": 4,
+        "dummy_R2_20250807": 4,
+        "dummy_R3_20250807": 4
+      },
+      "4": {
+        "dummy_R1_20250807": 5,
+        "dummy_R2_20250807": 5,
+        "dummy_R3_20250807": 5
+      },
+      "5": {
+        "dummy_R1_20250807": 1,
+        "dummy_R2_20250807": 1,
+        "dummy_R3_20250807": 1
+      },
+      "6": {
+        "dummy_R1_20250807": 2,
+        "dummy_R2_20250807": 2,
+        "dummy_R3_20250807": 2
+      },
+      "7": {
+        "dummy_R1_20250807": 3,
+        "dummy_R2_20250807": 3,
+        "dummy_R3_20250807": 3
+      },
+      "8": {
+        "dummy_R1_20250807": 4,
+        "dummy_R2_20250807": 4,
+        "dummy_R3_20250807": 4
+      },
+      "9": {
+        "dummy_R1_20250807": 5,
+        "dummy_R2_20250807": 5,
+        "dummy_R3_20250807": 5
+      },
+      "10": {
+        "dummy_R1_20250807": 1,
+        "dummy_R2_20250807": 1,
+        "dummy_R3_20250807": 1
+      },
+      "11": {
+        "dummy_R1_20250807": 2,
+        "dummy_R2_20250807": 2,
+        "dummy_R3_20250807": 2
+      },
+      "12": {
+        "dummy_R1_20250807": 3,
+        "dummy_R2_20250807": 3,
+        "dummy_R3_20250807": 3
+      }
+    },
+    "bankers": {
+      "1": "dummy_R1_20250807",
+      "2": "dummy_R1_20250807",
+      "3": "dummy_R1_20250807",
+      "4": "dummy_R1_20250807",
+      "5": "dummy_R1_20250807",
+      "6": "dummy_R1_20250807",
+      "7": "dummy_R1_20250807",
+      "8": "dummy_R1_20250807",
+      "9": "dummy_R1_20250807",
+      "10": "dummy_R1_20250807",
+      "11": "dummy_R1_20250807",
+      "12": "dummy_R1_20250807"
+    },
+    "completed": true
+  },
+  "2025-08-06": {
+    "date": "2025-08-06",
+    "races": [
+      {
+        "id": "dummy_R1_20250806",
+        "name": "Dummy Race 1 - 2025-08-06",
+        "time": "13:00",
+        "horses": [
+          {
+            "number": 1,
+            "name": "Horse 1 Day 4",
+            "odds": 3.1,
+            "points": 1
+          },
+          {
+            "number": 2,
+            "name": "Horse 2 Day 4",
+            "odds": 3.6,
+            "points": 1
+          },
+          {
+            "number": 3,
+            "name": "Horse 3 Day 4",
+            "odds": 4.1,
+            "points": 1
+          },
+          {
+            "number": 4,
+            "name": "Horse 4 Day 4",
+            "odds": 4.6,
+            "points": 1
+          },
+          {
+            "number": 5,
+            "name": "Horse 5 Day 4",
+            "odds": 5.1,
+            "points": 2
+          }
+        ],
+        "winner": 1,
+        "status": "completed"
+      },
+      {
+        "id": "dummy_R2_20250806",
+        "name": "Dummy Race 2 - 2025-08-06",
+        "time": "14:00",
+        "horses": [
+          {
+            "number": 1,
+            "name": "Horse 1 Day 4",
+            "odds": 3.1,
+            "points": 1
+          },
+          {
+            "number": 2,
+            "name": "Horse 2 Day 4",
+            "odds": 3.6,
+            "points": 1
+          },
+          {
+            "number": 3,
+            "name": "Horse 3 Day 4",
+            "odds": 4.1,
+            "points": 1
+          },
+          {
+            "number": 4,
+            "name": "Horse 4 Day 4",
+            "odds": 4.6,
+            "points": 1
+          },
+          {
+            "number": 5,
+            "name": "Horse 5 Day 4",
+            "odds": 5.1,
+            "points": 2
+          }
+        ],
+        "winner": 1,
+        "status": "completed"
+      },
+      {
+        "id": "dummy_R3_20250806",
+        "name": "Dummy Race 3 - 2025-08-06",
+        "time": "15:00",
+        "horses": [
+          {
+            "number": 1,
+            "name": "Horse 1 Day 4",
+            "odds": 3.1,
+            "points": 1
+          },
+          {
+            "number": 2,
+            "name": "Horse 2 Day 4",
+            "odds": 3.6,
+            "points": 1
+          },
+          {
+            "number": 3,
+            "name": "Horse 3 Day 4",
+            "odds": 4.1,
+            "points": 1
+          },
+          {
+            "number": 4,
+            "name": "Horse 4 Day 4",
+            "odds": 4.6,
+            "points": 1
+          },
+          {
+            "number": 5,
+            "name": "Horse 5 Day 4",
+            "odds": 5.1,
+            "points": 2
+          }
+        ],
+        "winner": 1,
+        "status": "completed"
+      }
+    ],
+    "bets": {
+      "1": {
+        "dummy_R1_20250806": 2,
+        "dummy_R2_20250806": 2,
+        "dummy_R3_20250806": 2
+      },
+      "2": {
+        "dummy_R1_20250806": 3,
+        "dummy_R2_20250806": 3,
+        "dummy_R3_20250806": 3
+      },
+      "3": {
+        "dummy_R1_20250806": 4,
+        "dummy_R2_20250806": 4,
+        "dummy_R3_20250806": 4
+      },
+      "4": {
+        "dummy_R1_20250806": 5,
+        "dummy_R2_20250806": 5,
+        "dummy_R3_20250806": 5
+      },
+      "5": {
+        "dummy_R1_20250806": 1,
+        "dummy_R2_20250806": 1,
+        "dummy_R3_20250806": 1
+      },
+      "6": {
+        "dummy_R1_20250806": 2,
+        "dummy_R2_20250806": 2,
+        "dummy_R3_20250806": 2
+      },
+      "7": {
+        "dummy_R1_20250806": 3,
+        "dummy_R2_20250806": 3,
+        "dummy_R3_20250806": 3
+      },
+      "8": {
+        "dummy_R1_20250806": 4,
+        "dummy_R2_20250806": 4,
+        "dummy_R3_20250806": 4
+      },
+      "9": {
+        "dummy_R1_20250806": 5,
+        "dummy_R2_20250806": 5,
+        "dummy_R3_20250806": 5
+      },
+      "10": {
+        "dummy_R1_20250806": 1,
+        "dummy_R2_20250806": 1,
+        "dummy_R3_20250806": 1
+      },
+      "11": {
+        "dummy_R1_20250806": 2,
+        "dummy_R2_20250806": 2,
+        "dummy_R3_20250806": 2
+      },
+      "12": {
+        "dummy_R1_20250806": 3,
+        "dummy_R2_20250806": 3,
+        "dummy_R3_20250806": 3
+      }
+    },
+    "bankers": {
+      "1": "dummy_R1_20250806",
+      "2": "dummy_R1_20250806",
+      "3": "dummy_R1_20250806",
+      "4": "dummy_R1_20250806",
+      "5": "dummy_R1_20250806",
+      "6": "dummy_R1_20250806",
+      "7": "dummy_R1_20250806",
+      "8": "dummy_R1_20250806",
+      "9": "dummy_R1_20250806",
+      "10": "dummy_R1_20250806",
+      "11": "dummy_R1_20250806",
+      "12": "dummy_R1_20250806"
+    },
+    "completed": true
+  },
+  "2025-08-05": {
+    "date": "2025-08-05",
+    "races": [
+      {
+        "id": "dummy_R1_20250805",
+        "name": "Dummy Race 1 - 2025-08-05",
+        "time": "13:00",
+        "horses": [
+          {
+            "number": 1,
+            "name": "Horse 1 Day 5",
+            "odds": 3.3,
+            "points": 1
+          },
+          {
+            "number": 2,
+            "name": "Horse 2 Day 5",
+            "odds": 3.8,
+            "points": 1
+          },
+          {
+            "number": 3,
+            "name": "Horse 3 Day 5",
+            "odds": 4.3,
+            "points": 1
+          },
+          {
+            "number": 4,
+            "name": "Horse 4 Day 5",
+            "odds": 4.8,
+            "points": 1
+          },
+          {
+            "number": 5,
+            "name": "Horse 5 Day 5",
+            "odds": 5.3,
+            "points": 2
+          }
+        ],
+        "winner": 1,
+        "status": "completed"
+      },
+      {
+        "id": "dummy_R2_20250805",
+        "name": "Dummy Race 2 - 2025-08-05",
+        "time": "14:00",
+        "horses": [
+          {
+            "number": 1,
+            "name": "Horse 1 Day 5",
+            "odds": 3.3,
+            "points": 1
+          },
+          {
+            "number": 2,
+            "name": "Horse 2 Day 5",
+            "odds": 3.8,
+            "points": 1
+          },
+          {
+            "number": 3,
+            "name": "Horse 3 Day 5",
+            "odds": 4.3,
+            "points": 1
+          },
+          {
+            "number": 4,
+            "name": "Horse 4 Day 5",
+            "odds": 4.8,
+            "points": 1
+          },
+          {
+            "number": 5,
+            "name": "Horse 5 Day 5",
+            "odds": 5.3,
+            "points": 2
+          }
+        ],
+        "winner": 1,
+        "status": "completed"
+      },
+      {
+        "id": "dummy_R3_20250805",
+        "name": "Dummy Race 3 - 2025-08-05",
+        "time": "15:00",
+        "horses": [
+          {
+            "number": 1,
+            "name": "Horse 1 Day 5",
+            "odds": 3.3,
+            "points": 1
+          },
+          {
+            "number": 2,
+            "name": "Horse 2 Day 5",
+            "odds": 3.8,
+            "points": 1
+          },
+          {
+            "number": 3,
+            "name": "Horse 3 Day 5",
+            "odds": 4.3,
+            "points": 1
+          },
+          {
+            "number": 4,
+            "name": "Horse 4 Day 5",
+            "odds": 4.8,
+            "points": 1
+          },
+          {
+            "number": 5,
+            "name": "Horse 5 Day 5",
+            "odds": 5.3,
+            "points": 2
+          }
+        ],
+        "winner": 1,
+        "status": "completed"
+      }
+    ],
+    "bets": {
+      "1": {
+        "dummy_R1_20250805": 2,
+        "dummy_R2_20250805": 2,
+        "dummy_R3_20250805": 2
+      },
+      "2": {
+        "dummy_R1_20250805": 3,
+        "dummy_R2_20250805": 3,
+        "dummy_R3_20250805": 3
+      },
+      "3": {
+        "dummy_R1_20250805": 4,
+        "dummy_R2_20250805": 4,
+        "dummy_R3_20250805": 4
+      },
+      "4": {
+        "dummy_R1_20250805": 5,
+        "dummy_R2_20250805": 5,
+        "dummy_R3_20250805": 5
+      },
+      "5": {
+        "dummy_R1_20250805": 1,
+        "dummy_R2_20250805": 1,
+        "dummy_R3_20250805": 1
+      },
+      "6": {
+        "dummy_R1_20250805": 2,
+        "dummy_R2_20250805": 2,
+        "dummy_R3_20250805": 2
+      },
+      "7": {
+        "dummy_R1_20250805": 3,
+        "dummy_R2_20250805": 3,
+        "dummy_R3_20250805": 3
+      },
+      "8": {
+        "dummy_R1_20250805": 4,
+        "dummy_R2_20250805": 4,
+        "dummy_R3_20250805": 4
+      },
+      "9": {
+        "dummy_R1_20250805": 5,
+        "dummy_R2_20250805": 5,
+        "dummy_R3_20250805": 5
+      },
+      "10": {
+        "dummy_R1_20250805": 1,
+        "dummy_R2_20250805": 1,
+        "dummy_R3_20250805": 1
+      },
+      "11": {
+        "dummy_R1_20250805": 2,
+        "dummy_R2_20250805": 2,
+        "dummy_R3_20250805": 2
+      },
+      "12": {
+        "dummy_R1_20250805": 3,
+        "dummy_R2_20250805": 3,
+        "dummy_R3_20250805": 3
+      }
+    },
+    "bankers": {
+      "1": "dummy_R1_20250805",
+      "2": "dummy_R1_20250805",
+      "3": "dummy_R1_20250805",
+      "4": "dummy_R1_20250805",
+      "5": "dummy_R1_20250805",
+      "6": "dummy_R1_20250805",
+      "7": "dummy_R1_20250805",
+      "8": "dummy_R1_20250805",
+      "9": "dummy_R1_20250805",
+      "10": "dummy_R1_20250805",
+      "11": "dummy_R1_20250805",
+      "12": "dummy_R1_20250805"
+    },
+    "completed": true
+  }
+}
