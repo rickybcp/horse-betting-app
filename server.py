@@ -3,6 +3,7 @@ from flask_cors import CORS
 import json
 import os
 from datetime import datetime, timedelta
+from typing import Dict, List, Any, Tuple
 from utils.smspariaz_scraper import scrape_horses_from_smspariaz
 from utils.mtc_scraper import scrape_mtc_next_race_day
 
@@ -310,48 +311,322 @@ def set_race_result_manual(race_id):
     
     return jsonify({"success": True}), 200
 
-@app.route('/api/reset', methods=['POST'])
-def reset_data():
+@app.route('/api/race-day/complete', methods=['POST'])
+def complete_race_day():
+    """Enhanced race day completion with full historical data preservation"""
+    try:
+        print("🏁 COMPLETING RACE DAY")
+        print("=" * 50)
+        
+        race_date = datetime.now().strftime('%Y-%m-%d')
+        
+        # Step 1: Calculate daily scores with enhanced details
+        user_scores = calculate_daily_scores_enhanced()
+        
+        # Step 2: Save completed race day to individual file
+        if not save_completed_race_day_enhanced(race_date, user_scores):
+            raise Exception("Failed to save race day data")
+        
+        # Step 3: Update user statistics and total scores
+        if not update_user_statistics_enhanced(user_scores):
+            raise Exception("Failed to update user statistics")
+        
+        # Step 4: Clear current day data for new race day
+        if not clear_current_day_data_enhanced():
+            raise Exception("Failed to clear current day data")
+        
+        # Create response summary
+        total_users = len(user_scores)
+        highest_score = max((score["dailyScore"] for score in user_scores.values()), default=0)
+        top_user = next((score["userName"] for score in user_scores.values() if score["dailyScore"] == highest_score), "Unknown")
+        
+        summary = {
+            "success": True,
+            "raceDate": race_date,
+            "totalUsers": total_users,
+            "highestScore": highest_score,
+            "topUser": top_user,
+            "completedAt": datetime.now().isoformat(),
+            "message": f"Race day {race_date} completed successfully! Top score: {highest_score} ({top_user})"
+        }
+        
+        print("🎉 RACE DAY COMPLETED SUCCESSFULLY!")
+        print(f"   📅 Date: {race_date}")
+        print(f"   👑 Top Score: {highest_score} ({top_user})")
+        print(f"   👥 Users: {total_users}")
+        print("=" * 50)
+        
+        return jsonify(summary), 200
+        
+    except Exception as e:
+        error_msg = f"Race day completion failed: {str(e)}"
+        print(f"❌ {error_msg}")
+        return jsonify({
+            "success": False,
+            "error": error_msg,
+            "raceDate": datetime.now().strftime('%Y-%m-%d')
+        }), 500
+
+# Enhanced Reset Helper Functions
+def calculate_daily_scores_enhanced() -> Dict[str, Dict]:
+    """Calculate all user scores for current race day with enhanced details"""
+    print("🧮 Calculating daily scores...")
+    
     users = load_json(USERS_FILE, [])
     current_races = load_json(RACES_FILE, [])
     current_bets = load_json(BETS_FILE, {})
     current_bankers = load_json(BANKERS_FILE, {})
-
+    
+    user_scores = {}
+    
     for user in users:
         user_id = user['id']
-        daily_score = 0
+        user_name = user['name']
         
+        user_score_data = {
+            "userId": user_id,
+            "userName": user_name,
+            "dailyScore": 0,
+            "basePoints": 0,
+            "bankerRaceId": current_bankers.get(user_id),
+            "bankerWon": False,
+            "bankerMultiplierApplied": False,
+            "bets": [],
+            "betsWon": 0,
+            "totalBets": 0,
+            "winRate": 0.0
+        }
+        
+        base_points = 0
+        user_bets = current_bets.get(user_id, {})
+        
+        # Calculate points from each race
         for race in current_races:
-            if race.get('winner') and current_bets.get(user_id) and current_bets[user_id].get(race['id']):
-                user_bet = current_bets[user_id][race['id']]
-                if user_bet == race['winner']:
-                    horse = next((h for h in race['horses'] if h['number'] == race['winner']), None)
-                    if horse:
-                        odds = horse['odds']
+            race_id = race['id']
+            
+            if race_id in user_bets:
+                user_score_data["totalBets"] += 1
+                user_bet = user_bets[race_id]
+                
+                bet_data = {
+                    "raceId": race_id,
+                    "raceName": race.get('name', f'Race {race_id}'),
+                    "horseNumber": user_bet,
+                    "won": False,
+                    "points": 0
+                }
+                
+                # Check if bet won
+                if race.get('winner') and user_bet == race['winner']:
+                    user_score_data["betsWon"] += 1
+                    bet_data["won"] = True
+                    
+                    # Calculate points based on odds
+                    winner_horse = next((h for h in race['horses'] if h['number'] == race['winner']), None)
+                    if winner_horse:
+                        odds = winner_horse['odds']
                         points = 1
                         if odds > 10: points = 3
                         elif odds > 5: points = 2
-                        daily_score += points
+                        
+                        bet_data["points"] = points
+                        base_points += points
+                
+                user_score_data["bets"].append(bet_data)
+        
+        # Calculate win rate
+        if user_score_data["totalBets"] > 0:
+            user_score_data["winRate"] = user_score_data["betsWon"] / user_score_data["totalBets"]
+        
+        user_score_data["basePoints"] = base_points
         
         # Apply banker bonus
+        daily_score = base_points
         if current_bankers.get(user_id):
-            banker_race_id = str(current_bankers[user_id]) # Ensure it's a string
+            banker_race_id = str(current_bankers[user_id])
+            user_score_data["bankerRaceId"] = banker_race_id
+            
             # Check if user won their banker race
-            if (current_bets.get(user_id) and 
-                current_bets[user_id].get(banker_race_id) and
-                # Check if the user's bet on the banker race matches the winner of that race
-                current_bets[user_id][banker_race_id] == next((r for r in current_races if r['id'] == banker_race_id), {}).get('winner')):
+            if (banker_race_id in user_bets and 
+                any(race['id'] == banker_race_id and race.get('winner') == user_bets[banker_race_id] 
+                    for race in current_races)):
+                user_score_data["bankerWon"] = True
+                user_score_data["bankerMultiplierApplied"] = True
                 daily_score *= 2
-
-        user['totalScore'] = user.get('totalScore', 0) + daily_score
+        
+        user_score_data["dailyScore"] = daily_score
+        user_scores[user_id] = user_score_data
+        
+        print(f"  ✅ {user_name}: {daily_score} points ({user_score_data['betsWon']}/{user_score_data['totalBets']} bets)")
     
-    save_json(USERS_FILE, users)
+    print(f"✅ Calculated scores for {len(user_scores)} users")
+    return user_scores
 
-    save_json(RACES_FILE, [])
-    save_json(BETS_FILE, {})
-    save_json(BANKERS_FILE, {})
+def save_completed_race_day_enhanced(race_date: str, user_scores: Dict) -> bool:
+    """Save completed race day to individual file and update index"""
+    print(f"💾 Saving completed race day: {race_date}")
     
-    return jsonify({"success": True}), 200
+    try:
+        current_races = load_json(RACES_FILE, [])
+        
+        race_day_data = {
+            "date": race_date,
+            "totalRaces": len(current_races),
+            "completedRaces": len([r for r in current_races if r.get('winner')]),
+            "status": "completed",
+            "completedAt": datetime.now().isoformat(),
+            "races": [],
+            "userScores": list(user_scores.values())
+        }
+        
+        # Add race details
+        for race in current_races:
+            race_data = {
+                "id": race['id'],
+                "name": race.get('name', f'Race {race["id"]}'),
+                "time": race.get('time', ''),
+                "winner": race.get('winner'),
+                "totalHorses": len(race.get('horses', [])),
+                "status": race.get('status', 'unknown')
+            }
+            
+            # Add winning horse details
+            if race.get('winner'):
+                winner_horse = next((h for h in race['horses'] if h['number'] == race['winner']), None)
+                if winner_horse:
+                    race_data["winningHorse"] = {
+                        "number": winner_horse['number'],
+                        "name": winner_horse['name'],
+                        "odds": winner_horse['odds'],
+                        "points": 3 if winner_horse['odds'] > 10 else (2 if winner_horse['odds'] > 5 else 1)
+                    }
+            
+            race_day_data["races"].append(race_data)
+        
+        # Save to individual race day file
+        race_day_file = os.path.join(RACE_DAYS_DIR, f'{race_date}.json')
+        save_json(race_day_file, race_day_data)
+        print(f"  ✅ Saved race day data to: {os.path.basename(race_day_file)}")
+        
+        # Update index
+        update_race_days_index_enhanced(race_date, race_day_data, user_scores)
+        
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error saving race day: {e}")
+        return False
+
+def update_race_days_index_enhanced(race_date: str, race_day_data: Dict, user_scores: Dict):
+    """Update the race days index with new completed day"""
+    print("📚 Updating race days index...")
+    
+    try:
+        index_data = load_json(RACE_DAYS_INDEX_FILE, {
+            "availableDates": [],
+            "lastUpdated": "",
+            "totalRaceDays": 0,
+            "metadata": {"structureVersion": "2.0", "description": "Historical race day data index"}
+        })
+        
+        # Find highest score and top user
+        highest_score = max((user_data["dailyScore"] for user_data in user_scores.values()), default=0)
+        top_user = next((user_data["userName"] for user_data in user_scores.values() if user_data["dailyScore"] == highest_score), "Unknown")
+        
+        date_entry = {
+            "date": race_date,
+            "status": "completed",
+            "totalUsers": len(user_scores),
+            "totalRaces": race_day_data["totalRaces"],
+            "completedRaces": race_day_data["completedRaces"],
+            "highestScore": highest_score,
+            "topUser": top_user,
+            "completedAt": race_day_data["completedAt"]
+        }
+        
+        # Remove existing entry for this date (if any)
+        index_data["availableDates"] = [d for d in index_data["availableDates"] if d["date"] != race_date]
+        
+        # Add new entry and sort by date (newest first)
+        index_data["availableDates"].append(date_entry)
+        index_data["availableDates"].sort(key=lambda x: x["date"], reverse=True)
+        
+        # Update metadata
+        index_data["totalRaceDays"] = len(index_data["availableDates"])
+        index_data["lastUpdated"] = datetime.now().isoformat()
+        
+        save_json(RACE_DAYS_INDEX_FILE, index_data)
+        print(f"  ✅ Updated index: {index_data['totalRaceDays']} total race days")
+        
+    except Exception as e:
+        print(f"❌ Error updating index: {e}")
+
+def update_user_statistics_enhanced(user_scores: Dict) -> bool:
+    """Update user total scores and statistics"""
+    print("👥 Updating user statistics...")
+    
+    try:
+        users = load_json(USERS_FILE, [])
+        
+        for user in users:
+            user_id = user['id']
+            if user_id in user_scores:
+                score_data = user_scores[user_id]
+                daily_score = score_data["dailyScore"]
+                
+                # Update total score
+                old_total = user.get('totalScore', 0)
+                user['totalScore'] = old_total + daily_score
+                
+                # Initialize or update statistics
+                if 'statistics' not in user:
+                    user['statistics'] = {
+                        "raceDaysPlayed": 0,
+                        "bestDayScore": 0,
+                        "bestDayDate": "",
+                        "averageScore": 0.0,
+                        "winRate": 0.0
+                    }
+                
+                stats = user['statistics']
+                stats["raceDaysPlayed"] += 1
+                
+                if daily_score > stats["bestDayScore"]:
+                    stats["bestDayScore"] = daily_score
+                    stats["bestDayDate"] = datetime.now().strftime('%Y-%m-%d')
+                
+                stats["averageScore"] = user['totalScore'] / stats["raceDaysPlayed"]
+                stats["winRate"] = score_data["winRate"]
+                
+                print(f"  ✅ {user['name']}: +{daily_score} → Total: {user['totalScore']}")
+        
+        save_json(USERS_FILE, users)
+        print(f"✅ Updated statistics for {len(users)} users")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error updating user statistics: {e}")
+        return False
+
+def clear_current_day_data_enhanced():
+    """Clear current day data for new race day"""
+    print("🧹 Clearing current day data...")
+    
+    try:
+        save_json(RACES_FILE, [])
+        save_json(BETS_FILE, {})
+        save_json(BANKERS_FILE, {})
+        print("✅ Cleared current day data files")
+        return True
+    except Exception as e:
+        print(f"❌ Error clearing data: {e}")
+        return False
+
+# Legacy reset endpoint (for backward compatibility)
+@app.route('/api/reset', methods=['POST'])
+def reset_data_legacy():
+    """Legacy reset endpoint - use /api/race-day/complete instead"""
+    return complete_race_day()
 
 # Race Day Management Routes
 
@@ -410,7 +685,7 @@ def get_race_day_data_endpoint(race_day):
     return jsonify(race_day_data)
 
 @app.route('/api/race-days/<race_day>/complete', methods=['POST'])
-def complete_race_day(race_day):
+def complete_legacy_race_day(race_day):
     """Mark a race day as completed and calculate final scores"""
     race_day_data = get_race_day_data(race_day)
     
