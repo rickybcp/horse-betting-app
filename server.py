@@ -792,6 +792,298 @@ def create_dummy_race_days():
     
     return jsonify({"success": True, "created_days": dummy_days})
 
+# ================================================================================
+# TASK 3: HISTORICAL DATA API ENDPOINTS
+# ================================================================================
+
+@app.route('/api/race-days/historical', methods=['GET'])
+def get_historical_race_days():
+    """Get available race days from index with enhanced information"""
+    try:
+        index_data = load_json(RACE_DAYS_INDEX_FILE, {
+            "availableDates": [],
+            "totalRaceDays": 0,
+            "lastUpdated": ""
+        })
+        
+        return jsonify({
+            "success": True,
+            "raceDays": index_data["availableDates"],
+            "totalRaceDays": index_data["totalRaceDays"],
+            "lastUpdated": index_data["lastUpdated"]
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": f"Failed to load historical race days: {str(e)}"
+        }), 500
+
+@app.route('/api/race-days/historical/<race_date>', methods=['GET'])
+def get_specific_race_day(race_date):
+    """Get complete data for a specific race day"""
+    try:
+        race_day_file = os.path.join(RACE_DAYS_DIR, f'{race_date}.json')
+        
+        if not os.path.exists(race_day_file):
+            return jsonify({
+                "success": False,
+                "error": f"Race day {race_date} not found"
+            }), 404
+        
+        race_day_data = load_json(race_day_file, {})
+        
+        return jsonify({
+            "success": True,
+            "raceDay": race_day_data
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": f"Failed to load race day {race_date}: {str(e)}"
+        }), 500
+
+@app.route('/api/users/<user_id>/history', methods=['GET'])
+def get_user_history(user_id):
+    """Get user's complete historical performance across all race days"""
+    try:
+        # Load race days index
+        index_data = load_json(RACE_DAYS_INDEX_FILE, {"availableDates": []})
+        
+        user_history = {
+            "userId": user_id,
+            "totalRaceDays": 0,
+            "totalScore": 0,
+            "bestDayScore": 0,
+            "bestDayDate": "",
+            "averageScore": 0.0,
+            "raceDays": []
+        }
+        
+        # Get user info
+        users = load_json(USERS_FILE, [])
+        user = next((u for u in users if u['id'] == user_id), None)
+        
+        if not user:
+            return jsonify({
+                "success": False,
+                "error": f"User {user_id} not found"
+            }), 404
+        
+        user_history["userName"] = user["name"]
+        user_history["totalScore"] = user.get("totalScore", 0)
+        
+        if "statistics" in user:
+            stats = user["statistics"]
+            user_history["totalRaceDays"] = stats.get("raceDaysPlayed", 0)
+            user_history["bestDayScore"] = stats.get("bestDayScore", 0)
+            user_history["bestDayDate"] = stats.get("bestDayDate", "")
+            user_history["averageScore"] = stats.get("averageScore", 0.0)
+        
+        # Load performance for each race day
+        for date_entry in index_data["availableDates"]:
+            race_date = date_entry["date"]
+            race_day_file = os.path.join(RACE_DAYS_DIR, f'{race_date}.json')
+            
+            if os.path.exists(race_day_file):
+                race_day_data = load_json(race_day_file, {})
+                
+                # Find user's performance in this race day
+                user_score_data = None
+                for user_score in race_day_data.get("userScores", []):
+                    if user_score["userId"] == user_id:
+                        user_score_data = user_score
+                        break
+                
+                if user_score_data:
+                    day_performance = {
+                        "date": race_date,
+                        "dailyScore": user_score_data["dailyScore"],
+                        "basePoints": user_score_data.get("basePoints", 0),
+                        "bankerMultiplierApplied": user_score_data.get("bankerMultiplierApplied", False),
+                        "betsWon": user_score_data.get("betsWon", 0),
+                        "totalBets": user_score_data.get("totalBets", 0),
+                        "winRate": user_score_data.get("winRate", 0.0),
+                        "totalRaces": race_day_data.get("totalRaces", 0),
+                        "topScore": date_entry.get("highestScore", 0),
+                        "rank": "Unknown"  # Could calculate this
+                    }
+                    user_history["raceDays"].append(day_performance)
+        
+        # Sort by date (newest first)
+        user_history["raceDays"].sort(key=lambda x: x["date"], reverse=True)
+        
+        return jsonify({
+            "success": True,
+            "userHistory": user_history
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": f"Failed to load user history: {str(e)}"
+        }), 500
+
+@app.route('/api/users/<user_id>/history/<race_date>', methods=['GET'])
+def get_user_performance_on_date(user_id, race_date):
+    """Get user's detailed performance on a specific race day"""
+    try:
+        race_day_file = os.path.join(RACE_DAYS_DIR, f'{race_date}.json')
+        
+        if not os.path.exists(race_day_file):
+            return jsonify({
+                "success": False,
+                "error": f"Race day {race_date} not found"
+            }), 404
+        
+        race_day_data = load_json(race_day_file, {})
+        
+        # Find user's performance
+        user_performance = None
+        for user_score in race_day_data.get("userScores", []):
+            if user_score["userId"] == user_id:
+                user_performance = user_score
+                break
+        
+        if not user_performance:
+            return jsonify({
+                "success": False,
+                "error": f"User {user_id} did not participate on {race_date}"
+            }), 404
+        
+        # Enhance with race day context
+        enhanced_performance = {
+            "raceDate": race_date,
+            "userPerformance": user_performance,
+            "raceDay": {
+                "totalRaces": race_day_data.get("totalRaces", 0),
+                "completedRaces": race_day_data.get("completedRaces", 0),
+                "highestScore": max((score["dailyScore"] for score in race_day_data.get("userScores", [])), default=0),
+                "averageScore": sum(score["dailyScore"] for score in race_day_data.get("userScores", [])) / len(race_day_data.get("userScores", [1])),
+            },
+            "races": race_day_data.get("races", [])
+        }
+        
+        return jsonify({
+            "success": True,
+            "performance": enhanced_performance
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": f"Failed to load user performance: {str(e)}"
+        }), 500
+
+@app.route('/api/leaderboard/enhanced', methods=['GET'])
+def get_enhanced_leaderboard():
+    """Get enhanced leaderboard with total scores and statistics"""
+    try:
+        users = load_json(USERS_FILE, [])
+        
+        # Sort users by total score (highest first)
+        users_sorted = sorted(users, key=lambda x: x.get('totalScore', 0), reverse=True)
+        
+        enhanced_leaderboard = []
+        for rank, user in enumerate(users_sorted, 1):
+            user_data = {
+                "rank": rank,
+                "id": user["id"],
+                "name": user["name"],
+                "totalScore": user.get("totalScore", 0),
+                "statistics": user.get("statistics", {
+                    "raceDaysPlayed": 0,
+                    "bestDayScore": 0,
+                    "bestDayDate": "",
+                    "averageScore": 0.0,
+                    "winRate": 0.0
+                })
+            }
+            enhanced_leaderboard.append(user_data)
+        
+        # Calculate leaderboard statistics
+        total_users = len(enhanced_leaderboard)
+        active_users = len([u for u in enhanced_leaderboard if u["statistics"]["raceDaysPlayed"] > 0])
+        highest_score = enhanced_leaderboard[0]["totalScore"] if enhanced_leaderboard else 0
+        
+        return jsonify({
+            "success": True,
+            "leaderboard": enhanced_leaderboard,
+            "summary": {
+                "totalUsers": total_users,
+                "activeUsers": active_users,
+                "highestScore": highest_score,
+                "generatedAt": datetime.now().isoformat()
+            }
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": f"Failed to generate enhanced leaderboard: {str(e)}"
+        }), 500
+
+@app.route('/api/race-day/current/status', methods=['GET'])
+def get_current_race_day_status():
+    """Get current race day status and progress"""
+    try:
+        current_races = load_json(RACES_FILE, [])
+        current_bets = load_json(BETS_FILE, {})
+        current_bankers = load_json(BANKERS_FILE, {})
+        
+        # Calculate current day statistics
+        total_races = len(current_races)
+        completed_races = len([r for r in current_races if r.get('winner')])
+        upcoming_races = total_races - completed_races
+        
+        # Count active users (users with bets)
+        active_users = len(current_bets)
+        total_bets = sum(len(user_bets) for user_bets in current_bets.values())
+        banker_selections = len(current_bankers)
+        
+        # Find next race
+        next_race = None
+        now = datetime.now()
+        for race in current_races:
+            if not race.get('winner'):
+                next_race = {
+                    "id": race["id"],
+                    "name": race.get("name", f"Race {race['id']}"),
+                    "time": race.get("time", ""),
+                    "totalHorses": len(race.get("horses", []))
+                }
+                break
+        
+        status = {
+            "date": datetime.now().strftime('%Y-%m-%d'),
+            "time": datetime.now().strftime('%H:%M:%S'),
+            "races": {
+                "total": total_races,
+                "completed": completed_races,
+                "upcoming": upcoming_races,
+                "progress": (completed_races / total_races * 100) if total_races > 0 else 0
+            },
+            "betting": {
+                "activeUsers": active_users,
+                "totalBets": total_bets,
+                "bankerSelections": banker_selections
+            },
+            "nextRace": next_race,
+            "isComplete": completed_races == total_races and total_races > 0
+        }
+        
+        return jsonify({
+            "success": True,
+            "status": status
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": f"Failed to get current race day status: {str(e)}"
+        }), 500
+
 if __name__ == '__main__':
     # Ensure the data directory exists before running the app
     os.makedirs(DATA_DIR, exist_ok=True)

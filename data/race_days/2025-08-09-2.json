@@ -1,0 +1,254 @@
+{
+    "race_date": "2024-10-06",
+    "races": [
+      {
+            "race_index": "R1",
+            "race_time": "12:30",
+            "race_title": "THE HAVE MERCY PLATE -  Benchmark 46 - 1365m",
+            "race_number": 1,
+            "horses": [
+              {
+                "horse_number": 1,
+                "horse_name": "ONE AND ALL",
+                "odds": 6.5
+              },
+              {
+                "horse_number": 2,
+                "horse_name": "OPAGUE",
+                "odds": 4.6
+              },
+              {
+                "horse_number": 3,
+                "horse_name": "COLOUR OF MONEY",
+                "odds": 4.0
+              },
+              {
+                "horse_number": 4,
+                "horse_name": "ALPINE CHALLENGE",
+                "odds": 1.9
+              }
+            ]
+      },
+      {
+            "race_index": "R2",
+            "race_time": "13:05",
+            "race_title": "THE SPEARFIN FUND ADMINISTRATION CUP -  [0-26] - 990m",
+            "race_number": 2,
+            "horses": [
+              {
+                "horse_number": 1,
+                "horse_name": "DUNZIE",
+                "odds": 15.0
+              },
+              {
+                "horse_number": 2,
+                "horse_name": "NOT IN DOUBT",
+                "odds": 8.0
+              },
+              {
+                "horse_number": 3,
+                "horse_name": "FENCING CAPTAIN",
+                "odds": 2.9
+              },
+              {
+                "horse_number": 4,
+                "horse_name": "NORDIC PRINCE",
+                "odds": 2.6
+              },
+              {
+                "horse_number": 5,
+                "horse_name": "PAVED WITH GOLD",
+                "odds": 6.0
+              },
+              {
+                "horse_number": 6,
+                "horse_name": "UNSUNG HERO",
+                "odds": 20.0
+              }
+            ]
+      },
+      {
+        "race_index": "R3",
+        "race_time": "13:40",
+        "race_title": "THE SPEARFIN SOCIAL COMMITTEE CUP - Benchmark 31 - 1450m",
+        "race_number": 3,
+        "horses": [
+          {
+            "horse_number": 1,
+            "horse_name": "KALGOORLIE",
+            "odds": 7.0
+          },
+          {
+            "horse_number": 2,
+            "horse_name": "LIQUID",
+            "odds": 6.5
+          },
+          {
+            "horse_number": 3,
+            "horse_name": "OVERDOSE",
+            "odds": 20.0
+          },
+          {
+            "horse_number": 4,
+            "horse_name": "CUMBRE VIEJA",
+            "odds": 1.6
+          },
+          {
+            "horse_number": 5,
+            "horse_name": "AMANDLA",
+            "odds": 5.5
+          }
+        ]
+      },
+      {
+        "race_index": "R4",
+        "race_time": "14:15",
+        "race_title": "THE SPEARFIN CORPORATE SERVICES CUP - Benchmark 41 - 1500m",
+        "race_number": 4,
+        "horses": [
+          {
+            "horse_number": 1,
+            "horse_name": "MONUMENTAL",
+            "odds": 10.0
+          },
+          {
+            "horse_number": 2,
+            "horse_name": "GLOBAL DOLLAR",
+            "odds": 2.0
+          },
+          {
+            "horse_number": 3,
+            "horse_name": "SPIRIT'S UNITE",
+            "odds": 5.7
+          },
+          {
+            "horse_number": 4,
+            "horse_name": "FIREFLARE",
+            "odds": 12.0
+          },
+          {
+            "horse_number": 5,
+            "horse_name": "ROYAL SOVEREIGN",
+            "odds": 3.1
+          }
+        ]
+      },
+      {
+        "race_index": "R5",
+        "race_time": "14:50",
+        "race_title": "THE SPEARFIN COMPLIANCE SUPPORT CUP - Benchmark 46 - 1365m",
+        "race_number": 5,
+        "horses": [
+          {
+            "horse_number": 1,
+            "horse_name": "KAROO LARK",
+            "odds": 25.0
+          },
+          {
+            "horse_number": 2,
+            "horse_name": "HARDFALLINGRAIN",
+            "odds": 4.7
+          },
+          {
+            "horse_number": 3,
+            "horse_name": "WUGUG",
+            "odds": 3.2
+          },
+          {
+            "horse_number": 4,
+            "horse_name": "FURIE NOCTURNE",
+            "odds": 2.0
+          },
+          {
+            "horse_number": 5,
+            "horse_name": "MASSIMO",
+            "odds": 13.0
+          }
+        ]
+      },
+      {
+        "race_index": "R6",
+        "race_time": "15:25",
+        "race_title": "THE SPEARFIN - LA COUPE DU CENT CINQUANTENAIRE - G3 [HCP] - 1365m",
+        "race_number": 6,
+        "horses": [
+          {
+            "horse_number": 1,
+            "horse_name": "WALLS OF DUBROVNIK",
+            "odds": 2.0
+          },
+          {
+            "horse_number": 2,
+            "horse_name": "BLESS MY PATH",
+            "odds": 7.5
+          },
+          {
+            "horse_number": 3,
+            "horse_name": "XAVION",
+            "odds": 4.0
+          },
+          {
+            "horse_number": 4,
+            "horse_name": "BETATHANTHEREST",
+            "odds": 13.0
+          },
+          {
+            "horse_number": 5,
+            "horse_name": "ZIL MORIS",
+            "odds": 8.0
+          },
+          {
+            "horse_number": 6,
+            "horse_name": "CAPTAIN LANNISTER",
+            "odds": 11.0
+          }
+        ]
+      },
+      {
+        "race_index": "R7",
+        "race_time": "16:00",
+        "race_title": "THE SPEARFIN (SINGAPORE) PTE LTD CUP - Benchmark 61 - 1500m",
+        "race_number": 7,
+        "horses": [
+          {
+            "horse_number": 1,
+            "horse_name": "FAVOUR",
+            "odds": 40.0
+          },
+          {
+            "horse_number": 2,
+            "horse_name": "FREE TO WIN",
+            "odds": 6.0
+          },
+          {
+            "horse_number": 3,
+            "horse_name": "MANHATTEN CAFE",
+            "odds": 7.0
+          },
+          {
+            "horse_number": 4,
+            "horse_name": "VAN HUNKS",
+            "odds": 2.6
+          },
+          {
+            "horse_number": 5,
+            "horse_name": "SECRET GIVER",
+            "odds": 45.0
+          },
+          {
+            "horse_number": 6,
+            "horse_name": "SHAH AKBAR",
+            "odds": 10.0
+          },
+          {
+            "horse_number": 7,
+            "horse_name": "JOIN THE DOTS",
+            "odds": 3.0
+          }
+        ]
+      }
+    ],
+    "scraped_at": "2025-08-09T11:35:05.474902",
+    "source_url": "https://www.smspariaz.com/local/",
+    "method": "headless_browser"
+  }
