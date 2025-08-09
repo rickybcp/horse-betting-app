@@ -1,0 +1,339 @@
+{
+  "date": "2025-08-09",
+  "totalRaces": 8,
+  "completedRaces": 8,
+  "status": "completed",
+  "completedAt": "2025-08-09T16:10:17.681418",
+  "races": [
+    {
+      "id": 1,
+      "name": "R1 - FASHION HEIGHTS - MIA BIJOUX CUP - [0 - 25] - 1400m",
+      "time": "12:45",
+      "winner": 3,
+      "totalHorses": 6,
+      "status": "completed",
+      "winningHorse": {
+        "number": 3,
+        "name": "KAISARISSA",
+        "odds": 4.7,
+        "points": 1
+      }
+    },
+    {
+      "id": 2,
+      "name": "R2 - FASHION HEIGHTS - GONG CHA CUP - [0 - 26] - 990m",
+      "time": "13:20",
+      "winner": 4,
+      "totalHorses": 5,
+      "status": "completed",
+      "winningHorse": {
+        "number": 4,
+        "name": "MIND MAP",
+        "odds": 12.0,
+        "points": 3
+      }
+    },
+    {
+      "id": 3,
+      "name": "R3 - FASHION HEIGHTS ETAM - GROUP CUP - Benchmark 36 - 1365m",
+      "time": "13:55",
+      "winner": 3,
+      "totalHorses": 6,
+      "status": "completed",
+      "winningHorse": {
+        "number": 3,
+        "name": "BABYLON",
+        "odds": 2.6,
+        "points": 1
+      }
+    },
+    {
+      "id": 4,
+      "name": "R4 - FASHION HEIGHTS - COTE SUSHI CUP - Benchmark 56 - 990m",
+      "time": "14:30",
+      "winner": 3,
+      "totalHorses": 5,
+      "status": "completed",
+      "winningHorse": {
+        "number": 3,
+        "name": "CAPTAIN MIKE",
+        "odds": 1.4,
+        "points": 1
+      }
+    },
+    {
+      "id": 5,
+      "name": "R5 - FASHION HEIGHTS - CELIO CUP - Benchmark 41 - 990m",
+      "time": "15:05",
+      "winner": 3,
+      "totalHorses": 5,
+      "status": "completed",
+      "winningHorse": {
+        "number": 3,
+        "name": "BON BOYAGE",
+        "odds": 3.3,
+        "points": 1
+      }
+    },
+    {
+      "id": 6,
+      "name": "R6 - THE DUCHESS OF YORK CUP - G2 - WFA WITH PENALTIES - 1400m",
+      "time": "15:40",
+      "winner": 5,
+      "totalHorses": 10,
+      "status": "completed",
+      "winningHorse": {
+        "number": 5,
+        "name": "WOLF MOUNTAIN",
+        "odds": 6.5,
+        "points": 2
+      }
+    },
+    {
+      "id": 7,
+      "name": "R7 - APEX - APPLE RESELLER CUP - Benchmark 56 - 1400m",
+      "time": "16:15",
+      "winner": 6,
+      "totalHorses": 7,
+      "status": "completed",
+      "winningHorse": {
+        "number": 6,
+        "name": "CAPTAIN COLA",
+        "odds": 5.0,
+        "points": 1
+      }
+    },
+    {
+      "id": 8,
+      "name": "R8 - THE WORSHIPFUL DAY PLATE - Benchmark 31 - 1365m",
+      "time": "16:55",
+      "winner": 8,
+      "totalHorses": 8,
+      "status": "upcoming",
+      "winningHorse": {
+        "number": 8,
+        "name": "HAVANA MOON",
+        "odds": 1.9,
+        "points": 1
+      }
+    }
+  ],
+  "userScores": [
+    {
+      "userId": "1",
+      "userName": "Ben",
+      "dailyScore": 0,
+      "basePoints": 0,
+      "afterBankerMultiplier": 0,
+      "bankerRaceId": "2",
+      "bankerWon": false,
+      "bankerMultiplierApplied": false,
+      "bets": [],
+      "betsWon": 0,
+      "totalBets": 0,
+      "winRate": 0.0,
+      "pointsBreakdown": {
+        "basePoints": 0,
+        "afterBankerMultiplier": 0
+      }
+    },
+    {
+      "userId": "2",
+      "userName": "Michelle",
+      "dailyScore": 0,
+      "basePoints": 0,
+      "afterBankerMultiplier": 0,
+      "bankerRaceId": null,
+      "bankerWon": false,
+      "bankerMultiplierApplied": false,
+      "bets": [],
+      "betsWon": 0,
+      "totalBets": 0,
+      "winRate": 0.0,
+      "pointsBreakdown": {
+        "basePoints": 0,
+        "afterBankerMultiplier": 0
+      }
+    },
+    {
+      "userId": "3",
+      "userName": "Conrad",
+      "dailyScore": 0,
+      "basePoints": 0,
+      "afterBankerMultiplier": 0,
+      "bankerRaceId": "4",
+      "bankerWon": false,
+      "bankerMultiplierApplied": false,
+      "bets": [],
+      "betsWon": 0,
+      "totalBets": 0,
+      "winRate": 0.0,
+      "pointsBreakdown": {
+        "basePoints": 0,
+        "afterBankerMultiplier": 0
+      }
+    },
+    {
+      "userId": "4",
+      "userName": "Jason",
+      "dailyScore": 0,
+      "basePoints": 0,
+      "afterBankerMultiplier": 0,
+      "bankerRaceId": "8",
+      "bankerWon": false,
+      "bankerMultiplierApplied": false,
+      "bets": [],
+      "betsWon": 0,
+      "totalBets": 0,
+      "winRate": 0.0,
+      "pointsBreakdown": {
+        "basePoints": 0,
+        "afterBankerMultiplier": 0
+      }
+    },
+    {
+      "userId": "5",
+      "userName": "Ricky",
+      "dailyScore": 0,
+      "basePoints": 0,
+      "afterBankerMultiplier": 0,
+      "bankerRaceId": "4",
+      "bankerWon": false,
+      "bankerMultiplierApplied": false,
+      "bets": [],
+      "betsWon": 0,
+      "totalBets": 0,
+      "winRate": 0.0,
+      "pointsBreakdown": {
+        "basePoints": 0,
+        "afterBankerMultiplier": 0
+      }
+    },
+    {
+      "userId": "6",
+      "userName": "Caroline",
+      "dailyScore": 0,
+      "basePoints": 0,
+      "afterBankerMultiplier": 0,
+      "bankerRaceId": "2",
+      "bankerWon": false,
+      "bankerMultiplierApplied": false,
+      "bets": [],
+      "betsWon": 0,
+      "totalBets": 0,
+      "winRate": 0.0,
+      "pointsBreakdown": {
+        "basePoints": 0,
+        "afterBankerMultiplier": 0
+      }
+    },
+    {
+      "userId": "7",
+      "userName": "Shaun",
+      "dailyScore": 0,
+      "basePoints": 0,
+      "afterBankerMultiplier": 0,
+      "bankerRaceId": "2",
+      "bankerWon": false,
+      "bankerMultiplierApplied": false,
+      "bets": [],
+      "betsWon": 0,
+      "totalBets": 0,
+      "winRate": 0.0,
+      "pointsBreakdown": {
+        "basePoints": 0,
+        "afterBankerMultiplier": 0
+      }
+    },
+    {
+      "userId": "8",
+      "userName": "Sarah",
+      "dailyScore": 0,
+      "basePoints": 0,
+      "afterBankerMultiplier": 0,
+      "bankerRaceId": null,
+      "bankerWon": false,
+      "bankerMultiplierApplied": false,
+      "bets": [],
+      "betsWon": 0,
+      "totalBets": 0,
+      "winRate": 0.0,
+      "pointsBreakdown": {
+        "basePoints": 0,
+        "afterBankerMultiplier": 0
+      }
+    },
+    {
+      "userId": "9",
+      "userName": "Grand-m\u00e8re",
+      "dailyScore": 0,
+      "basePoints": 0,
+      "afterBankerMultiplier": 0,
+      "bankerRaceId": null,
+      "bankerWon": false,
+      "bankerMultiplierApplied": false,
+      "bets": [],
+      "betsWon": 0,
+      "totalBets": 0,
+      "winRate": 0.0,
+      "pointsBreakdown": {
+        "basePoints": 0,
+        "afterBankerMultiplier": 0
+      }
+    },
+    {
+      "userId": "10",
+      "userName": "Ma\u00eblle",
+      "dailyScore": 0,
+      "basePoints": 0,
+      "afterBankerMultiplier": 0,
+      "bankerRaceId": "6",
+      "bankerWon": false,
+      "bankerMultiplierApplied": false,
+      "bets": [],
+      "betsWon": 0,
+      "totalBets": 0,
+      "winRate": 0.0,
+      "pointsBreakdown": {
+        "basePoints": 0,
+        "afterBankerMultiplier": 0
+      }
+    },
+    {
+      "userId": "11",
+      "userName": "Leana",
+      "dailyScore": 0,
+      "basePoints": 0,
+      "afterBankerMultiplier": 0,
+      "bankerRaceId": "4",
+      "bankerWon": false,
+      "bankerMultiplierApplied": false,
+      "bets": [],
+      "betsWon": 0,
+      "totalBets": 0,
+      "winRate": 0.0,
+      "pointsBreakdown": {
+        "basePoints": 0,
+        "afterBankerMultiplier": 0
+      }
+    },
+    {
+      "userId": "12",
+      "userName": "Test User",
+      "dailyScore": 0,
+      "basePoints": 0,
+      "afterBankerMultiplier": 0,
+      "bankerRaceId": null,
+      "bankerWon": false,
+      "bankerMultiplierApplied": false,
+      "bets": [],
+      "betsWon": 0,
+      "totalBets": 0,
+      "winRate": 0.0,
+      "pointsBreakdown": {
+        "basePoints": 0,
+        "afterBankerMultiplier": 0
+      }
+    }
+  ]
+}

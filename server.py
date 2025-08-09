@@ -11,15 +11,28 @@ CORS(app, origins="*", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], allo
 
 # Data file paths
 DATA_DIR = 'data'
+CURRENT_DIR = os.path.join(DATA_DIR, 'current')
+RACE_DAYS_DIR = os.path.join(DATA_DIR, 'race_days')
+
+# User data (global)
 USERS_FILE = os.path.join(DATA_DIR, 'users.json')
-RACES_FILE = os.path.join(DATA_DIR, 'races.json')
-BETS_FILE = os.path.join(DATA_DIR, 'bets.json')
-BANKERS_FILE = os.path.join(DATA_DIR, 'bankers.json')
-RACE_DAYS_FILE = os.path.join(DATA_DIR, 'race_days.json')
+
+# Current day data (new structure)
+RACES_FILE = os.path.join(CURRENT_DIR, 'races.json')
+BETS_FILE = os.path.join(CURRENT_DIR, 'bets.json')
+BANKERS_FILE = os.path.join(CURRENT_DIR, 'bankers.json')
+
+# Race day management
+RACE_DAYS_INDEX_FILE = os.path.join(RACE_DAYS_DIR, 'index.json')
 CURRENT_RACE_DAY_FILE = os.path.join(DATA_DIR, 'current_race_day.json')
 
-# Create data directory if it doesn't exist
+# Legacy file (for backward compatibility)
+LEGACY_RACE_DAYS_FILE = os.path.join(DATA_DIR, 'race_days.json')
+
+# Create data directories if they don't exist
 os.makedirs(DATA_DIR, exist_ok=True)
+os.makedirs(CURRENT_DIR, exist_ok=True)
+os.makedirs(RACE_DAYS_DIR, exist_ok=True)
 
 def load_json(filepath, default=None):
     """Load JSON data from file or return default if file doesn't exist"""
@@ -56,8 +69,18 @@ def init_default_data():
     if not os.path.exists(BANKERS_FILE):
         save_json(BANKERS_FILE, {})
     
-    if not os.path.exists(RACE_DAYS_FILE):
-        save_json(RACE_DAYS_FILE, {})
+    if not os.path.exists(RACE_DAYS_INDEX_FILE):
+        index_data = {
+            "availableDates": [],
+            "lastUpdated": datetime.now().isoformat(),
+            "totalRaceDays": 0,
+            "metadata": {
+                "structureVersion": "2.0",
+                "createdAt": datetime.now().isoformat(),
+                "description": "Historical race day data index"
+            }
+        }
+        save_json(RACE_DAYS_INDEX_FILE, index_data)
     
     if not os.path.exists(CURRENT_RACE_DAY_FILE):
         # Set today's date as the current race day
@@ -78,7 +101,7 @@ def set_current_race_day(race_day):
 
 def get_race_day_data(race_day):
     """Get all data for a specific race day"""
-    race_days = load_json(RACE_DAYS_FILE, {})
+    race_days = load_json(LEGACY_RACE_DAYS_FILE, {})
     if race_day not in race_days:
         race_days[race_day] = {
             "date": race_day,
@@ -87,12 +110,12 @@ def get_race_day_data(race_day):
             "bankers": {},
             "completed": False
         }
-        save_json(RACE_DAYS_FILE, race_days)
+        save_json(LEGACY_RACE_DAYS_FILE, race_days)
     return race_days[race_day]
 
 def save_race_day_data(race_day, data):
     """Save data for a specific race day"""
-    race_days = load_json(RACE_DAYS_FILE, {})
+    race_days = load_json(LEGACY_RACE_DAYS_FILE, {})
     race_days[race_day] = data
     save_json(RACE_DAYS_FILE, race_days)
 
@@ -335,7 +358,7 @@ def reset_data():
 @app.route('/api/race-days', methods=['GET'])
 def get_race_days():
     """Get all race days"""
-    race_days = load_json(RACE_DAYS_FILE, {})
+    race_days = load_json(LEGACY_RACE_DAYS_FILE, {})
     current_race_day = get_current_race_day()
     
     # Convert to list format for frontend
