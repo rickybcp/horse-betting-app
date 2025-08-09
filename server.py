@@ -25,10 +25,9 @@ BANKERS_FILE = os.path.join(CURRENT_DIR, 'bankers.json')
 
 # Race day management
 RACE_DAYS_INDEX_FILE = os.path.join(RACE_DAYS_DIR, 'index.json')
-CURRENT_RACE_DAY_FILE = os.path.join(DATA_DIR, 'current_race_day.json')
 
-# Legacy file (for backward compatibility)
-LEGACY_RACE_DAYS_FILE = os.path.join(DATA_DIR, 'race_days.json')
+# Legacy file (for backward compatibility) - DEPRECATED
+# LEGACY_RACE_DAYS_FILE = os.path.join(DATA_DIR, 'race_days.json')
 
 # Create data directories if they don't exist
 os.makedirs(DATA_DIR, exist_ok=True)
@@ -83,42 +82,42 @@ def init_default_data():
         }
         save_json(RACE_DAYS_INDEX_FILE, index_data)
     
-    if not os.path.exists(CURRENT_RACE_DAY_FILE):
-        # Set today's date as the current race day
-        today = datetime.now().strftime('%Y-%m-%d')
-        save_json(CURRENT_RACE_DAY_FILE, {"current_race_day": today})
+    # Current race day is always today's date in the new system
 
 # Initialize default data on startup
 init_default_data()
 
 def get_current_race_day():
-    """Get the current active race day"""
-    current_data = load_json(CURRENT_RACE_DAY_FILE, {"current_race_day": datetime.now().strftime('%Y-%m-%d')})
-    return current_data["current_race_day"]
+    """Get the current active race day (always today's date)"""
+    return datetime.now().strftime('%Y-%m-%d')
 
 def set_current_race_day(race_day):
-    """Set the current active race day"""
-    save_json(CURRENT_RACE_DAY_FILE, {"current_race_day": race_day})
+    """Set the current active race day (deprecated - always uses today's date)"""
+    # In the new system, we always use today's date as current
+    # This function is kept for backward compatibility but does nothing
+    pass
 
 def get_race_day_data(race_day):
-    """Get all data for a specific race day"""
-    race_days = load_json(LEGACY_RACE_DAYS_FILE, {})
-    if race_day not in race_days:
-        race_days[race_day] = {
+    """Get all data for a specific race day from the new historical system"""
+    race_day_file = os.path.join(RACE_DAYS_DIR, f"{race_day}.json")
+    
+    if os.path.exists(race_day_file):
+        # Load from historical file
+        return load_json(race_day_file, {})
+    else:
+        # Return empty structure for new race days
+        return {
             "date": race_day,
             "races": [],
             "bets": {},
             "bankers": {},
             "completed": False
         }
-        save_json(LEGACY_RACE_DAYS_FILE, race_days)
-    return race_days[race_day]
 
 def save_race_day_data(race_day, data):
-    """Save data for a specific race day"""
-    race_days = load_json(LEGACY_RACE_DAYS_FILE, {})
-    race_days[race_day] = data
-    save_json(RACE_DAYS_FILE, race_days)
+    """Save data for a specific race day to the new historical system"""
+    race_day_file = os.path.join(RACE_DAYS_DIR, f"{race_day}.json")
+    save_json(race_day_file, data)
 
 def sync_current_race_day_to_files():
     """Sync current race day data to the legacy files for backward compatibility"""
@@ -632,18 +631,31 @@ def reset_data_legacy():
 
 @app.route('/api/race-days', methods=['GET'])
 def get_race_days():
-    """Get all race days"""
-    race_days = load_json(LEGACY_RACE_DAYS_FILE, {})
+    """Get all race days from the new historical system"""
+    # Load from the new index file
+    index_data = load_json(RACE_DAYS_INDEX_FILE, {"availableDates": []})
     current_race_day = get_current_race_day()
     
-    # Convert to list format for frontend
+    # Convert index format to legacy format for backward compatibility
     race_days_list = []
-    for date, data in race_days.items():
+    for race_day_entry in index_data.get("availableDates", []):
         race_days_list.append({
-            "date": date,
-            "completed": data.get("completed", False),
-            "race_count": len(data.get("races", [])),
-            "is_current": date == current_race_day
+            "date": race_day_entry["date"],
+            "completed": race_day_entry.get("status") == "completed",
+            "race_count": race_day_entry.get("totalRaces", 0),
+            "is_current": race_day_entry["date"] == current_race_day
+        })
+    
+    # Add current day if not in historical list
+    current_day_exists = any(day["date"] == current_race_day for day in race_days_list)
+    if not current_day_exists:
+        # Get current day race count
+        current_races = load_json(RACES_FILE, [])
+        race_days_list.insert(0, {
+            "date": current_race_day,
+            "completed": False,
+            "race_count": len(current_races),
+            "is_current": True
         })
     
     # Sort by date (newest first)
@@ -1245,6 +1257,64 @@ def get_backend_status():
         return jsonify({
             "success": False,
             "error": f"Failed to get status: {str(e)}"
+        }), 500
+
+@app.route('/api/admin/files/<path:filepath>', methods=['PUT'])
+def save_data_file(filepath):
+    """Save edited content to a specific data file"""
+    try:
+        # Security: only allow access to files in data directory
+        if '..' in filepath or filepath.startswith('/'):
+            return jsonify({"error": "Invalid file path"}), 400
+        
+        full_path = os.path.join(DATA_DIR, filepath)
+        
+        if not full_path.endswith('.json'):
+            return jsonify({"error": "Only JSON files allowed"}), 400
+        
+        # Get the new content from request
+        if not request.json:
+            return jsonify({"error": "No JSON content provided"}), 400
+        
+        new_content = request.json
+        
+        # Create backup of original file
+        if os.path.exists(full_path):
+            backup_path = f"{full_path}.backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            import shutil
+            shutil.copy2(full_path, backup_path)
+        
+        # Ensure directory exists
+        os.makedirs(os.path.dirname(full_path), exist_ok=True)
+        
+        # Save the new content
+        with open(full_path, 'w') as f:
+            json.dump(new_content, f, indent=2)
+        
+        # Get updated file metadata
+        stat = os.stat(full_path)
+        metadata = {
+            "path": filepath,
+            "size": stat.st_size,
+            "lastModified": datetime.fromtimestamp(stat.st_mtime).isoformat(),
+            "recordCount": len(new_content) if isinstance(new_content, (list, dict)) else 1
+        }
+        
+        return jsonify({
+            "success": True,
+            "message": f"File {filepath} saved successfully",
+            "metadata": metadata
+        }), 200
+        
+    except json.JSONDecodeError:
+        return jsonify({
+            "success": False,
+            "error": "Invalid JSON format"
+        }), 400
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": f"Failed to save file: {str(e)}"
         }), 500
 
 if __name__ == '__main__':

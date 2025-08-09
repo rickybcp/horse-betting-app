@@ -1,7 +1,7 @@
 // App.js (Revised script)
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Users, Trophy, Calendar, Settings, Plus, RefreshCw, Clock, Star, Download, AlertCircle } from 'lucide-react';
+import { Users, Trophy, Calendar, Settings, Plus, RefreshCw, Clock, Star, Download, AlertCircle, Database, FileText, Activity, Folder } from 'lucide-react';
 
 const API_BASE = process.env.NODE_ENV === 'development' 
   ? 'http://localhost:5000/api'
@@ -390,8 +390,20 @@ const UserBetsTab = ({ users, selectedUser, setSelectedUser, races, bets, banker
   </div>
 );
 
-// --- Admin Tab Component ---
+// --- Admin Tab Component with Data Management ---
 const AdminTab = ({ newUserName, setNewUserName, addUser, loading, scrapeRaces, scrapeResults, resetForNewDay, races, setRaceResult, users, bets, bankers, serverConnected }) => {
+  // Admin panel state
+  const [adminView, setAdminView] = useState('overview');
+  const [backendFiles, setBackendFiles] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileContent, setFileContent] = useState(null);
+  const [editingContent, setEditingContent] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [backendStatus, setBackendStatus] = useState(null);
+  const [loadingFiles, setLoadingFiles] = useState(false);
+  const [loadingFile, setLoadingFile] = useState(false);
+  const [savingFile, setSavingFile] = useState(false);
+
   // Helper to calculate score for display in admin panel if needed
   const calculatePoints = useCallback((odds) => {
     if (odds > 10) return 3;
@@ -427,15 +439,318 @@ const AdminTab = ({ newUserName, setNewUserName, addUser, loading, scrapeRaces, 
     return dailyScore;
   }, [races, bets, bankers, calculatePoints]);
 
-  return (
-    <div className="space-y-4">
-      <div className="bg-gradient-to-r from-purple-500 to-purple-700 text-white p-6 rounded-lg">
-        <h2 className="text-2xl font-bold flex items-center gap-2">
-          <Settings className="w-6 h-6" />
-          Admin Panel
-        </h2>
-      </div>
+  // Fetch backend status
+  const fetchBackendStatus = useCallback(async () => {
+    try {
+      const response = await fetch(`${API_BASE}/admin/status`);
+      if (!response.ok) throw new Error('Failed to fetch status');
+      const data = await response.json();
+      setBackendStatus(data.status);
+    } catch (error) {
+      console.error('Error fetching backend status:', error);
+    }
+  }, []);
 
+  // Fetch backend files
+  const fetchBackendFiles = useCallback(async () => {
+    setLoadingFiles(true);
+    try {
+      const response = await fetch(`${API_BASE}/admin/files`);
+      if (!response.ok) throw new Error('Failed to fetch files');
+      const data = await response.json();
+      setBackendFiles(data.files || []);
+    } catch (error) {
+      console.error('Error fetching files:', error);
+      setBackendFiles([]);
+    } finally {
+      setLoadingFiles(false);
+    }
+  }, []);
+
+  // Fetch specific file content
+  const fetchFileContent = useCallback(async (filepath) => {
+    setLoadingFile(true);
+    try {
+      const response = await fetch(`${API_BASE}/admin/files/${encodeURIComponent(filepath)}`);
+      if (!response.ok) throw new Error('Failed to fetch file');
+      const data = await response.json();
+      setSelectedFile(data.metadata);
+      setFileContent(data.data);
+      setEditingContent(JSON.stringify(data.data, null, 2));
+    } catch (error) {
+      console.error('Error fetching file:', error);
+      setSelectedFile(null);
+      setFileContent(null);
+    } finally {
+      setLoadingFile(false);
+    }
+  }, []);
+
+  // Save edited file content
+  const saveFileContent = useCallback(async () => {
+    if (!selectedFile) return;
+    
+    setSavingFile(true);
+    try {
+      // Validate JSON
+      const parsedContent = JSON.parse(editingContent);
+      
+      // Save to backend
+      const response = await fetch(`${API_BASE}/admin/files/${encodeURIComponent(selectedFile.path)}`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(parsedContent, null, 2)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save file');
+      }
+      
+      const result = await response.json();
+      
+      // Update local state
+      setFileContent(parsedContent);
+      setSelectedFile(result.metadata);
+      setIsEditing(false);
+      
+      // Refresh file list to show updated size/date
+      fetchBackendFiles();
+      
+      alert(`✅ File saved successfully!\n\nBackup created automatically.\nLast modified: ${new Date(result.metadata.lastModified).toLocaleString()}`);
+      
+    } catch (error) {
+      console.error('Save error:', error);
+      if (error.message.includes('JSON')) {
+        alert('❌ Invalid JSON format. Please check your syntax.');
+      } else {
+        alert(`❌ Failed to save file: ${error.message}`);
+      }
+    } finally {
+      setSavingFile(false);
+    }
+  }, [selectedFile, editingContent, fetchBackendFiles]);
+
+  // Download file
+  const downloadFile = useCallback((filepath, content) => {
+    const dataStr = JSON.stringify(content, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    
+    const exportFileDefaultName = filepath.replace(/\//g, '_');
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+  }, []);
+
+  // Load initial data when admin panel opens
+  useEffect(() => {
+    if (adminView === 'data') {
+      fetchBackendFiles();
+      fetchBackendStatus();
+    }
+  }, [adminView, fetchBackendFiles, fetchBackendStatus]);
+
+  const AdminSubNavigation = () => (
+    <div className="flex gap-2 mb-4">
+      <button
+        onClick={() => setAdminView('overview')}
+        className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+          adminView === 'overview' 
+            ? 'bg-purple-500 text-white' 
+            : 'bg-gray-100 hover:bg-gray-200'
+        }`}
+      >
+        <Settings className="w-4 h-4" />
+        Overview
+      </button>
+      <button
+        onClick={() => setAdminView('data')}
+        className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+          adminView === 'data' 
+            ? 'bg-purple-500 text-white' 
+            : 'bg-gray-100 hover:bg-gray-200'
+        }`}
+      >
+        <Database className="w-4 h-4" />
+        Data Manager
+      </button>
+    </div>
+  );
+
+  const DataManagerView = () => (
+    <div className="space-y-4">
+      {/* Backend Status */}
+      {backendStatus && (
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h3 className="font-semibold mb-3 flex items-center gap-2">
+            <Activity className="w-5 h-5" />
+            Backend Status
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div>
+              <span className="text-gray-600">Current Race Day:</span>
+              <br />
+              <span className="font-medium">{backendStatus.currentRaceDay}</span>
+            </div>
+            <div>
+              <span className="text-gray-600">Users:</span>
+              <br />
+              <span className="font-medium">{backendStatus.currentData.users}</span>
+            </div>
+            <div>
+              <span className="text-gray-600">Current Races:</span>
+              <br />
+              <span className="font-medium">{backendStatus.currentData.races}</span>
+            </div>
+            <div>
+              <span className="text-gray-600">Historical Days:</span>
+              <br />
+              <span className="font-medium">{backendStatus.historicalData.raceDays}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* File Browser */}
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h3 className="font-semibold mb-3 flex items-center gap-2">
+            <Folder className="w-5 h-5" />
+            Backend Data Files
+            <button
+              onClick={fetchBackendFiles}
+              disabled={loadingFiles}
+              className="ml-auto p-1 text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              <RefreshCw className={`w-4 h-4 ${loadingFiles ? 'animate-spin' : ''}`} />
+            </button>
+          </h3>
+          
+          {loadingFiles ? (
+            <div className="space-y-2">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="h-8 bg-gray-200 animate-pulse rounded"></div>
+              ))}
+            </div>
+          ) : (
+            <div className="max-h-64 overflow-y-auto space-y-1">
+              {backendFiles.map((file, index) => (
+                <div
+                  key={index}
+                  className={`p-2 rounded cursor-pointer transition-colors flex items-center justify-between ${
+                    selectedFile?.path === file.path
+                      ? 'bg-blue-100 border border-blue-300'
+                      : 'hover:bg-gray-50 border border-transparent'
+                  }`}
+                  onClick={() => fetchFileContent(file.path)}
+                >
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-gray-500" />
+                    <div>
+                      <div className="text-sm font-medium">{file.path}</div>
+                      <div className="text-xs text-gray-500">
+                        {file.recordCount} records • {file.sizeHuman}
+                      </div>
+                    </div>
+                  </div>
+                  {fileContent && selectedFile?.path === file.path && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        downloadFile(file.path, fileContent);
+                      }}
+                      className="p-1 text-green-600 hover:text-green-800 transition-colors"
+                      title="Download file"
+                    >
+                      <Download className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* File Viewer/Editor */}
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h3 className="font-semibold mb-3 flex items-center gap-2">
+            <FileText className="w-5 h-5" />
+            File Content
+            {selectedFile && (
+              <div className="ml-auto flex gap-2">
+                {!isEditing ? (
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors"
+                  >
+                    Edit
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      onClick={saveFileContent}
+                      disabled={savingFile}
+                      className="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition-colors disabled:opacity-50"
+                    >
+                      {savingFile ? 'Saving...' : 'Save'}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsEditing(false);
+                        setEditingContent(JSON.stringify(fileContent, null, 2));
+                      }}
+                      className="px-3 py-1 bg-gray-500 text-white text-sm rounded hover:bg-gray-600 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+          </h3>
+          
+          {loadingFile ? (
+            <div className="h-64 bg-gray-200 animate-pulse rounded"></div>
+          ) : selectedFile ? (
+            <div className="space-y-2">
+              <div className="text-xs text-gray-500 mb-2">
+                <div>Path: {selectedFile.path}</div>
+                <div>Size: {(selectedFile.size / 1024).toFixed(1)} KB</div>
+                <div>Last Modified: {new Date(selectedFile.lastModified).toLocaleString()}</div>
+              </div>
+              
+              {isEditing ? (
+                <textarea
+                  value={editingContent}
+                  onChange={(e) => setEditingContent(e.target.value)}
+                  className="w-full h-64 p-2 border rounded font-mono text-xs"
+                  placeholder="JSON content..."
+                />
+              ) : (
+                <pre className="bg-gray-50 p-3 rounded text-xs overflow-auto max-h-64 border">
+                  {JSON.stringify(fileContent, null, 2)}
+                </pre>
+              )}
+            </div>
+          ) : (
+            <div className="h-64 flex items-center justify-center text-gray-500">
+              <div className="text-center">
+                <FileText className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+                <p>Select a file to view its contents</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  const OverviewView = () => (
+    <div className="space-y-4">
       <div className="bg-white p-4 rounded-lg shadow">
         <h3 className="font-semibold mb-2">Add New User:</h3>
         <div className="flex gap-2">
@@ -565,6 +880,23 @@ const AdminTab = ({ newUserName, setNewUserName, addUser, loading, scrapeRaces, 
           <li>5. Click "Reset for New Day" to start fresh (saves current scores)</li>
         </ol>
       </div>
+    </div>
+  );
+
+  return (
+    <div className="space-y-4">
+      <div className="bg-gradient-to-r from-purple-500 to-purple-700 text-white p-6 rounded-lg">
+        <h2 className="text-2xl font-bold flex items-center gap-2">
+          <Settings className="w-6 h-6" />
+          Admin Panel
+        </h2>
+        <p className="text-purple-100 mt-2">Complete control over your betting system and data</p>
+      </div>
+
+      <AdminSubNavigation />
+
+      {adminView === 'overview' && <OverviewView />}
+      {adminView === 'data' && <DataManagerView />}
     </div>
   );
 };
@@ -847,15 +1179,26 @@ const HorseBettingApp = () => {
   const fetchRaceDays = useCallback(async () => {
     setLoadingRaceDays(true);
     try {
-      const response = await fetch(`${API_BASE}/race-days`, {
+      // Use the new historical race days endpoint
+      const response = await fetch(`${API_BASE}/race-days/historical`, {
         signal: AbortSignal.timeout(15000)
       });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      setRaceDays(data.race_days);
-      setCurrentRaceDay(data.current_race_day);
+      
+      // Transform the data to match the expected format
+      const transformedRaceDays = data.raceDays || [];
+      setRaceDays(transformedRaceDays);
+      
+      // Set current race day to today or most recent
+      const today = new Date().toISOString().split('T')[0];
+      const currentDay = transformedRaceDays.find(day => day.date === today) || 
+                        transformedRaceDays[0] || 
+                        { date: today };
+      setCurrentRaceDay(currentDay.date);
+      
       setServerConnected(true);
     } catch (error) {
       console.error('Error fetching race days:', error);
@@ -869,26 +1212,68 @@ const HorseBettingApp = () => {
   const switchRaceDay = useCallback(async (raceDay) => {
     setLoadingRaceDays(true);
     try {
-      const response = await fetch(`${API_BASE}/race-days/current`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ race_day: raceDay }),
-        signal: AbortSignal.timeout(15000)
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      // Update the UI state
       setCurrentRaceDay(raceDay);
       
-      // Refresh all data after switching race day
-      loadAllData(true);
+      // Check if this is a historical race day
+      const today = new Date().toISOString().split('T')[0];
+      if (raceDay !== today) {
+        // Load historical data for this specific race day
+        const response = await fetch(`${API_BASE}/race-days/historical/${raceDay}`, {
+          signal: AbortSignal.timeout(15000)
+        });
+        
+        if (response.ok) {
+          const historicalData = await response.json();
+          console.log('Historical data loaded:', historicalData);
+          
+          // Extract the race day data from the response
+          const raceData = historicalData.raceDay || historicalData;
+          
+          // Update the app state with historical data
+          if (raceData.races) {
+            setRaces(raceData.races);
+          }
+          
+          // Convert userScores to bets and bankers format for display
+          if (raceData.userScores) {
+            const historicalBets = {};
+            const historicalBankers = {};
+            
+            raceData.userScores.forEach(userScore => {
+              // Convert bets format
+              if (userScore.bets) {
+                historicalBets[userScore.userId] = {};
+                userScore.bets.forEach(bet => {
+                  historicalBets[userScore.userId][bet.raceId] = bet.horseNumber;
+                });
+              }
+              
+              // Set banker if exists
+              if (userScore.bankerRaceId) {
+                historicalBankers[userScore.userId] = userScore.bankerRaceId;
+              }
+            });
+            
+            setBets(historicalBets);
+            setBankers(historicalBankers);
+          }
+          
+          showMessage(`Viewing historical race day: ${raceDay} (Read-only)`, 'info');
+        } else {
+          showMessage(`Race day ${raceDay} data not found`, 'error');
+        }
+      } else {
+        // For current day, reload all current data
+        loadAllData(true);
+        showMessage(`Switched to current race day: ${raceDay}`, 'success');
+      }
       
-      showMessage(`Switched to race day: ${raceDay}`, 'success');
+      setServerConnected(true);
     } catch (error) {
       console.error('Error switching race day:', error);
       showMessage('Error switching race day', 'error');
+      setServerConnected(false);
     } finally {
       setLoadingRaceDays(false);
     }
@@ -1242,7 +1627,7 @@ const HorseBettingApp = () => {
                 >
                   {raceDays.map(day => (
                     <option key={day.date} value={day.date} className="text-black">
-                      {day.date} {day.completed ? '(Completed)' : ''} ({day.race_count} races)
+                      {day.date} {day.status === 'completed' ? '(Completed)' : ''} ({day.totalRaces || day.race_count || 0} races)
                     </option>
                   ))}
                 </select>

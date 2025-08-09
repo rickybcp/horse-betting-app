@@ -1,1170 +1,1170 @@
 {
-  "completedAt": "2025-08-02T18:00:00Z",
-  "completedRaces": 8,
   "date": "2025-08-02",
+  "totalRaces": 8,
+  "completedRaces": 8,
+  "status": "completed",
+  "completedAt": "2025-08-02T18:00:00Z",
   "races": [
     {
+      "id": 1,
+      "name": "R1 - FASHION HEIGHTS - MIA BIJOUX CUP - [0 - 25] - 1400m",
+      "time": "12:45",
+      "status": "completed",
       "horses": [
         {
-          "name": "CAPTAIN'S CONSORT",
           "number": 1,
+          "name": "CAPTAIN'S CONCORT",
           "odds": 3.1
         },
         {
-          "name": "CYBOTIX",
           "number": 2,
-          "odds": 4
+          "name": "CYBOTIX",
+          "odds": 4.0
         },
         {
-          "name": "KAISARISSA",
           "number": 3,
+          "name": "KAISARISSA",
           "odds": 4.7
         },
         {
-          "name": "MYSTERY CACHE",
           "number": 4,
+          "name": "MYSTERY CACHE",
           "odds": 2.9
         },
         {
-          "name": "RAINWATER",
           "number": 5,
-          "odds": 33
+          "name": "RAINWATER",
+          "odds": 33.0
         },
         {
-          "name": "LE QUARTIER",
           "number": 6,
-          "odds": 16
+          "name": "LE QUARTIER",
+          "odds": 16.0
         }
       ],
-      "id": 1,
-      "name": "R1 - FASHION HEIGHTS - MIA BIJOUX CUP - [0 - 25] - 1400m",
-      "status": "completed",
-      "time": "12:45",
       "totalHorses": 6,
       "winner": 3,
       "winningHorse": {
-        "name": "KAISARISSA",
         "number": 3,
+        "name": "KAISARISSA",
         "odds": 4.7,
         "points": 1
       }
     },
     {
+      "id": 2,
+      "name": "R2 - FASHION HEIGHTS - GONG CHA CUP - [0 - 26] - 990m",
+      "time": "13:20",
+      "status": "completed",
       "horses": [
         {
-          "name": "CIDER HOUSE RULES",
           "number": 1,
-          "odds": 5
+          "name": "CIDER HOUSE RULES",
+          "odds": 5.0
         },
         {
-          "name": "CRESCENT",
           "number": 2,
-          "odds": 5
+          "name": "CRESCENT",
+          "odds": 5.0
         },
         {
-          "name": "KRIM",
           "number": 3,
+          "name": "KRIM",
           "odds": 1.5
         },
         {
-          "name": "MIND MAP",
           "number": 4,
-          "odds": 12
+          "name": "MIND MAP",
+          "odds": 12.0
         },
         {
-          "name": "STEPPING OUT",
           "number": 5,
-          "odds": 20
+          "name": "STEPPING OUT",
+          "odds": 20.0
         }
       ],
-      "id": 2,
-      "name": "R2 - FASHION HEIGHTS - GONG CHA CUP - [0 - 26] - 990m",
-      "status": "completed",
-      "time": "13:20",
       "totalHorses": 5,
       "winner": 4,
       "winningHorse": {
-        "name": "MIND MAP",
         "number": 4,
-        "odds": 12,
+        "name": "MIND MAP",
+        "odds": 12.0,
         "points": 3
       }
     },
     {
+      "id": 3,
+      "name": "R3 - FASHION HEIGHTS ETAM - GROUP CUP - Benchmark 36 - 1365m",
+      "time": "13:55",
+      "status": "completed",
       "horses": [
         {
-          "name": "CHARLIE SQUADRON",
           "number": 1,
-          "odds": 8
+          "name": "CHARLIE SQUADRON",
+          "odds": 8.0
         },
         {
-          "name": "MASTER POINT",
           "number": 2,
-          "odds": 8
+          "name": "MASTER POINT",
+          "odds": 8.0
         },
         {
-          "name": "BABYLON",
           "number": 3,
+          "name": "BABYLON",
           "odds": 2.6
         },
         {
-          "name": "CITADEL",
           "number": 4,
-          "odds": 33
+          "name": "CITADEL",
+          "odds": 33.0
         },
         {
-          "name": "ORANGE RED",
           "number": 5,
+          "name": "ORANGE RED",
           "odds": 2.3
         },
         {
-          "name": "ZOOBERI",
           "number": 6,
-          "odds": 13
+          "name": "ZOOBERI",
+          "odds": 13.0
         }
       ],
-      "id": 3,
-      "name": "R3 - FASHION HEIGHTS ETAM - GROUP CUP - Benchmark 36 - 1365m",
-      "status": "completed",
-      "time": "13:55",
       "totalHorses": 6,
       "winner": 3,
       "winningHorse": {
-        "name": "BABYLON",
         "number": 3,
+        "name": "BABYLON",
         "odds": 2.6,
         "points": 1
       }
     },
     {
+      "id": 4,
+      "name": "R4 - FASHION HEIGHTS - COTE SUSHI CUP - Benchmark 56 - 990m",
+      "time": "14:30",
+      "status": "completed",
       "horses": [
         {
-          "name": "EMERALD BAND",
           "number": 1,
-          "odds": 25
+          "name": "EMERALD BAND",
+          "odds": 25.0
         },
         {
-          "name": "AMPERSAND",
           "number": 2,
+          "name": "AMPERSAND",
           "odds": 7.5
         },
         {
-          "name": "CAPTAIN MIKE",
           "number": 3,
+          "name": "CAPTAIN MIKE",
           "odds": 1.4
         },
         {
-          "name": "QUATRO FIVE SIX",
           "number": 4,
-          "odds": 25
+          "name": "QUATRO FIVE SIX",
+          "odds": 25.0
         },
         {
-          "name": "GRAND BAY",
           "number": 5,
-          "odds": 4
+          "name": "GRAND BAY",
+          "odds": 4.0
         }
       ],
-      "id": 4,
-      "name": "R4 - FASHION HEIGHTS - COTE SUSHI CUP - Benchmark 56 - 990m",
-      "status": "completed",
-      "time": "14:30",
       "totalHorses": 5,
       "winner": 3,
       "winningHorse": {
-        "name": "CAPTAIN MIKE",
         "number": 3,
+        "name": "CAPTAIN MIKE",
         "odds": 1.4,
         "points": 1
       }
     },
     {
+      "id": 5,
+      "name": "R5 - FASHION HEIGHTS - CELIO CUP - Benchmark 41 - 990m",
+      "time": "15:05",
+      "status": "completed",
       "horses": [
         {
-          "name": "WARRIOR CAPTAIN",
           "number": 1,
+          "name": "WARRIOR CAPTAIN",
           "odds": 2.4
         },
         {
-          "name": "ZIVA LA WINTER",
           "number": 2,
-          "odds": 4
+          "name": "ZIVA LA WINER",
+          "odds": 4.0
         },
         {
-          "name": "BON BOYAGE",
           "number": 3,
+          "name": "BON BOYAGE",
           "odds": 3.3
         },
         {
-          "name": "SAN ANDREAS",
           "number": 4,
-          "odds": 7
+          "name": "SAN ANDREAS",
+          "odds": 7.0
         },
         {
-          "name": "CLOUD SEEDER",
           "number": 5,
-          "odds": 14
+          "name": "CLOUD SEEDER",
+          "odds": 14.0
         }
       ],
-      "id": 5,
-      "name": "R5 - FASHION HEIGHTS - CELIO CUP - Benchmark 41 - 990m",
-      "status": "completed",
-      "time": "15:05",
       "totalHorses": 5,
       "winner": 3,
       "winningHorse": {
-        "name": "BON BOYAGE",
         "number": 3,
+        "name": "BON BOYAGE",
         "odds": 3.3,
         "points": 1
       }
     },
     {
+      "id": 6,
+      "name": "R6 - THE DUCHESS OF YORK CUP - G2 - WFA WITH PENALTIES - 1400m",
+      "time": "15:40",
+      "status": "completed",
       "horses": [
         {
-          "name": "CAPTAIN BOMBSHELL",
           "number": 1,
-          "odds": 8
+          "name": "CAPTAIN BOMBSHELL",
+          "odds": 8.0
         },
         {
-          "name": "ITSRAININGWILLIAM",
           "number": 2,
+          "name": "ITSRAININGWILLIAM",
           "odds": 2.35
         },
         {
-          "name": "MERIDIUS",
           "number": 3,
-          "odds": 14
+          "name": "MERIDIUS",
+          "odds": 14.0
         },
         {
-          "name": "SUGAR BLAST",
           "number": 4,
-          "odds": 60
+          "name": "SUGAR BLAST",
+          "odds": 60.0
         },
         {
-          "name": "WOLF MOUNTAIN",
           "number": 5,
+          "name": "WOLF MOUNTAIN",
           "odds": 6.5
         },
         {
-          "name": "GOOD COUNCIL",
           "number": 6,
-          "odds": 40
+          "name": "GOOD COUNCIL",
+          "odds": 40.0
         },
         {
-          "name": "BRAVE BOMBER",
           "number": 7,
-          "odds": 50
+          "name": "BRAVE BOMBER",
+          "odds": 50.0
         },
         {
-          "name": "PORT LOUIS",
           "number": 8,
+          "name": "PORT LOUIS",
           "odds": 7.5
         },
         {
-          "name": "WILLIAM IRON ARM",
           "number": 9,
-          "odds": 7
+          "name": "WILLIAM IRON ARM",
+          "odds": 7.0
         },
         {
-          "name": "WILLIE JOHN",
           "number": 10,
-          "odds": 9
+          "name": "WILLIE JOHN",
+          "odds": 9.0
         }
       ],
-      "id": 6,
-      "name": "R6 - THE DUCHESS OF YORK CUP - G2 - WFA WITH PENALTIES - 1400m",
-      "status": "completed",
-      "time": "15:40",
       "totalHorses": 10,
       "winner": 5,
       "winningHorse": {
-        "name": "WOLF MOUNTAIN",
         "number": 5,
+        "name": "WOLF MOUNTAIN",
         "odds": 6.5,
         "points": 2
       }
     },
     {
+      "id": 7,
+      "name": "R7 - APEX - APPLE RESELLER CUP - Benchmark 56 - 1400m",
+      "time": "16:15",
+      "status": "completed",
       "horses": [
         {
-          "name": "GRAND VISION",
           "number": 1,
-          "odds": 4
+          "name": "GRAND VISION",
+          "odds": 4.0
         },
         {
-          "name": "ZOOMIE",
           "number": 2,
+          "name": "ZOOMIE",
           "odds": 2.8
         },
         {
-          "name": "SEA DANCE",
           "number": 3,
-          "odds": 20
+          "name": "SEA DANCE",
+          "odds": 20.0
         },
         {
-          "name": "BALOUCHI",
           "number": 4,
-          "odds": 10
+          "name": "BALOUCHI",
+          "odds": 10.0
         },
         {
-          "name": "CHOSEN WAY",
           "number": 5,
-          "odds": 25
+          "name": "CHOSEN WAY",
+          "odds": 25.0
         },
         {
-          "name": "CAPTAIN COLA",
           "number": 6,
-          "odds": 5
+          "name": "CAPTAIN COLA",
+          "odds": 5.0
         },
         {
-          "name": "MENELAUS",
           "number": 7,
+          "name": "MENELAUS",
           "odds": 5.5
         }
       ],
-      "id": 7,
-      "name": "R7 - APEX - APPLE RESELLER CUP - Benchmark 56 - 1400m",
-      "status": "completed",
-      "time": "16:15",
       "totalHorses": 7,
       "winner": 6,
       "winningHorse": {
-        "name": "CAPTAIN COLA",
         "number": 6,
-        "odds": 5,
+        "name": "CAPTAIN COLA",
+        "odds": 5.0,
         "points": 1
       }
     },
     {
+      "id": 8,
+      "name": "R8 - THE WORSHIPFUL DAY PLATE - Benchmark 31 - 1365m",
+      "time": "16:55",
+      "status": "upcoming",
       "horses": [
         {
-          "name": "ARLINGTONS REVENGE",
           "number": 1,
-          "odds": 50
+          "name": "ARLINGTONS REVENGE",
+          "odds": 50.0
         },
         {
-          "name": "AMANCIO",
           "number": 2,
-          "odds": 7
+          "name": "AMANCIO",
+          "odds": 7.0
         },
         {
-          "name": "BESTDAY OF MYLIFE",
           "number": 3,
+          "name": "BESTDAY OF MYLIFE",
           "odds": 7.5
         },
         {
-          "name": "DOUBLE SILVER",
           "number": 4,
-          "odds": 9
+          "name": "DOUBLE SILVER",
+          "odds": 9.0
         },
         {
-          "name": "MALINOIS",
           "number": 5,
-          "odds": 50
+          "name": "MALINOIS",
+          "odds": 50.0
         },
         {
-          "name": "SUMMER SNOW",
           "number": 6,
-          "odds": 6
+          "name": "SUMMER SNOW",
+          "odds": 6.0
         },
         {
-          "name": "UNSUNG HERO",
           "number": 7,
-          "odds": 13
+          "name": "UNSUNG HERO",
+          "odds": 13.0
         },
         {
-          "name": "HAVANA MOON",
           "number": 8,
+          "name": "HAVANA MOON",
           "odds": 1.9
         }
       ],
-      "id": 8,
-      "name": "R8 - THE WORSHIPFUL DAY PLATE - Benchmark 31 - 1365m",
-      "status": "upcoming",
-      "time": "16:55",
       "totalHorses": 8,
       "winner": 8,
       "winningHorse": {
-        "name": "HAVANA MOON",
         "number": 8,
+        "name": "HAVANA MOON",
         "odds": 1.9,
         "points": 1
       }
     }
   ],
-  "status": "completed",
-  "totalRaces": 8,
   "userScores": [
     {
-      "bankerMultiplierApplied": false,
+      "userId": "1",
+      "userName": "Ben",
+      "dailyScore": 2,
+      "basePoints": 2,
       "bankerRaceId": 2,
       "bankerWon": false,
-      "basePoints": 2,
+      "bankerMultiplierApplied": false,
       "bets": [
         {
-          "horseName": "CYBOTIX",
-          "horseNumber": 2,
-          "points": 0,
           "raceId": 1,
           "raceName": "R1 - FASHION HEIGHTS - MIA BIJOUX CUP - [0 - 25] - 1400m",
-          "won": false
+          "horseNumber": 2,
+          "horseName": "CYBOTIX",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "KRIM",
-          "horseNumber": 3,
-          "points": 0,
           "raceId": 2,
           "raceName": "R2 - FASHION HEIGHTS - GONG CHA CUP - [0 - 26] - 990m",
-          "won": false
+          "horseNumber": 3,
+          "horseName": "KRIM",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "ORANGE RED",
-          "horseNumber": 5,
-          "points": 0,
           "raceId": 3,
           "raceName": "R3 - FASHION HEIGHTS ETAM - GROUP CUP - Benchmark 36 - 1365m",
-          "won": false
+          "horseNumber": 5,
+          "horseName": "ORANGE RED",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "CAPTAIN MIKE",
-          "horseNumber": 3,
-          "points": 1,
           "raceId": 4,
           "raceName": "R4 - FASHION HEIGHTS - COTE SUSHI CUP - Benchmark 56 - 990m",
-          "won": true
+          "horseNumber": 3,
+          "horseName": "CAPTAIN MIKE",
+          "won": true,
+          "points": 1
         },
         {
-          "horseName": "WARRIOR CAPTAIN",
-          "horseNumber": 1,
-          "points": 0,
           "raceId": 5,
           "raceName": "R5 - FASHION HEIGHTS - CELIO CUP - Benchmark 41 - 990m",
-          "won": false
+          "horseNumber": 1,
+          "horseName": "WARRIOR CAPTAIN",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "WILLIAM IRON ARM",
-          "horseNumber": 9,
-          "points": 0,
           "raceId": 6,
           "raceName": "R6 - THE DUCHESS OF YORK CUP - G2 - WFA WITH PENALTIES - 1400m",
-          "won": false
+          "horseNumber": 9,
+          "horseName": "WILLIAM IRON ARM",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "ZOOMIE",
-          "horseNumber": 2,
-          "points": 0,
           "raceId": 7,
           "raceName": "R7 - APEX - APPLE RESELLER CUP - Benchmark 56 - 1400m",
-          "won": false
+          "horseNumber": 2,
+          "horseName": "ZOOMIE",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "HAVANA MOON",
-          "horseNumber": 8,
-          "points": 1,
           "raceId": 8,
           "raceName": "R8 - THE WORSHIPFUL DAY PLATE - Benchmark 31 - 1365m",
-          "won": true
+          "horseNumber": 8,
+          "horseName": "HAVANA MOON",
+          "won": true,
+          "points": 1
         }
       ],
       "betsWon": 2,
-      "dailyScore": 2,
       "totalBets": 8,
-      "userId": "1",
-      "userName": "Ben",
       "winRate": 0.25
     },
     {
-      "bankerMultiplierApplied": true,
+      "userId": "3",
+      "userName": "Conrad",
+      "dailyScore": 6,
+      "basePoints": 3,
       "bankerRaceId": 4,
       "bankerWon": true,
-      "basePoints": 3,
+      "bankerMultiplierApplied": true,
       "bets": [
         {
-          "horseNumber": 3,
-          "points": 1,
           "raceId": "1",
           "raceName": "R1 - FASHION HEIGHTS - MIA BIJOUX CUP - [0 - 25] - 1400m",
-          "won": true
+          "horseNumber": 3,
+          "won": true,
+          "points": 1
         },
         {
-          "horseNumber": 3,
-          "points": 0,
           "raceId": "2",
           "raceName": "R2 - FASHION HEIGHTS - GONG CHA CUP - [0 - 26] - 990m",
-          "won": false
+          "horseNumber": 3,
+          "won": false,
+          "points": 0
         },
         {
-          "horseNumber": 5,
-          "points": 0,
           "raceId": "3",
           "raceName": "R3 - FASHION HEIGHTS ETAM - GROUP CUP - Benchmark 36 - 1365m",
-          "won": false
+          "horseNumber": 5,
+          "won": false,
+          "points": 0
         },
         {
-          "horseNumber": 3,
-          "points": 1,
           "raceId": "4",
           "raceName": "R4 - FASHION HEIGHTS - COTE SUSHI CUP - Benchmark 56 - 990m",
-          "won": true
+          "horseNumber": 3,
+          "won": true,
+          "points": 1
         },
         {
-          "horseNumber": 2,
-          "points": 0,
           "raceId": "5",
           "raceName": "R5 - FASHION HEIGHTS - CELIO CUP - Benchmark 41 - 990m",
-          "won": false
+          "horseNumber": 2,
+          "won": false,
+          "points": 0
         },
         {
-          "horseNumber": 2,
-          "points": 0,
           "raceId": "6",
           "raceName": "R6 - THE DUCHESS OF YORK CUP - G2 - WFA WITH PENALTIES - 1400m",
-          "won": false
+          "horseNumber": 2,
+          "won": false,
+          "points": 0
         },
         {
-          "horseNumber": 2,
-          "points": 0,
           "raceId": "7",
           "raceName": "R7 - APEX - APPLE RESELLER CUP - Benchmark 56 - 1400m",
-          "won": false
+          "horseNumber": 2,
+          "won": false,
+          "points": 0
         },
         {
-          "horseNumber": 8,
-          "points": 1,
           "raceId": "8",
           "raceName": "R8 - THE WORSHIPFUL DAY PLATE - Benchmark 31 - 1365m",
-          "won": true
+          "horseNumber": 8,
+          "won": true,
+          "points": 1
         }
       ],
       "betsWon": 3,
-      "dailyScore": 6,
       "totalBets": 8,
-      "userId": "3",
-      "userName": "Conrad",
       "winRate": 0.375
     },
     {
-      "bankerMultiplierApplied": true,
-      "bankerRaceId": 8,
-      "bankerWon": true,
-      "basePoints": 2,
-      "bets": [
-        {
-          "horseName": "MYSTERY CACHE",
-          "horseNumber": 4,
-          "points": 0,
-          "raceId": 1,
-          "raceName": "R1 - FASHION HEIGHTS - MIA BIJOUX CUP - [0 - 25] - 1400m",
-          "won": false
-        },
-        {
-          "horseName": "KRIM",
-          "horseNumber": 3,
-          "points": 0,
-          "raceId": 2,
-          "raceName": "R2 - FASHION HEIGHTS - GONG CHA CUP - [0 - 26] - 990m",
-          "won": false
-        },
-        {
-          "horseName": "BABYLON",
-          "horseNumber": 3,
-          "points": 1,
-          "raceId": 3,
-          "raceName": "R3 - FASHION HEIGHTS ETAM - GROUP CUP - Benchmark 36 - 1365m",
-          "won": true
-        },
-        {
-          "horseName": "GRAND BAY",
-          "horseNumber": 5,
-          "points": 0,
-          "raceId": 4,
-          "raceName": "R4 - FASHION HEIGHTS - COTE SUSHI CUP - Benchmark 56 - 990m",
-          "won": false
-        },
-        {
-          "horseName": "CLOUD SEEDER",
-          "horseNumber": 5,
-          "points": 0,
-          "raceId": 5,
-          "raceName": "R5 - FASHION HEIGHTS - CELIO CUP - Benchmark 41 - 990m",
-          "won": false
-        },
-        {
-          "horseName": "CAPTAIN BOMBSHELL",
-          "horseNumber": 1,
-          "points": 0,
-          "raceId": 6,
-          "raceName": "R6 - THE DUCHESS OF YORK CUP - G2 - WFA WITH PENALTIES - 1400m",
-          "won": false
-        },
-        {
-          "horseName": "ZOOMIE",
-          "horseNumber": 2,
-          "points": 0,
-          "raceId": 7,
-          "raceName": "R7 - APEX - APPLE RESELLER CUP - Benchmark 56 - 1400m",
-          "won": false
-        },
-        {
-          "horseName": "HAVANA MOON",
-          "horseNumber": 8,
-          "points": 1,
-          "raceId": 8,
-          "raceName": "R8 - THE WORSHIPFUL DAY PLATE - Benchmark 31 - 1365m",
-          "won": true
-        }
-      ],
-      "betsWon": 2,
-      "dailyScore": 4,
-      "totalBets": 8,
       "userId": "4",
       "userName": "Jason",
-      "winRate": 0.25
-    },
-    {
-      "bankerMultiplierApplied": false,
-      "bankerRaceId": 6,
-      "bankerWon": false,
+      "dailyScore": 4,
       "basePoints": 2,
+      "bankerRaceId": 8,
+      "bankerWon": true,
+      "bankerMultiplierApplied": true,
       "bets": [
         {
-          "horseName": "MYSTERY CACHE",
-          "horseNumber": 4,
-          "points": 0,
           "raceId": 1,
           "raceName": "R1 - FASHION HEIGHTS - MIA BIJOUX CUP - [0 - 25] - 1400m",
-          "won": false
+          "horseNumber": 4,
+          "horseName": "MYSTERY CACHE",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "MIND MAP",
-          "horseNumber": 4,
-          "points": 1,
           "raceId": 2,
           "raceName": "R2 - FASHION HEIGHTS - GONG CHA CUP - [0 - 26] - 990m",
-          "won": true
+          "horseNumber": 3,
+          "horseName": "KRIM",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "BABYLON",
-          "horseNumber": 3,
-          "points": 1,
           "raceId": 3,
           "raceName": "R3 - FASHION HEIGHTS ETAM - GROUP CUP - Benchmark 36 - 1365m",
-          "won": true
+          "horseNumber": 3,
+          "horseName": "BABYLON",
+          "won": true,
+          "points": 1
         },
         {
-          "horseName": "AMPERSAND",
-          "horseNumber": 2,
-          "points": 0,
           "raceId": 4,
           "raceName": "R4 - FASHION HEIGHTS - COTE SUSHI CUP - Benchmark 56 - 990m",
-          "won": false
+          "horseNumber": 5,
+          "horseName": "GRAND BAY",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "ZIVA LA WINER",
-          "horseNumber": 2,
-          "points": 0,
           "raceId": 5,
           "raceName": "R5 - FASHION HEIGHTS - CELIO CUP - Benchmark 41 - 990m",
-          "won": false
+          "horseNumber": 5,
+          "horseName": "CLOUD SEEDER",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "ITSRAININGWILLIAM",
-          "horseNumber": 2,
-          "points": 0,
           "raceId": 6,
           "raceName": "R6 - THE DUCHESS OF YORK CUP - G2 - WFA WITH PENALTIES - 1400m",
-          "won": false
+          "horseNumber": 1,
+          "horseName": "CAPTAIN BOMBSHELL",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "GRAND VISION",
-          "horseNumber": 1,
-          "points": 0,
           "raceId": 7,
           "raceName": "R7 - APEX - APPLE RESELLER CUP - Benchmark 56 - 1400m",
-          "won": false
+          "horseNumber": 2,
+          "horseName": "ZOOMIE",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "DOUBLE SILVER",
-          "horseNumber": 4,
-          "points": 0,
           "raceId": 8,
           "raceName": "R8 - THE WORSHIPFUL DAY PLATE - Benchmark 31 - 1365m",
-          "won": false
+          "horseNumber": 8,
+          "horseName": "HAVANA MOON",
+          "won": true,
+          "points": 1
         }
       ],
       "betsWon": 2,
-      "dailyScore": 2,
       "totalBets": 8,
+      "winRate": 0.25
+    },
+    {
       "userId": "10",
       "userName": "Ma\u00eblle",
+      "dailyScore": 2,
+      "basePoints": 2,
+      "bankerRaceId": 6,
+      "bankerWon": false,
+      "bankerMultiplierApplied": false,
+      "bets": [
+        {
+          "raceId": 1,
+          "raceName": "R1 - FASHION HEIGHTS - MIA BIJOUX CUP - [0 - 25] - 1400m",
+          "horseNumber": 4,
+          "horseName": "MYSTERY CACHE",
+          "won": false,
+          "points": 0
+        },
+        {
+          "raceId": 2,
+          "raceName": "R2 - FASHION HEIGHTS - GONG CHA CUP - [0 - 26] - 990m",
+          "horseNumber": 4,
+          "horseName": "MIND MAP",
+          "won": true,
+          "points": 1
+        },
+        {
+          "raceId": 3,
+          "raceName": "R3 - FASHION HEIGHTS ETAM - GROUP CUP - Benchmark 36 - 1365m",
+          "horseNumber": 3,
+          "horseName": "BABYLON",
+          "won": true,
+          "points": 1
+        },
+        {
+          "raceId": 4,
+          "raceName": "R4 - FASHION HEIGHTS - COTE SUSHI CUP - Benchmark 56 - 990m",
+          "horseNumber": 2,
+          "horseName": "AMPERSAND",
+          "won": false,
+          "points": 0
+        },
+        {
+          "raceId": 5,
+          "raceName": "R5 - FASHION HEIGHTS - CELIO CUP - Benchmark 41 - 990m",
+          "horseNumber": 2,
+          "horseName": "ZIVA LA WINER",
+          "won": false,
+          "points": 0
+        },
+        {
+          "raceId": 6,
+          "raceName": "R6 - THE DUCHESS OF YORK CUP - G2 - WFA WITH PENALTIES - 1400m",
+          "horseNumber": 2,
+          "horseName": "ITSRAININGWILLIAM",
+          "won": false,
+          "points": 0
+        },
+        {
+          "raceId": 7,
+          "raceName": "R7 - APEX - APPLE RESELLER CUP - Benchmark 56 - 1400m",
+          "horseNumber": 1,
+          "horseName": "GRAND VISION",
+          "won": false,
+          "points": 0
+        },
+        {
+          "raceId": 8,
+          "raceName": "R8 - THE WORSHIPFUL DAY PLATE - Benchmark 31 - 1365m",
+          "horseNumber": 4,
+          "horseName": "DOUBLE SILVER",
+          "won": false,
+          "points": 0
+        }
+      ],
+      "betsWon": 2,
+      "totalBets": 8,
       "winRate": 0.25
     },
     {
-      "bankerMultiplierApplied": false,
-      "bankerRaceId": 2,
-      "bankerWon": false,
-      "basePoints": 4,
-      "bets": [
-        {
-          "horseName": "KAISARISSA",
-          "horseNumber": 3,
-          "points": 1,
-          "raceId": 1,
-          "raceName": "R1 - FASHION HEIGHTS - MIA BIJOUX CUP - [0 - 25] - 1400m",
-          "won": true
-        },
-        {
-          "horseName": "KRIM",
-          "horseNumber": 3,
-          "points": 0,
-          "raceId": 2,
-          "raceName": "R2 - FASHION HEIGHTS - GONG CHA CUP - [0 - 26] - 990m",
-          "won": false
-        },
-        {
-          "horseName": "BABYLON",
-          "horseNumber": 3,
-          "points": 1,
-          "raceId": 3,
-          "raceName": "R3 - FASHION HEIGHTS ETAM - GROUP CUP - Benchmark 36 - 1365m",
-          "won": true
-        },
-        {
-          "horseName": "AMPERSAND",
-          "horseNumber": 2,
-          "points": 0,
-          "raceId": 4,
-          "raceName": "R4 - FASHION HEIGHTS - COTE SUSHI CUP - Benchmark 56 - 990m",
-          "won": false
-        },
-        {
-          "horseName": "WARRIOR CAPTAIN",
-          "horseNumber": 1,
-          "points": 0,
-          "raceId": 5,
-          "raceName": "R5 - FASHION HEIGHTS - CELIO CUP - Benchmark 41 - 990m",
-          "won": false
-        },
-        {
-          "horseName": "CAPTAIN BOMBSHELL",
-          "horseNumber": 1,
-          "points": 0,
-          "raceId": 6,
-          "raceName": "R6 - THE DUCHESS OF YORK CUP - G2 - WFA WITH PENALTIES - 1400m",
-          "won": false
-        },
-        {
-          "horseName": "CAPTAIN COLA",
-          "horseNumber": 6,
-          "points": 1,
-          "raceId": 7,
-          "raceName": "R7 - APEX - APPLE RESELLER CUP - Benchmark 56 - 1400m",
-          "won": true
-        },
-        {
-          "horseName": "HAVANA MOON",
-          "horseNumber": 8,
-          "points": 1,
-          "raceId": 8,
-          "raceName": "R8 - THE WORSHIPFUL DAY PLATE - Benchmark 31 - 1365m",
-          "won": true
-        }
-      ],
-      "betsWon": 4,
-      "dailyScore": 4,
-      "totalBets": 8,
       "userId": "7",
       "userName": "Shaun",
-      "winRate": 0.5
-    },
-    {
-      "bankerMultiplierApplied": false,
-      "bankerRaceId": 4,
-      "bankerWon": false,
-      "basePoints": 1,
-      "bets": [
-        {
-          "horseName": "CAPTAIN'S CONSORT",
-          "horseNumber": 1,
-          "points": 0,
-          "raceId": 1,
-          "raceName": "R1 - FASHION HEIGHTS - MIA BIJOUX CUP - [0 - 25] - 1400m",
-          "won": false
-        },
-        {
-          "horseName": "STEPPING OUT",
-          "horseNumber": 5,
-          "points": 0,
-          "raceId": 2,
-          "raceName": "R2 - FASHION HEIGHTS - GONG CHA CUP - [0 - 26] - 990m",
-          "won": false
-        },
-        {
-          "horseName": "CITADEL",
-          "horseNumber": 4,
-          "points": 0,
-          "raceId": 3,
-          "raceName": "R3 - FASHION HEIGHTS ETAM - GROUP CUP - Benchmark 36 - 1365m",
-          "won": false
-        },
-        {
-          "horseName": "QUATRO FIVE SIX",
-          "horseNumber": 4,
-          "points": 0,
-          "raceId": 4,
-          "raceName": "R4 - FASHION HEIGHTS - COTE SUSHI CUP - Benchmark 56 - 990m",
-          "won": false
-        },
-        {
-          "horseName": "SAN ANDREAS",
-          "horseNumber": 4,
-          "points": 0,
-          "raceId": 5,
-          "raceName": "R5 - FASHION HEIGHTS - CELIO CUP - Benchmark 41 - 990m",
-          "won": false
-        },
-        {
-          "horseName": "WOLF MOUNTAIN",
-          "horseNumber": 5,
-          "points": 1,
-          "raceId": 6,
-          "raceName": "R6 - THE DUCHESS OF YORK CUP - G2 - WFA WITH PENALTIES - 1400m",
-          "won": true
-        },
-        {
-          "horseName": "GRAND VISION",
-          "horseNumber": 1,
-          "points": 0,
-          "raceId": 7,
-          "raceName": "R7 - APEX - APPLE RESELLER CUP - Benchmark 56 - 1400m",
-          "won": false
-        },
-        {
-          "horseName": "BESTDAY OF MYLIFE",
-          "horseNumber": 3,
-          "points": 0,
-          "raceId": 8,
-          "raceName": "R8 - THE WORSHIPFUL DAY PLATE - Benchmark 31 - 1365m",
-          "won": false
-        }
-      ],
-      "betsWon": 1,
-      "dailyScore": 1,
-      "totalBets": 8,
-      "userId": "11",
-      "userName": "Leana",
-      "winRate": 0.125
-    },
-    {
-      "bankerMultiplierApplied": false,
+      "dailyScore": 4,
+      "basePoints": 4,
       "bankerRaceId": 2,
       "bankerWon": false,
-      "basePoints": 4,
+      "bankerMultiplierApplied": false,
       "bets": [
         {
-          "horseName": "KAISARISSA",
-          "horseNumber": 3,
-          "points": 1,
           "raceId": 1,
           "raceName": "R1 - FASHION HEIGHTS - MIA BIJOUX CUP - [0 - 25] - 1400m",
-          "won": true
+          "horseNumber": 3,
+          "horseName": "KAISARISSA",
+          "won": true,
+          "points": 1
         },
         {
-          "horseName": "KRIM",
-          "horseNumber": 3,
-          "points": 0,
           "raceId": 2,
           "raceName": "R2 - FASHION HEIGHTS - GONG CHA CUP - [0 - 26] - 990m",
-          "won": false
+          "horseNumber": 3,
+          "horseName": "KRIM",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "BABYLON",
-          "horseNumber": 3,
-          "points": 1,
           "raceId": 3,
           "raceName": "R3 - FASHION HEIGHTS ETAM - GROUP CUP - Benchmark 36 - 1365m",
-          "won": true
+          "horseNumber": 3,
+          "horseName": "BABYLON",
+          "won": true,
+          "points": 1
         },
         {
-          "horseName": "CAPTAIN MIKE",
-          "horseNumber": 3,
-          "points": 1,
           "raceId": 4,
           "raceName": "R4 - FASHION HEIGHTS - COTE SUSHI CUP - Benchmark 56 - 990m",
-          "won": true
+          "horseNumber": 2,
+          "horseName": "AMPERSAND",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "WARRIOR CAPTAIN",
-          "horseNumber": 1,
-          "points": 0,
           "raceId": 5,
           "raceName": "R5 - FASHION HEIGHTS - CELIO CUP - Benchmark 41 - 990m",
-          "won": false
+          "horseNumber": 1,
+          "horseName": "WARRIOR CAPTAIN",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "ITSRAININGWILLIAM",
-          "horseNumber": 2,
-          "points": 0,
           "raceId": 6,
           "raceName": "R6 - THE DUCHESS OF YORK CUP - G2 - WFA WITH PENALTIES - 1400m",
-          "won": false
+          "horseNumber": 1,
+          "horseName": "CAPTAIN BOMBSHELL",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "ZOOMIE",
-          "horseNumber": 2,
-          "points": 0,
           "raceId": 7,
           "raceName": "R7 - APEX - APPLE RESELLER CUP - Benchmark 56 - 1400m",
-          "won": false
+          "horseNumber": 6,
+          "horseName": "CAPTAIN COLA",
+          "won": true,
+          "points": 1
         },
         {
-          "horseName": "HAVANA MOON",
-          "horseNumber": 8,
-          "points": 1,
           "raceId": 8,
           "raceName": "R8 - THE WORSHIPFUL DAY PLATE - Benchmark 31 - 1365m",
-          "won": true
+          "horseNumber": 8,
+          "horseName": "HAVANA MOON",
+          "won": true,
+          "points": 1
         }
       ],
       "betsWon": 4,
-      "dailyScore": 4,
       "totalBets": 8,
-      "userId": "6",
-      "userName": "Caroline",
       "winRate": 0.5
     },
     {
-      "bankerMultiplierApplied": true,
-      "bankerRaceId": 4,
-      "bankerWon": true,
-      "basePoints": 2,
-      "bets": [
-        {
-          "horseName": "RAINWATER",
-          "horseNumber": 5,
-          "points": 0,
-          "raceId": 1,
-          "raceName": "R1 - FASHION HEIGHTS - MIA BIJOUX CUP - [0 - 25] - 1400m",
-          "won": false
-        },
-        {
-          "horseName": "CRESCENT",
-          "horseNumber": 2,
-          "points": 0,
-          "raceId": 2,
-          "raceName": "R2 - FASHION HEIGHTS - GONG CHA CUP - [0 - 26] - 990m",
-          "won": false
-        },
-        {
-          "horseName": "CHARLIE SQUADRON",
-          "horseNumber": 1,
-          "points": 0,
-          "raceId": 3,
-          "raceName": "R3 - FASHION HEIGHTS ETAM - GROUP CUP - Benchmark 36 - 1365m",
-          "won": false
-        },
-        {
-          "horseName": "CAPTAIN MIKE",
-          "horseNumber": 3,
-          "points": 1,
-          "raceId": 4,
-          "raceName": "R4 - FASHION HEIGHTS - COTE SUSHI CUP - Benchmark 56 - 990m",
-          "won": true
-        },
-        {
-          "horseName": "WARRIOR CAPTAIN",
-          "horseNumber": 1,
-          "points": 0,
-          "raceId": 5,
-          "raceName": "R5 - FASHION HEIGHTS - CELIO CUP - Benchmark 41 - 990m",
-          "won": false
-        },
-        {
-          "horseName": "WILLIAM IRON ARM",
-          "horseNumber": 9,
-          "points": 0,
-          "raceId": 6,
-          "raceName": "R6 - THE DUCHESS OF YORK CUP - G2 - WFA WITH PENALTIES - 1400m",
-          "won": false
-        },
-        {
-          "horseName": "ZOOMIE",
-          "horseNumber": 2,
-          "points": 0,
-          "raceId": 7,
-          "raceName": "R7 - APEX - APPLE RESELLER CUP - Benchmark 56 - 1400m",
-          "won": false
-        },
-        {
-          "horseName": "HAVANA MOON",
-          "horseNumber": 8,
-          "points": 1,
-          "raceId": 8,
-          "raceName": "R8 - THE WORSHIPFUL DAY PLATE - Benchmark 31 - 1365m",
-          "won": true
-        }
-      ],
-      "betsWon": 2,
-      "dailyScore": 4,
-      "totalBets": 8,
-      "userId": "5",
-      "userName": "Ricky",
-      "winRate": 0.25
-    },
-    {
-      "bankerMultiplierApplied": false,
-      "bankerRaceId": 2,
-      "bankerWon": false,
+      "userId": "11",
+      "userName": "Leana",
+      "dailyScore": 1,
       "basePoints": 1,
+      "bankerRaceId": 4,
+      "bankerWon": false,
+      "bankerMultiplierApplied": false,
       "bets": [
         {
-          "horseName": "MYSTERY CACHE",
-          "horseNumber": 4,
-          "points": 0,
           "raceId": 1,
           "raceName": "R1 - FASHION HEIGHTS - MIA BIJOUX CUP - [0 - 25] - 1400m",
-          "won": false
+          "horseNumber": 1,
+          "horseName": "CAPTAIN'S CONSORT",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "KRIM",
-          "horseNumber": 3,
-          "points": 0,
           "raceId": 2,
           "raceName": "R2 - FASHION HEIGHTS - GONG CHA CUP - [0 - 26] - 990m",
-          "won": false
+          "horseNumber": 5,
+          "horseName": "STEPPING OUT",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "BABYLON",
-          "horseNumber": 3,
-          "points": 1,
           "raceId": 3,
           "raceName": "R3 - FASHION HEIGHTS ETAM - GROUP CUP - Benchmark 36 - 1365m",
-          "won": true
+          "horseNumber": 4,
+          "horseName": "CITADEL",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "GRAND BAY",
-          "horseNumber": 5,
-          "points": 0,
           "raceId": 4,
           "raceName": "R4 - FASHION HEIGHTS - COTE SUSHI CUP - Benchmark 56 - 990m",
-          "won": false
+          "horseNumber": 4,
+          "horseName": "QUATRO FIVE SIX",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "WARRIOR CAPTAIN",
-          "horseNumber": 1,
-          "points": 0,
           "raceId": 5,
           "raceName": "R5 - FASHION HEIGHTS - CELIO CUP - Benchmark 41 - 990m",
-          "won": false
+          "horseNumber": 4,
+          "horseName": "SAN ANDREAS",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "ITSRAININGWILLIAM",
-          "horseNumber": 2,
-          "points": 0,
           "raceId": 6,
           "raceName": "R6 - THE DUCHESS OF YORK CUP - G2 - WFA WITH PENALTIES - 1400m",
-          "won": false
+          "horseNumber": 5,
+          "horseName": "WOLF MOUNTAIN",
+          "won": true,
+          "points": 1
         },
         {
-          "horseName": "ZOOMIE",
-          "horseNumber": 2,
-          "points": 0,
           "raceId": 7,
           "raceName": "R7 - APEX - APPLE RESELLER CUP - Benchmark 56 - 1400m",
-          "won": false
+          "horseNumber": 1,
+          "horseName": "GRAND VISION",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "UNSUNG HERO",
-          "horseNumber": 7,
-          "points": 0,
           "raceId": 8,
           "raceName": "R8 - THE WORSHIPFUL DAY PLATE - Benchmark 31 - 1365m",
-          "won": false
+          "horseNumber": 3,
+          "horseName": "BESTDAY OF MYLIFE",
+          "won": false,
+          "points": 0
         }
       ],
       "betsWon": 1,
-      "dailyScore": 1,
       "totalBets": 8,
-      "userId": "8",
-      "userName": "Sarah",
       "winRate": 0.125
     },
     {
-      "bankerMultiplierApplied": false,
-      "bankerRaceId": null,
+      "userId": "6",
+      "userName": "Caroline",
+      "dailyScore": 4,
+      "basePoints": 4,
+      "bankerRaceId": 2,
       "bankerWon": false,
-      "basePoints": 2,
+      "bankerMultiplierApplied": false,
       "bets": [
         {
-          "horseName": "CAPTAIN'S CONSORT",
-          "horseNumber": 1,
-          "points": 0,
           "raceId": 1,
           "raceName": "R1 - FASHION HEIGHTS - MIA BIJOUX CUP - [0 - 25] - 1400m",
-          "won": false
+          "horseNumber": 3,
+          "horseName": "KAISARISSA",
+          "won": true,
+          "points": 1
         },
         {
-          "horseName": "CRESCENT",
-          "horseNumber": 2,
-          "points": 0,
           "raceId": 2,
           "raceName": "R2 - FASHION HEIGHTS - GONG CHA CUP - [0 - 26] - 990m",
-          "won": false
+          "horseNumber": 3,
+          "horseName": "KRIM",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "BABYLON",
-          "horseNumber": 3,
-          "points": 1,
           "raceId": 3,
           "raceName": "R3 - FASHION HEIGHTS ETAM - GROUP CUP - Benchmark 36 - 1365m",
-          "won": true
+          "horseNumber": 3,
+          "horseName": "BABYLON",
+          "won": true,
+          "points": 1
         },
         {
-          "horseName": "GRAND BAY",
-          "horseNumber": 5,
-          "points": 0,
           "raceId": 4,
           "raceName": "R4 - FASHION HEIGHTS - COTE SUSHI CUP - Benchmark 56 - 990m",
-          "won": false
+          "horseNumber": 3,
+          "horseName": "CAPTAIN MIKE",
+          "won": true,
+          "points": 1
         },
         {
-          "horseName": "WARRIOR CAPTAIN",
-          "horseNumber": 1,
-          "points": 0,
           "raceId": 5,
           "raceName": "R5 - FASHION HEIGHTS - CELIO CUP - Benchmark 41 - 990m",
-          "won": false
+          "horseNumber": 1,
+          "horseName": "WARRIOR CAPTAIN",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "ITSRAININGWILLIAM",
-          "horseNumber": 2,
-          "points": 0,
           "raceId": 6,
           "raceName": "R6 - THE DUCHESS OF YORK CUP - G2 - WFA WITH PENALTIES - 1400m",
-          "won": false
+          "horseNumber": 2,
+          "horseName": "ITSRAININGWILLIAM",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "ZOOMIE",
-          "horseNumber": 2,
-          "points": 0,
           "raceId": 7,
           "raceName": "R7 - APEX - APPLE RESELLER CUP - Benchmark 56 - 1400m",
-          "won": false
+          "horseNumber": 2,
+          "horseName": "ZOOMIE",
+          "won": false,
+          "points": 0
         },
         {
-          "horseName": "HAVANA MOON",
-          "horseNumber": 8,
-          "points": 1,
           "raceId": 8,
           "raceName": "R8 - THE WORSHIPFUL DAY PLATE - Benchmark 31 - 1365m",
-          "won": true
+          "horseNumber": 8,
+          "horseName": "HAVANA MOON",
+          "won": true,
+          "points": 1
+        }
+      ],
+      "betsWon": 4,
+      "totalBets": 8,
+      "winRate": 0.5
+    },
+    {
+      "userId": "5",
+      "userName": "Ricky",
+      "dailyScore": 4,
+      "basePoints": 2,
+      "bankerRaceId": 4,
+      "bankerWon": true,
+      "bankerMultiplierApplied": true,
+      "bets": [
+        {
+          "raceId": 1,
+          "raceName": "R1 - FASHION HEIGHTS - MIA BIJOUX CUP - [0 - 25] - 1400m",
+          "horseNumber": 5,
+          "horseName": "RAINWATER",
+          "won": false,
+          "points": 0
+        },
+        {
+          "raceId": 2,
+          "raceName": "R2 - FASHION HEIGHTS - GONG CHA CUP - [0 - 26] - 990m",
+          "horseNumber": 2,
+          "horseName": "CRESCENT",
+          "won": false,
+          "points": 0
+        },
+        {
+          "raceId": 3,
+          "raceName": "R3 - FASHION HEIGHTS ETAM - GROUP CUP - Benchmark 36 - 1365m",
+          "horseNumber": 1,
+          "horseName": "CHARLIE SQUADRON",
+          "won": false,
+          "points": 0
+        },
+        {
+          "raceId": 4,
+          "raceName": "R4 - FASHION HEIGHTS - COTE SUSHI CUP - Benchmark 56 - 990m",
+          "horseNumber": 3,
+          "horseName": "CAPTAIN MIKE",
+          "won": true,
+          "points": 1
+        },
+        {
+          "raceId": 5,
+          "raceName": "R5 - FASHION HEIGHTS - CELIO CUP - Benchmark 41 - 990m",
+          "horseNumber": 1,
+          "horseName": "WARRIOR CAPTAIN",
+          "won": false,
+          "points": 0
+        },
+        {
+          "raceId": 6,
+          "raceName": "R6 - THE DUCHESS OF YORK CUP - G2 - WFA WITH PENALTIES - 1400m",
+          "horseNumber": 9,
+          "horseName": "WILLIAM IRON ARM",
+          "won": false,
+          "points": 0
+        },
+        {
+          "raceId": 7,
+          "raceName": "R7 - APEX - APPLE RESELLER CUP - Benchmark 56 - 1400m",
+          "horseNumber": 2,
+          "horseName": "ZOOMIE",
+          "won": false,
+          "points": 0
+        },
+        {
+          "raceId": 8,
+          "raceName": "R8 - THE WORSHIPFUL DAY PLATE - Benchmark 31 - 1365m",
+          "horseNumber": 8,
+          "horseName": "HAVANA MOON",
+          "won": true,
+          "points": 1
         }
       ],
       "betsWon": 2,
-      "dailyScore": 2,
       "totalBets": 8,
+      "winRate": 0.25
+    },
+    {
+      "userId": "8",
+      "userName": "Sarah",
+      "dailyScore": 1,
+      "basePoints": 1,
+      "bankerRaceId": 2,
+      "bankerWon": false,
+      "bankerMultiplierApplied": false,
+      "bets": [
+        {
+          "raceId": 1,
+          "raceName": "R1 - FASHION HEIGHTS - MIA BIJOUX CUP - [0 - 25] - 1400m",
+          "horseNumber": 4,
+          "horseName": "MYSTERY CACHE",
+          "won": false,
+          "points": 0
+        },
+        {
+          "raceId": 2,
+          "raceName": "R2 - FASHION HEIGHTS - GONG CHA CUP - [0 - 26] - 990m",
+          "horseNumber": 3,
+          "horseName": "KRIM",
+          "won": false,
+          "points": 0
+        },
+        {
+          "raceId": 3,
+          "raceName": "R3 - FASHION HEIGHTS ETAM - GROUP CUP - Benchmark 36 - 1365m",
+          "horseNumber": 3,
+          "horseName": "BABYLON",
+          "won": true,
+          "points": 1
+        },
+        {
+          "raceId": 4,
+          "raceName": "R4 - FASHION HEIGHTS - COTE SUSHI CUP - Benchmark 56 - 990m",
+          "horseNumber": 5,
+          "horseName": "GRAND BAY",
+          "won": false,
+          "points": 0
+        },
+        {
+          "raceId": 5,
+          "raceName": "R5 - FASHION HEIGHTS - CELIO CUP - Benchmark 41 - 990m",
+          "horseNumber": 1,
+          "horseName": "WARRIOR CAPTAIN",
+          "won": false,
+          "points": 0
+        },
+        {
+          "raceId": 6,
+          "raceName": "R6 - THE DUCHESS OF YORK CUP - G2 - WFA WITH PENALTIES - 1400m",
+          "horseNumber": 2,
+          "horseName": "ITSRAININGWILLIAM",
+          "won": false,
+          "points": 0
+        },
+        {
+          "raceId": 7,
+          "raceName": "R7 - APEX - APPLE RESELLER CUP - Benchmark 56 - 1400m",
+          "horseNumber": 2,
+          "horseName": "ZOOMIE",
+          "won": false,
+          "points": 0
+        },
+        {
+          "raceId": 8,
+          "raceName": "R8 - THE WORSHIPFUL DAY PLATE - Benchmark 31 - 1365m",
+          "horseNumber": 7,
+          "horseName": "UNSUNG HERO",
+          "won": false,
+          "points": 0
+        }
+      ],
+      "betsWon": 1,
+      "totalBets": 8,
+      "winRate": 0.125
+    },
+    {
       "userId": "12",
-      "userName": "Grand-m\u00e8re",
+      "userName": "Grand-mère",
+      "dailyScore": 2,
+      "basePoints": 2,
+      "bankerRaceId": null,
+      "bankerWon": false,
+      "bankerMultiplierApplied": false,
+      "bets": [
+        {
+          "raceId": 1,
+          "raceName": "R1 - FASHION HEIGHTS - MIA BIJOUX CUP - [0 - 25] - 1400m",
+          "horseNumber": 1,
+          "horseName": "CAPTAIN'S CONSORT",
+          "won": false,
+          "points": 0
+        },
+        {
+          "raceId": 2,
+          "raceName": "R2 - FASHION HEIGHTS - GONG CHA CUP - [0 - 26] - 990m",
+          "horseNumber": 2,
+          "horseName": "CRESCENT",
+          "won": false,
+          "points": 0
+        },
+        {
+          "raceId": 3,
+          "raceName": "R3 - FASHION HEIGHTS ETAM - GROUP CUP - Benchmark 36 - 1365m",
+          "horseNumber": 3,
+          "horseName": "BABYLON",
+          "won": true,
+          "points": 1
+        },
+        {
+          "raceId": 4,
+          "raceName": "R4 - FASHION HEIGHTS - COTE SUSHI CUP - Benchmark 56 - 990m",
+          "horseNumber": 5,
+          "horseName": "GRAND BAY",
+          "won": false,
+          "points": 0
+        },
+        {
+          "raceId": 5,
+          "raceName": "R5 - FASHION HEIGHTS - CELIO CUP - Benchmark 41 - 990m",
+          "horseNumber": 1,
+          "horseName": "WARRIOR CAPTAIN",
+          "won": false,
+          "points": 0
+        },
+        {
+          "raceId": 6,
+          "raceName": "R6 - THE DUCHESS OF YORK CUP - G2 - WFA WITH PENALTIES - 1400m",
+          "horseNumber": 2,
+          "horseName": "ITSRAININGWILLIAM",
+          "won": false,
+          "points": 0
+        },
+        {
+          "raceId": 7,
+          "raceName": "R7 - APEX - APPLE RESELLER CUP - Benchmark 56 - 1400m",
+          "horseNumber": 2,
+          "horseName": "ZOOMIE",
+          "won": false,
+          "points": 0
+        },
+        {
+          "raceId": 8,
+          "raceName": "R8 - THE WORSHIPFUL DAY PLATE - Benchmark 31 - 1365m",
+          "horseNumber": 8,
+          "horseName": "HAVANA MOON",
+          "won": true,
+          "points": 1
+        }
+      ],
+      "betsWon": 2,
+      "totalBets": 8,
       "winRate": 0.25
     }
   ]
