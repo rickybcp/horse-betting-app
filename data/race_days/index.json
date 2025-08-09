@@ -13,15 +13,15 @@
     {
       "date": "2025-08-02",
       "status": "completed",
-      "totalUsers": 2,
+      "totalUsers": 8,
       "totalRaces": 8,
       "completedRaces": 8,
       "highestScore": 6,
-      "topUser": "User 3",
+      "topUser": "Conrad",
       "completedAt": "2025-08-02T18:00:00Z"
     }
   ],
-  "lastUpdated": "2025-08-09T17:00:09.566167",
+  "lastUpdated": "2025-08-09T21:51:46.627676",
   "totalRaceDays": 2,
   "metadata": {
     "structureVersion": "2.0",

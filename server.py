@@ -378,7 +378,7 @@ def calculate_daily_scores_enhanced() -> Dict[str, Dict]:
     current_bankers = load_json(BANKERS_FILE, {})
     
     user_scores = {}
-    
+
     for user in users:
         user_id = user['id']
         user_name = user['name']
@@ -718,7 +718,7 @@ def complete_legacy_race_day(race_day):
                 bets[user_id].get(banker_race_id) and
                 bets[user_id][banker_race_id] == next((r for r in races if r['id'] == banker_race_id), {}).get('winner')):
                 daily_score *= 2
-        
+
         user['totalScore'] = user.get('totalScore', 0) + daily_score
     
     # Mark race day as completed
@@ -1082,6 +1082,169 @@ def get_current_race_day_status():
         return jsonify({
             "success": False,
             "error": f"Failed to get current race day status: {str(e)}"
+        }), 500
+
+# ============================================================================
+# 🔧 ADMIN / DATA MANAGEMENT ENDPOINTS
+# ============================================================================
+
+@app.route('/api/admin/files', methods=['GET'])
+def list_data_files():
+    """List all data files and their sizes for admin visibility"""
+    try:
+        files_info = []
+        
+        # Check all data directories
+        for root, dirs, files in os.walk(DATA_DIR):
+            for file in files:
+                if file.endswith('.json'):
+                    file_path = os.path.join(root, file)
+                    relative_path = os.path.relpath(file_path, DATA_DIR)
+                    
+                    # Get file size and last modified
+                    stat = os.stat(file_path)
+                    size = stat.st_size
+                    modified = datetime.fromtimestamp(stat.st_mtime).isoformat()
+                    
+                    # Get record count for JSON files
+                    try:
+                        data = load_json(file_path, {})
+                        if isinstance(data, list):
+                            record_count = len(data)
+                        elif isinstance(data, dict):
+                            if 'availableDates' in data:  # race_days index
+                                record_count = len(data['availableDates'])
+                            elif 'userScores' in data:  # race day file
+                                record_count = len(data['userScores'])
+                            else:
+                                record_count = len(data)
+                        else:
+                            record_count = 1
+                    except:
+                        record_count = 0
+                    
+                    files_info.append({
+                        "path": relative_path,
+                        "fullPath": file_path,
+                        "size": size,
+                        "sizeHuman": f"{size / 1024:.1f} KB" if size > 1024 else f"{size} B",
+                        "lastModified": modified,
+                        "recordCount": record_count
+                    })
+        
+        # Sort by path
+        files_info.sort(key=lambda x: x['path'])
+        
+        return jsonify({
+            "success": True,
+            "files": files_info,
+            "totalFiles": len(files_info),
+            "directories": {
+                "data": DATA_DIR,
+                "current": CURRENT_DIR,
+                "raceDays": RACE_DAYS_DIR
+            }
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": f"Failed to list files: {str(e)}"
+        }), 500
+
+@app.route('/api/admin/files/<path:filepath>', methods=['GET'])
+def get_data_file(filepath):
+    """Get contents of a specific data file for admin viewing"""
+    try:
+        # Security: only allow access to files in data directory
+        if '..' in filepath or filepath.startswith('/'):
+            return jsonify({"error": "Invalid file path"}), 400
+        
+        full_path = os.path.join(DATA_DIR, filepath)
+        
+        if not os.path.exists(full_path):
+            return jsonify({"error": "File not found"}), 404
+        
+        if not full_path.endswith('.json'):
+            return jsonify({"error": "Only JSON files allowed"}), 400
+        
+        data = load_json(full_path, {})
+        
+        # Get file metadata
+        stat = os.stat(full_path)
+        metadata = {
+            "path": filepath,
+            "size": stat.st_size,
+            "lastModified": datetime.fromtimestamp(stat.st_mtime).isoformat(),
+            "recordCount": len(data) if isinstance(data, (list, dict)) else 1
+        }
+        
+        return jsonify({
+            "success": True,
+            "metadata": metadata,
+            "data": data
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": f"Failed to read file: {str(e)}"
+        }), 500
+
+@app.route('/api/admin/status', methods=['GET'])
+def get_backend_status():
+    """Get comprehensive backend status for admin dashboard"""
+    try:
+        # Current data stats
+        users = load_json(USERS_FILE, [])
+        races = load_json(RACES_FILE, [])
+        bets = load_json(BETS_FILE, {})
+        bankers = load_json(BANKERS_FILE, {})
+        
+        # Historical data stats
+        index_data = load_json(RACE_DAYS_INDEX_FILE, {"availableDates": []})
+        historical_days = len(index_data.get("availableDates", []))
+        
+        # Current race day info
+        current_race_day = get_current_race_day()
+        
+        status = {
+            "timestamp": datetime.now().isoformat(),
+            "currentRaceDay": current_race_day,
+            "currentData": {
+                "users": len(users),
+                "races": len(races),
+                "bets": len(bets),
+                "bankers": len(bankers),
+                "completedRaces": len([r for r in races if r.get('winner')])
+            },
+            "historicalData": {
+                "raceDays": historical_days,
+                "totalUsers": len(users)
+            },
+            "directories": {
+                "dataDir": DATA_DIR,
+                "currentDir": CURRENT_DIR,
+                "raceDaysDir": RACE_DAYS_DIR
+            },
+            "fileStructure": {
+                "users": USERS_FILE,
+                "currentRaces": RACES_FILE,
+                "currentBets": BETS_FILE,
+                "currentBankers": BANKERS_FILE,
+                "raceDaysIndex": RACE_DAYS_INDEX_FILE
+            }
+        }
+        
+        return jsonify({
+            "success": True,
+            "status": status
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": f"Failed to get status: {str(e)}"
         }), 500
 
 if __name__ == '__main__':
