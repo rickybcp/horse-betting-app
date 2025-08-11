@@ -23,6 +23,14 @@ Thumbs.db
 # Logs
 *.log
 
-# Data files
-data/
-*.json 
+# Data files - exclude temporary but allow essential
+data/__pycache__/
+data/*.backup*
+data/*.tmp
+data/*.log
+
+# Allow essential data files to be committed
+!data/users.json
+!data/race_days/index.json
+!data/race_days/*.json
+!data/current/*.json 

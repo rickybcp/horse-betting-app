@@ -7,6 +7,7 @@ from typing import Dict, List, Any, Tuple
 from utils.smspariaz_scraper import scrape_horses_from_smspariaz
 from utils.mtc_scraper import scrape_mtc_next_race_day
 from utils.results_scraper import scrape_results_with_fallback
+from utils.cloud_storage import get_storage_manager, init_cloud_storage
 
 app = Flask(__name__)
 CORS(app, origins="*", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], allow_headers=["Content-Type", "Authorization"])
@@ -30,47 +31,50 @@ RACE_DAYS_INDEX_FILE = os.path.join(RACE_DAYS_DIR, 'index.json')
 # Legacy file (for backward compatibility) - DEPRECATED
 # LEGACY_RACE_DAYS_FILE = os.path.join(DATA_DIR, 'race_days.json')
 
-# Create data directories if they don't exist
+# Initialize cloud storage if environment variables are set
+if os.getenv('GCS_BUCKET_NAME'):
+    init_cloud_storage()
+    print("🚀 Cloud storage initialized")
+else:
+    print("💾 Using local file storage")
+
+# Create data directories if they don't exist (for local fallback)
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(CURRENT_DIR, exist_ok=True)
 os.makedirs(RACE_DAYS_DIR, exist_ok=True)
 
 def load_json(filepath, default=None):
-    """Load JSON data from file or return default if file doesn't exist"""
-    if os.path.exists(filepath):
-        try:
-            with open(filepath, 'r') as f:
-                return json.load(f)
-        except json.JSONDecodeError:
-            print(f"Error decoding JSON from {filepath}. Returning default.")
-            pass # Fall through to return default
-    
-    # Return appropriate default based on file type
-    if 'users' in filepath or 'races' in filepath:
-        return default if default is not None else []
-    else:
-        return default if default is not None else {}
+    """Load JSON data from file using cloud storage or local fallback"""
+    storage_manager = get_storage_manager()
+    return storage_manager.load_file(filepath, default)
 
 def save_json(filepath, data):
-    """Save data to JSON file"""
-    with open(filepath, 'w') as f:
-        json.dump(data, f, indent=2)
+    """Save data to JSON file using cloud storage or local fallback"""
+    storage_manager = get_storage_manager()
+    return storage_manager.save_file(filepath, data)
 
 def init_default_data():
     """Initialize empty data files if they don't exist"""
-    if not os.path.exists(USERS_FILE):
+    storage_manager = get_storage_manager()
+    
+    # Initialize users if not exists
+    if not storage_manager.file_exists(USERS_FILE):
         save_json(USERS_FILE, [])
     
-    if not os.path.exists(RACES_FILE):
+    # Initialize races if not exists
+    if not storage_manager.file_exists(RACES_FILE):
         save_json(RACES_FILE, [])
     
-    if not os.path.exists(BETS_FILE):
+    # Initialize bets if not exists
+    if not storage_manager.file_exists(BETS_FILE):
         save_json(BETS_FILE, {})
     
-    if not os.path.exists(BANKERS_FILE):
+    # Initialize bankers if not exists
+    if not storage_manager.file_exists(BANKERS_FILE):
         save_json(BANKERS_FILE, {})
     
-    if not os.path.exists(RACE_DAYS_INDEX_FILE):
+    # Initialize race days index if not exists
+    if not storage_manager.file_exists(RACE_DAYS_INDEX_FILE):
         index_data = {
             "availableDates": [],
             "lastUpdated": datetime.now().isoformat(),
@@ -104,8 +108,9 @@ def set_current_race_day(race_day):
 def get_race_day_data(race_day):
     """Get all data for a specific race day from the new historical system"""
     race_day_file = os.path.join(RACE_DAYS_DIR, f"{race_day}.json")
+    storage_manager = get_storage_manager()
     
-    if os.path.exists(race_day_file):
+    if storage_manager.file_exists(race_day_file):
         # Load from historical file
         return load_json(race_day_file, {})
     else:
@@ -865,7 +870,7 @@ def get_specific_race_day(race_date):
     try:
         race_day_file = os.path.join(RACE_DAYS_DIR, f'{race_date}.json')
         
-        if not os.path.exists(race_day_file):
+        if not load_json(race_day_file, {}).get("date"): # Check if file exists and is not empty
             return jsonify({
                 "success": False,
                 "error": f"Race day {race_date} not found"
@@ -926,7 +931,7 @@ def get_user_history(user_id):
             race_date = date_entry["date"]
             race_day_file = os.path.join(RACE_DAYS_DIR, f'{race_date}.json')
             
-            if os.path.exists(race_day_file):
+            if load_json(race_day_file, {}).get("date"): # Check if file exists
                 race_day_data = load_json(race_day_file, {})
                 
                 # Find user's performance in this race day
@@ -971,7 +976,7 @@ def get_user_performance_on_date(user_id, race_date):
     try:
         race_day_file = os.path.join(RACE_DAYS_DIR, f'{race_date}.json')
         
-        if not os.path.exists(race_day_file):
+        if not load_json(race_day_file, {}).get("date"): # Check if file exists
             return jsonify({
                 "success": False,
                 "error": f"Race day {race_date} not found"
@@ -1000,7 +1005,7 @@ def get_user_performance_on_date(user_id, race_date):
                 "totalRaces": race_day_data.get("totalRaces", 0),
                 "completedRaces": race_day_data.get("completedRaces", 0),
                 "highestScore": max((score["dailyScore"] for score in race_day_data.get("userScores", [])), default=0),
-                "averageScore": sum(score["dailyScore"] for score in race_day_data.get("userScores", [])) / len(race_day_data.get("userScores", [1])),
+                "averageScore": sum(score["dailyScore"] for score in race_day_data.get("userScores", [1])) / len(race_day_data.get("userScores", [1])),
             },
             "races": race_day_data.get("races", [])
         }
@@ -1022,17 +1027,72 @@ def get_enhanced_leaderboard():
     try:
         users = load_json(USERS_FILE, [])
         
-        # Sort users by total score (highest first)
-        users_sorted = sorted(users, key=lambda x: x.get('totalScore', 0), reverse=True)
+        # Load race days index to get all available dates
+        index_data = load_json(RACE_DAYS_INDEX_FILE, {"availableDates": []})
+        available_dates = [day["date"] for day in index_data.get("availableDates", []) if day.get("status") == "completed"]
         
+        # Calculate total scores for each user from all completed race days
+        user_total_scores = {}
+        user_statistics = {}
+        
+        for user in users:
+            user_id = user['id']
+            user_total_scores[user_id] = 0
+            user_statistics[user_id] = {
+                "raceDaysPlayed": 0,
+                "bestDayScore": 0,
+                "bestDayDate": "",
+                "averageScore": 0.0,
+                "winRate": 0.0,
+                "totalBets": 0,
+                "totalWins": 0
+            }
+        
+        # Sum up scores from all completed race days
+        for race_date in available_dates:
+            try:
+                race_day_data = get_race_day_data(race_date)
+                if race_day_data and 'userScores' in race_day_data:
+                    # userScores is an array, not a dictionary
+                    for score_data in race_day_data['userScores']:
+                        user_id = score_data.get('userId')
+                        if user_id and user_id in user_total_scores:
+                            daily_score = score_data.get('dailyScore', 0)
+                            user_total_scores[user_id] += daily_score
+                            user_statistics[user_id]["raceDaysPlayed"] += 1
+                            
+                            # Track best day score
+                            if daily_score > user_statistics[user_id]["bestDayScore"]:
+                                user_statistics[user_id]["bestDayScore"] = daily_score
+                                user_statistics[user_id]["bestDayDate"] = race_date
+                            
+                            # Track betting statistics
+                            user_statistics[user_id]["totalBets"] += score_data.get('totalBets', 0)
+                            user_statistics[user_id]["totalWins"] += score_data.get('betsWon', 0)
+                            
+                            print(f"📊 {race_date}: User {user_id} scored {daily_score} (Total: {user_total_scores[user_id]})")
+            except Exception as e:
+                print(f"⚠️ Error processing race day {race_date}: {e}")
+                continue
+        
+        # Calculate averages and win rates
+        for user_id in user_statistics:
+            stats = user_statistics[user_id]
+            if stats["raceDaysPlayed"] > 0:
+                stats["averageScore"] = user_total_scores[user_id] / stats["raceDaysPlayed"]
+                if stats["totalBets"] > 0:
+                    stats["winRate"] = stats["totalWins"] / stats["totalBets"]
+        
+        # Create enhanced leaderboard sorted by total score
         enhanced_leaderboard = []
-        for rank, user in enumerate(users_sorted, 1):
+        for rank, user in enumerate(sorted(users, key=lambda x: user_total_scores.get(x['id'], 0), reverse=True), 1):
+            user_id = user['id']
             user_data = {
                 "rank": rank,
                 "id": user["id"],
                 "name": user["name"],
-                "totalScore": user.get("totalScore", 0),
-                "statistics": user.get("statistics", {
+                "totalScore": user_total_scores.get(user_id, 0),
+                "statistics": user_statistics.get(user_id, {
                     "raceDaysPlayed": 0,
                     "bestDayScore": 0,
                     "bestDayDate": "",
@@ -1047,6 +1107,8 @@ def get_enhanced_leaderboard():
         active_users = len([u for u in enhanced_leaderboard if u["statistics"]["raceDaysPlayed"] > 0])
         highest_score = enhanced_leaderboard[0]["totalScore"] if enhanced_leaderboard else 0
         
+        print(f"🏆 Enhanced leaderboard generated: {total_users} users, {active_users} active, highest score: {highest_score}")
+        
         return jsonify({
             "success": True,
             "leaderboard": enhanced_leaderboard,
@@ -1059,6 +1121,7 @@ def get_enhanced_leaderboard():
         }), 200
         
     except Exception as e:
+        print(f"❌ Error generating enhanced leaderboard: {e}")
         return jsonify({
             "success": False,
             "error": f"Failed to generate enhanced leaderboard: {str(e)}"

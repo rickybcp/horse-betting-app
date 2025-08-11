@@ -135,13 +135,37 @@ const ConnectionStatus = ({ serverConnected, retryConnection }) => (
 );
 
 // --- Leaderboard Tab Component ---
-const LeaderboardTab = ({ users, calculateUserScore, bankers, setActiveTab }) => (
+const LeaderboardTab = ({ users, calculateUserScore, bankers, setActiveTab, showTotalScores, setShowTotalScores, enhancedLeaderboard, loadingEnhanced }) => (
   <div className="space-y-4">
     <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white p-6 rounded-lg">
-      <h2 className="text-2xl font-bold flex items-center gap-2">
-        <Trophy className="w-6 h-6" />
-        Leaderboard
-      </h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold flex items-center gap-2">
+          <Trophy className="w-6 h-6" />
+          Leaderboard
+        </h2>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowTotalScores(false)}
+            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+              !showTotalScores 
+                ? 'bg-white text-yellow-600' 
+                : 'bg-yellow-500 text-white hover:bg-yellow-400'
+            }`}
+          >
+            Daily Score
+          </button>
+          <button
+            onClick={() => setShowTotalScores(true)}
+            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+              showTotalScores 
+                ? 'bg-white text-yellow-600' 
+                : 'bg-yellow-500 text-white hover:bg-yellow-400'
+            }`}
+          >
+            Total Score
+          </button>
+        </div>
+      </div>
     </div>
     
     {users.length === 0 ? (
@@ -162,31 +186,79 @@ const LeaderboardTab = ({ users, calculateUserScore, bankers, setActiveTab }) =>
       </div>
     ) : (
       <div className="space-y-2">
-        {users
-          .map(user => ({
-            ...user,
-            dailyScore: calculateUserScore(user.id)
-          }))
-          .sort((a, b) => (b.totalScore + b.dailyScore) - (a.totalScore + a.dailyScore))
-          .map((user, index) => (
-            <div key={user.id} className="bg-white p-4 rounded-lg shadow flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${
-                  index === 0 ? 'bg-yellow-500' : index === 1 ? 'bg-gray-400' : index === 2 ? 'bg-yellow-600' : 'bg-gray-300'
-                }`}>
-                  {index + 1}
-                </div>
-                <span className="font-semibold">{user.name}</span>
+        {showTotalScores ? (
+          // Total Score View
+          loadingEnhanced ? (
+            <div className="bg-white p-6 rounded-lg shadow text-center">
+              <div className="text-gray-400 mb-4">
+                <RefreshCw className="w-16 h-16 mx-auto mb-2 animate-spin" />
               </div>
-              <div className="text-right">
-                <div className="font-bold text-lg">{user.totalScore + user.dailyScore} pts</div>
-                <div className="text-sm text-gray-500">
-                  Total: {user.totalScore} + Today: {user.dailyScore}
-                  {bankers[user.id] && <Star className="w-4 h-4 inline ml-1 text-yellow-500" />}
-                </div>
-              </div>
+              <h3 className="text-lg font-semibold text-gray-600 mb-2">Loading Total Scores</h3>
+              <p className="text-gray-500">Calculating scores across all race days...</p>
             </div>
-          ))}
+          ) : enhancedLeaderboard && enhancedLeaderboard.length > 0 ? (
+            enhancedLeaderboard.map((user, index) => (
+              <div key={user.id} className="bg-white p-4 rounded-lg shadow flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${
+                    index === 0 ? 'bg-yellow-500' : index === 1 ? 'bg-gray-400' : index === 2 ? 'bg-yellow-600' : 'bg-gray-300'
+                  }`}>
+                    {user.rank}
+                  </div>
+                  <span className="font-semibold">{user.name}</span>
+                </div>
+                <div className="text-right">
+                  <div className="font-bold text-lg">{user.totalScore} pts</div>
+                  <div className="text-sm text-gray-500">
+                    {user.statistics.raceDaysPlayed} race days • Avg: {user.statistics.averageScore.toFixed(1)} pts
+                    {user.statistics.bestDayScore > 0 && (
+                      <span className="block text-xs text-blue-600">
+                        Best: {user.statistics.bestDayScore} pts ({user.statistics.bestDayDate})
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="bg-white p-6 rounded-lg shadow text-center">
+              <div className="text-gray-400 mb-4">
+                <AlertCircle className="w-16 h-16 mx-auto mb-2" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-600 mb-2">No Total Score Data</h3>
+              <p className="text-gray-500 mb-4">
+                Total scores are calculated from completed race days. Complete a race day to see total scores.
+              </p>
+            </div>
+          )
+        ) : (
+          // Daily Score View (existing logic)
+          users
+            .map(user => ({
+              ...user,
+              dailyScore: calculateUserScore(user.id)
+            }))
+            .sort((a, b) => (b.totalScore + b.dailyScore) - (a.totalScore + a.dailyScore))
+            .map((user, index) => (
+              <div key={user.id} className="bg-white p-4 rounded-lg shadow flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${
+                    index === 0 ? 'bg-yellow-500' : index === 1 ? 'bg-gray-400' : index === 2 ? 'bg-yellow-600' : 'bg-gray-300'
+                  }`}>
+                    {index + 1}
+                  </div>
+                  <span className="font-semibold">{user.name}</span>
+                </div>
+                <div className="text-right">
+                  <div className="font-bold text-lg">{user.totalScore + user.dailyScore} pts</div>
+                  <div className="text-sm text-gray-500">
+                    Total: {user.totalScore} + Today: {user.dailyScore}
+                    {bankers[user.id] && <Star className="w-4 h-4 inline ml-1 text-yellow-500" />}
+                  </div>
+                </div>
+              </div>
+            ))
+        )}
       </div>
     )}
   </div>
@@ -919,6 +991,11 @@ const HorseBettingApp = () => {
   const [currentRaceDay, setCurrentRaceDay] = useState('');
   const [loadingRaceDays, setLoadingRaceDays] = useState(false);
 
+  // Enhanced Leaderboard State
+  const [showTotalScores, setShowTotalScores] = useState(false);
+  const [enhancedLeaderboard, setEnhancedLeaderboard] = useState([]);
+  const [loadingEnhanced, setLoadingEnhanced] = useState(false);
+
   // Individual loading states for better UX
   const [loadingStates, setLoadingStates] = useState({
     users: false,
@@ -1143,7 +1220,36 @@ const HorseBettingApp = () => {
     }
   }, [showMessage, setLoadingState, getCachedData, updateCache]);
 
-
+  const fetchEnhancedLeaderboard = useCallback(async (retryCount = 0, forceRefresh = false) => {
+    setLoadingEnhanced(true);
+    try {
+      const response = await fetch(`${API_BASE}/leaderboard/enhanced`, {
+        signal: AbortSignal.timeout(15000) // 15 second timeout
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      if (data.success && data.leaderboard) {
+        setEnhancedLeaderboard(data.leaderboard);
+        setServerConnected(true);
+      } else {
+        throw new Error(data.error || 'Failed to fetch enhanced leaderboard');
+      }
+    } catch (error) {
+      console.error('Error fetching enhanced leaderboard:', error);
+      if (retryCount < 2 && error.name !== 'AbortError') {
+        // Retry after 2 seconds
+        setTimeout(() => fetchEnhancedLeaderboard(retryCount + 1, forceRefresh), 2000);
+        return;
+      }
+      showMessage('Error fetching total scores', 'error');
+      setEnhancedLeaderboard([]);
+      setServerConnected(false);
+    } finally {
+      setLoadingEnhanced(false);
+    }
+  }, [showMessage, setServerConnected]);
 
   // Progressive loading - load data in sequence to avoid overwhelming the server
   const loadAllData = useCallback(async (forceRefresh = false) => {
@@ -1327,6 +1433,13 @@ const HorseBettingApp = () => {
   useEffect(() => {
     console.log('Races state changed:', races);
   }, [races]);
+
+  // Fetch enhanced leaderboard when switching to total scores view
+  useEffect(() => {
+    if (showTotalScores) {
+      fetchEnhancedLeaderboard();
+    }
+  }, [showTotalScores, fetchEnhancedLeaderboard]);
 
   // Check if betting is still allowed for a race
   const isBettingAllowed = useCallback((raceTime) => {
@@ -1850,6 +1963,10 @@ const HorseBettingApp = () => {
                     calculateUserScore={calculateUserScore}
                     bankers={bankers}
                     setActiveTab={setActiveTab}
+                    showTotalScores={showTotalScores}
+                    setShowTotalScores={setShowTotalScores}
+                    enhancedLeaderboard={enhancedLeaderboard}
+                    loadingEnhanced={loadingEnhanced}
                   />
                 )}
                 {activeTab === 'races' && (

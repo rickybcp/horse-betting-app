@@ -6,4 +6,16 @@ services:
     startCommand: gunicorn server:app
     envVars:
       - key: PYTHON_VERSION
-        value: 3.9.0 
+        value: 3.9.0
+      - key: FLASK_ENV
+        value: production
+      - key: FLASK_DEBUG
+        value: false
+      # Cloud Storage Configuration (set these in Render dashboard)
+      - key: GCS_BUCKET_NAME
+        value: your-horse-betting-bucket
+      - key: GOOGLE_CLOUD_PROJECT
+        value: your-project-id
+      # Current Race Day
+      - key: CURRENT_RACE_DAY
+        value: "2025-08-09" 
