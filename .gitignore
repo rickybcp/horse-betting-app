@@ -35,4 +35,17 @@ data/*.log
 !data/race_days/*.json
 !data/current/*.json 
 
+# Security - Never commit these files
 service-account-key.json
+*.key
+*.pem
+*.p12
+*.pfx
+.env
+.env.local
+.env.production
+.env.staging
+secrets/
+credentials/
+keys/
+*.secret
