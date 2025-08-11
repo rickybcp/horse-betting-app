@@ -32,7 +32,7 @@
           "odds": 1.9
         }
       ],
-      "winner": null,
+      "winner": 4,
       "totalHorses": 4
     },
     {
@@ -72,7 +72,7 @@
           "odds": 20.0
         }
       ],
-      "winner": null,
+      "winner": 3,
       "totalHorses": 6
     },
     {
@@ -107,7 +107,7 @@
           "odds": 5.5
         }
       ],
-      "winner": null,
+      "winner": 4,
       "totalHorses": 5
     },
     {
@@ -142,7 +142,7 @@
           "odds": 3.1
         }
       ],
-      "winner": null,
+      "winner": 3,
       "totalHorses": 5
     },
     {
@@ -177,7 +177,7 @@
           "odds": 13.0
         }
       ],
-      "winner": null,
+      "winner": 2,
       "totalHorses": 5
     },
     {
@@ -217,7 +217,7 @@
           "odds": 11.0
         }
       ],
-      "winner": null,
+      "winner": 6,
       "totalHorses": 6
     },
     {
@@ -262,7 +262,7 @@
           "odds": 3.0
         }
       ],
-      "winner": null,
+      "winner": 7,
       "totalHorses": 7
     }
   ],
