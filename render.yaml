@@ -11,11 +11,11 @@ services:
         value: production
       - key: FLASK_DEBUG
         value: false
-      # Cloud Storage Configuration (set these in Render dashboard)
+      # Cloud Storage Configuration
       - key: GCS_BUCKET_NAME
-        value: your-horse-betting-bucket
+        value: horse-betting-data-123
       - key: GOOGLE_CLOUD_PROJECT
-        value: your-project-id
+        value: horse-betting-app-123
       # Current Race Day
       - key: CURRENT_RACE_DAY
         value: "2025-08-09" 

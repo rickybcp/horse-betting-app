@@ -35,7 +35,26 @@ class CloudStorageManager:
         
         if CLOUD_STORAGE_AVAILABLE and self.bucket_name:
             try:
-                self.client = storage.Client(project=self.project_id)
+                # Check if we have service account credentials in environment variable
+                credentials_json = os.getenv('GOOGLE_APPLICATION_CREDENTIALS_JSON')
+                if credentials_json:
+                    # Use credentials from environment variable
+                    import json
+                    from google.oauth2 import service_account
+                    
+                    try:
+                        credentials_info = json.loads(credentials_json)
+                        credentials = service_account.Credentials.from_service_account_info(credentials_info)
+                        self.client = storage.Client(project=self.project_id, credentials=credentials)
+                        logger.info(f"✅ Cloud Storage initialized with service account credentials from environment")
+                    except Exception as e:
+                        logger.error(f"❌ Failed to parse service account credentials from environment: {e}")
+                        # Fall back to default authentication
+                        self.client = storage.Client(project=self.project_id)
+                else:
+                    # Use default authentication (GOOGLE_APPLICATION_CREDENTIALS file)
+                    self.client = storage.Client(project=self.project_id)
+                
                 self.bucket = self.client.bucket(self.bucket_name)
                 logger.info(f"✅ Cloud Storage initialized with bucket: {self.bucket_name}")
             except Exception as e:

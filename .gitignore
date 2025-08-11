@@ -34,3 +34,5 @@ data/*.log
 !data/race_days/index.json
 !data/race_days/*.json
 !data/current/*.json 
+
+service-account-key.json
