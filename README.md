@@ -148,7 +148,7 @@ Race Results → Points Calculation → Banker Multiplier → User Score Update
 ### Race Management
 - `GET /api/races` - Get current race data
 - `POST /api/races/scrape` - Scrape SMS Pariaz races
-- `POST /api/races/scrape_mtc` - Scrape MTC races (optional: `{month: string}`)
+
 - `POST /api/races/results` - Auto-simulate race results
 - `POST /api/races/<race_id>/result` - Set manual race result (requires: `{winner: number}`)
 

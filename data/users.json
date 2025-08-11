@@ -1,134 +1,46 @@
 [
   {
     "id": "1",
-    "name": "Ben",
-    "totalScore": 0,
-    "statistics": {
-      "raceDaysPlayed": 2,
-      "bestDayScore": 0,
-      "bestDayDate": "",
-      "averageScore": 0.0,
-      "winRate": 0.0
-    }
+    "name": "Ben"
   },
   {
     "id": "2",
-    "name": "Michelle",
-    "totalScore": 0,
-    "statistics": {
-      "raceDaysPlayed": 2,
-      "bestDayScore": 0,
-      "bestDayDate": "",
-      "averageScore": 0.0,
-      "winRate": 0.0
-    }
+    "name": "Michelle"
   },
   {
     "id": "3",
-    "name": "Conrad",
-    "totalScore": 0,
-    "statistics": {
-      "raceDaysPlayed": 2,
-      "bestDayScore": 0,
-      "bestDayDate": "",
-      "averageScore": 0.0,
-      "winRate": 0.0
-    }
+    "name": "Conrad"
   },
   {
     "id": "4",
-    "name": "Jason",
-    "totalScore": 0,
-    "statistics": {
-      "raceDaysPlayed": 2,
-      "bestDayScore": 0,
-      "bestDayDate": "",
-      "averageScore": 0.0,
-      "winRate": 0.0
-    }
+    "name": "Jason"
   },
   {
     "id": "5",
-    "name": "Ricky",
-    "totalScore": 0,
-    "statistics": {
-      "raceDaysPlayed": 2,
-      "bestDayScore": 0,
-      "bestDayDate": "",
-      "averageScore": 0.0,
-      "winRate": 0.0
-    }
+    "name": "Ricky"
   },
   {
     "id": "6",
-    "name": "Caroline",
-    "totalScore": 0,
-    "statistics": {
-      "raceDaysPlayed": 2,
-      "bestDayScore": 0,
-      "bestDayDate": "",
-      "averageScore": 0.0,
-      "winRate": 0.0
-    }
+    "name": "Caroline"
   },
   {
     "id": "7",
-    "name": "Shaun",
-    "totalScore": 0,
-    "statistics": {
-      "raceDaysPlayed": 2,
-      "bestDayScore": 0,
-      "bestDayDate": "",
-      "averageScore": 0.0,
-      "winRate": 0.0
-    }
+    "name": "Shaun"
   },
   {
     "id": "8",
-    "name": "Sarah",
-    "totalScore": 0,
-    "statistics": {
-      "raceDaysPlayed": 2,
-      "bestDayScore": 0,
-      "bestDayDate": "",
-      "averageScore": 0.0,
-      "winRate": 0.0
-    }
+    "name": "Sarah"
   },
   {
     "id": "9",
-    "name": "Grand-m\u00e8re",
-    "totalScore": 0,
-    "statistics": {
-      "raceDaysPlayed": 2,
-      "bestDayScore": 0,
-      "bestDayDate": "",
-      "averageScore": 0.0,
-      "winRate": 0.0
-    }
+    "name": "Grand-mere"
   },
   {
     "id": "10",
-    "name": "Ma\u00eblle",
-    "totalScore": 0,
-    "statistics": {
-      "raceDaysPlayed": 2,
-      "bestDayScore": 0,
-      "bestDayDate": "",
-      "averageScore": 0.0,
-      "winRate": 0.0
-    }
+    "name": "Maelle"
   },
   {
     "id": "11",
-    "name": "Leana",
-    "totalScore": 0,
-    "statistics": {
-      "raceDaysPlayed": 2,
-      "bestDayScore": 0,
-      "bestDayDate": "",
-      "averageScore": 0.0,
-      "winRate": 0.0
-    }
+    "name": "Leana"
   }
 ]

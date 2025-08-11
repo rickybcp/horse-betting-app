@@ -210,12 +210,7 @@ const LeaderboardTab = ({ users, calculateUserScore, bankers, setActiveTab, show
                 <div className="text-right">
                   <div className="font-bold text-lg">{user.totalScore} pts</div>
                   <div className="text-sm text-gray-500">
-                    {user.statistics.raceDaysPlayed} race days • Avg: {user.statistics.averageScore.toFixed(1)} pts
-                    {user.statistics.bestDayScore > 0 && (
-                      <span className="block text-xs text-blue-600">
-                        Best: {user.statistics.bestDayScore} pts ({user.statistics.bestDayDate})
-                      </span>
-                    )}
+                    Total Score
                   </div>
                 </div>
               </div>
@@ -232,13 +227,13 @@ const LeaderboardTab = ({ users, calculateUserScore, bankers, setActiveTab, show
             </div>
           )
         ) : (
-          // Daily Score View (existing logic)
+          // Daily Score View (simplified - only daily score)
           users
             .map(user => ({
               ...user,
               dailyScore: calculateUserScore(user.id)
             }))
-            .sort((a, b) => (b.totalScore + b.dailyScore) - (a.totalScore + a.dailyScore))
+            .sort((a, b) => b.dailyScore - a.dailyScore)
             .map((user, index) => (
               <div key={user.id} className="bg-white p-4 rounded-lg shadow flex justify-between items-center">
                 <div className="flex items-center gap-3">
@@ -250,9 +245,9 @@ const LeaderboardTab = ({ users, calculateUserScore, bankers, setActiveTab, show
                   <span className="font-semibold">{user.name}</span>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-lg">{user.totalScore + user.dailyScore} pts</div>
+                  <div className="font-bold text-lg">{user.dailyScore} pts</div>
                   <div className="text-sm text-gray-500">
-                    Total: {user.totalScore} + Today: {user.dailyScore}
+                    Daily Score
                     {bankers[user.id] && <Star className="w-4 h-4 inline ml-1 text-yellow-500" />}
                   </div>
                 </div>
@@ -1300,8 +1295,8 @@ const HorseBettingApp = () => {
   const fetchRaceDays = useCallback(async () => {
     setLoadingRaceDays(true);
     try {
-      // Use the new historical race days endpoint
-      const response = await fetch(`${API_BASE}/race-days/historical`, {
+      // Use the main race days endpoint to get both current and past race days
+      const response = await fetch(`${API_BASE}/race-days`, {
         signal: AbortSignal.timeout(15000)
       });
       if (!response.ok) {
@@ -1313,11 +1308,10 @@ const HorseBettingApp = () => {
       const transformedRaceDays = data.raceDays || [];
       setRaceDays(transformedRaceDays);
       
-      // Set current race day to today or most recent
-      const today = new Date().toISOString().split('T')[0];
-      const currentDay = transformedRaceDays.find(day => day.date === today) || 
+      // Set current race day to the one marked as current
+      const currentDay = transformedRaceDays.find(day => day.current) || 
                         transformedRaceDays[0] || 
-                        { date: today };
+                        { date: new Date().toISOString().split('T')[0] };
       setCurrentRaceDay(currentDay.date);
       
       setServerConnected(true);
@@ -1356,28 +1350,13 @@ const HorseBettingApp = () => {
             setRaces(raceData.races);
           }
           
-          // Convert userScores to bets and bankers format for display
-          if (raceData.userScores) {
-            const historicalBets = {};
-            const historicalBankers = {};
-            
-            raceData.userScores.forEach(userScore => {
-              // Convert bets format
-              if (userScore.bets) {
-                historicalBets[userScore.userId] = {};
-                userScore.bets.forEach(bet => {
-                  historicalBets[userScore.userId][bet.raceId] = bet.horseNumber;
-                });
-              }
-              
-              // Set banker if exists
-              if (userScore.bankerRaceId) {
-                historicalBankers[userScore.userId] = userScore.bankerRaceId;
-              }
-            });
-            
-            setBets(historicalBets);
-            setBankers(historicalBankers);
+          // The new format already has bets and bankers in the correct structure
+          if (raceData.bets) {
+            setBets(raceData.bets);
+          }
+          
+          if (raceData.bankers) {
+            setBankers(raceData.bankers);
           }
           
           showMessage(`Viewing historical race day: ${raceDay} (Read-only)`, 'info');
@@ -1751,7 +1730,7 @@ const HorseBettingApp = () => {
                 >
                   {raceDays.map(day => (
                     <option key={day.date} value={day.date} className="text-black">
-                      {day.date} {day.status === 'completed' ? '(Completed)' : ''} ({day.totalRaces || day.race_count || 0} races)
+                      {day.date} {day.status === 'current' ? '(Current)' : '(Past)'}
                     </option>
                   ))}
                 </select>
