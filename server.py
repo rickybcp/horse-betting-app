@@ -14,8 +14,9 @@ CORS(app, origins="*", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], allo
 
 # Data file paths
 DATA_DIR = 'data'
-CURRENT_DIR = os.path.join(DATA_DIR, 'current')
-RACE_DAYS_DIR = os.path.join(DATA_DIR, 'race_days')
+CURRENT_DIR = os.path.join(DATA_DIR, 'current')  # legacy
+RACE_DAYS_DIR = os.path.join(DATA_DIR, 'race_days')  # legacy
+ALL_RACES_DIR = os.path.join(DATA_DIR, 'all_races')  # new canonical store
 
 # User data (global)
 USERS_FILE = os.path.join(DATA_DIR, 'users.json')
@@ -26,7 +27,8 @@ BETS_FILE = os.path.join(CURRENT_DIR, 'bets.json')
 BANKERS_FILE = os.path.join(CURRENT_DIR, 'bankers.json')
 
 # Race day management
-RACE_DAYS_INDEX_FILE = os.path.join(RACE_DAYS_DIR, 'index.json')
+RACE_DAYS_INDEX_FILE = os.path.join(RACE_DAYS_DIR, 'index.json')  # legacy
+ALL_RACES_INDEX_FILE = os.path.join(ALL_RACES_DIR, 'index.json')  # new
 
 # Legacy file (for backward compatibility) - DEPRECATED
 # LEGACY_RACE_DAYS_FILE = os.path.join(DATA_DIR, 'race_days.json')
@@ -42,6 +44,7 @@ else:
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(CURRENT_DIR, exist_ok=True)
 os.makedirs(RACE_DAYS_DIR, exist_ok=True)
+os.makedirs(ALL_RACES_DIR, exist_ok=True)
 
 def load_json(filepath, default=None):
     """Load JSON data from file using cloud storage or local fallback"""
@@ -73,82 +76,100 @@ def init_default_data():
     if not storage_manager.file_exists(BANKERS_FILE):
         save_json(BANKERS_FILE, {})
     
-    # Initialize race days index if not exists
-    if not storage_manager.file_exists(RACE_DAYS_INDEX_FILE):
-        index_data = {
-            "availableDates": [],
-            "lastUpdated": datetime.now().isoformat(),
-            "totalRaceDays": 0,
-            "metadata": {
-                "structureVersion": "2.0",
-                "createdAt": datetime.now().isoformat(),
-                "description": "Historical race day data index"
+    # Initialize new all_races index if not exists; seed from legacy if present
+    if not storage_manager.file_exists(ALL_RACES_INDEX_FILE):
+        if storage_manager.file_exists(RACE_DAYS_INDEX_FILE):
+            legacy = load_json(RACE_DAYS_INDEX_FILE, {"availableDates": []})
+            legacy.setdefault("currentDate", None)
+            save_json(ALL_RACES_INDEX_FILE, legacy)
+        else:
+            index_data = {
+                "availableDates": [],
+                "currentDate": None,
+                "lastUpdated": datetime.now().isoformat(),
+                "totalRaceDays": 0,
+                "metadata": {
+                    "structureVersion": "3.0",
+                    "createdAt": datetime.now().isoformat(),
+                    "description": "All race days index"
+                }
             }
-        }
-        save_json(RACE_DAYS_INDEX_FILE, index_data)
+            save_json(ALL_RACES_INDEX_FILE, index_data)
     
     # Current race day is always today's date in the new system
 
 # Initialize default data on startup
 init_default_data()
 
-# Configuration for current race day
-CURRENT_RACE_DAY = "2025-08-09"  # Default to August 9th race day
-
 def get_current_race_day():
-    """Get the current active race day (configurable, defaults to August 9th)"""
-    return CURRENT_RACE_DAY
+    """Get the current active race day from all_races index; fallback to latest."""
+    index_data = load_json(ALL_RACES_INDEX_FILE, {"availableDates": [], "currentDate": None})
+    if index_data.get("currentDate"):
+        return index_data["currentDate"]
+    dates = [d.get("date") for d in index_data.get("availableDates", []) if d.get("date")]
+    return dates[0] if dates else datetime.now().strftime('%Y-%m-%d')
 
 def set_current_race_day(race_day):
-    """Set the current active race day"""
-    global CURRENT_RACE_DAY
-    CURRENT_RACE_DAY = race_day
-    print(f"Current race day set to: {CURRENT_RACE_DAY}")
+    """Persist the current active race day to all_races index."""
+    index_data = load_json(ALL_RACES_INDEX_FILE, {"availableDates": [], "currentDate": None})
+    index_data["currentDate"] = race_day
+    index_data["lastUpdated"] = datetime.now().isoformat()
+    save_json(ALL_RACES_INDEX_FILE, index_data)
+    print(f"Current race day set to: {race_day}")
 
 def get_race_day_data(race_day):
-    """Get all data for a specific race day from the new historical system"""
-    race_day_file = os.path.join(RACE_DAYS_DIR, f"{race_day}.json")
+    """Get all data for a specific race day from all_races; fallback to legacy."""
     storage_manager = get_storage_manager()
-    
-    if storage_manager.file_exists(race_day_file):
-        # Load from historical file
-        return load_json(race_day_file, {})
-    else:
-        # Return empty structure for new race days
-        return {
-            "date": race_day,
-            "races": [],
-            "bets": {},
-            "bankers": {},
-            "completed": False
-        }
+    primary = os.path.join(ALL_RACES_DIR, f"{race_day}.json")
+    legacy = os.path.join(RACE_DAYS_DIR, f"{race_day}.json")
+    if storage_manager.file_exists(primary):
+        return load_json(primary, {})
+    if storage_manager.file_exists(legacy):
+        return load_json(legacy, {})
+    return {
+        "date": race_day,
+        "status": "in_progress",
+        "races": [],
+        "bets": {},
+        "bankers": {},
+        "userScores": []
+    }
 
 def save_race_day_data(race_day, data):
-    """Save data for a specific race day to the new historical system"""
-    race_day_file = os.path.join(RACE_DAYS_DIR, f"{race_day}.json")
+    """Save data for a specific race day to all_races directory."""
+    race_day_file = os.path.join(ALL_RACES_DIR, f"{race_day}.json")
     save_json(race_day_file, data)
 
+def load_current_day_data() -> Dict:
+    """Load the current race day data from all_races."""
+    current_day = get_current_race_day()
+    return get_race_day_data(current_day)
+
+def save_current_day_data(data: Dict) -> None:
+    """Persist the current race day data to all_races and ensure index entry exists."""
+    current_day = get_current_race_day()
+    save_race_day_data(current_day, data)
+    # Ensure index entry exists
+    index_data = load_json(ALL_RACES_INDEX_FILE, {"availableDates": [], "currentDate": current_day})
+    if not any(d.get("date") == current_day for d in index_data.get("availableDates", [])):
+        index_data.setdefault("availableDates", []).append({
+            "date": current_day,
+            "status": data.get("status", "in_progress"),
+            "totalRaces": len(data.get("races", [])),
+            "completedRaces": len([r for r in data.get("races", []) if r.get("winner")])
+        })
+        index_data["availableDates"].sort(key=lambda x: x["date"], reverse=True)
+    index_data["currentDate"] = current_day
+    index_data["lastUpdated"] = datetime.now().isoformat()
+    save_json(ALL_RACES_INDEX_FILE, index_data)
+
 def sync_current_race_day_to_files():
-    """Sync current race day data to the legacy files for backward compatibility"""
-    current_race_day = get_current_race_day()
-    race_day_data = get_race_day_data(current_race_day)
-    
-    # Update legacy files with current race day data
-    save_json(RACES_FILE, race_day_data["races"])
-    save_json(BETS_FILE, race_day_data["bets"])
-    save_json(BANKERS_FILE, race_day_data["bankers"])
+    """Deprecated: no-op (we work directly from all_races)."""
+    return
 
 def sync_files_to_current_race_day():
-    """Sync legacy files data to current race day storage"""
-    current_race_day = get_current_race_day()
-    race_day_data = get_race_day_data(current_race_day)
-    
-    # Update race day data with current legacy file contents
-    race_day_data["races"] = load_json(RACES_FILE, [])
-    race_day_data["bets"] = load_json(BETS_FILE, {})
-    race_day_data["bankers"] = load_json(BANKERS_FILE, {})
-    
-    save_race_day_data(current_race_day, race_day_data)
+    """Deprecated: no-op (we work directly from all_races)."""
+    return
 
 
 
@@ -175,17 +196,20 @@ def add_user():
 
 @app.route('/api/races', methods=['GET'])
 def get_races():
-    races = load_json(RACES_FILE, [])
+    current = load_current_day_data()
+    races = current.get("races", [])
     return jsonify(races)
 
 @app.route('/api/bets', methods=['GET'])
 def get_bets():
-    bets = load_json(BETS_FILE, {})
+    current = load_current_day_data()
+    bets = current.get("bets", {})
     return jsonify(bets)
 
 @app.route('/api/bets', methods=['POST'])
 def place_bet():
-    bets = load_json(BETS_FILE, {})
+    current = load_current_day_data()
+    bets = current.get("bets", {})
     user_id = request.json.get('userId')
     race_id = request.json.get('raceId')
     horse_number = request.json.get('horseNumber')
@@ -197,21 +221,21 @@ def place_bet():
         bets[user_id] = {}
     
     bets[user_id][race_id] = horse_number
-    save_json(BETS_FILE, bets)
-    
-    # Also sync to current race day
-    sync_files_to_current_race_day()
+    current["bets"] = bets
+    save_current_day_data(current)
     
     return jsonify({"success": True, "bets": bets}), 200
 
 @app.route('/api/bankers', methods=['GET'])
 def get_bankers():
-    bankers = load_json(BANKERS_FILE, {})
+    current = load_current_day_data()
+    bankers = current.get("bankers", {})
     return jsonify(bankers)
 
 @app.route('/api/bankers', methods=['POST'])
 def set_banker():
-    bankers = load_json(BANKERS_FILE, {})
+    current = load_current_day_data()
+    bankers = current.get("bankers", {})
     user_id = request.json.get('userId')
     race_id = request.json.get('raceId')  # Changed from horseNumber to raceId
 
@@ -219,10 +243,8 @@ def set_banker():
         return jsonify({"error": "Missing banker data"}), 400
     
     bankers[user_id] = race_id  # Store race ID, not horse number
-    save_json(BANKERS_FILE, bankers)
-    
-    # Also sync to current race day
-    sync_files_to_current_race_day()
+    current["bankers"] = bankers
+    save_current_day_data(current)
     
     return jsonify({"success": True, "bankers": bankers}), 200
 
@@ -230,10 +252,9 @@ def set_banker():
 def scrape_races_endpoint():
     try:
         scraped_data = scrape_horses_from_smspariaz()
-        save_json(RACES_FILE, scraped_data)
-        
-        # Also sync to current race day
-        sync_files_to_current_race_day()
+        current = load_current_day_data()
+        current["races"] = scraped_data
+        save_current_day_data(current)
         
         return jsonify({"success": True, "races": scraped_data}), 200
     except Exception as e:
@@ -248,10 +269,9 @@ def scrape_mtc_endpoint():
             desired_month = request.json.get('month')
         scraped_data = scrape_mtc_next_race_day(desired_month)
         if scraped_data:
-            save_json(RACES_FILE, scraped_data)
-            
-            # Also sync to current race day
-            sync_files_to_current_race_day()
+            current = load_current_day_data()
+            current["races"] = scraped_data
+            save_current_day_data(current)
             
             return jsonify({"success": True, "races": scraped_data}), 200
         else:
@@ -271,7 +291,8 @@ def scrape_results_endpoint():
         
         if scraped_results:
             # Update races with scraped results
-            races = load_json(RACES_FILE, [])
+            current = load_current_day_data()
+            races = current.get("races", [])
             updated_results = {}
             
             for race in races:
@@ -286,9 +307,8 @@ def scrape_results_endpoint():
                         print(f"🏆 Updated race {race_id} with winner: horse #{result_data['winner_number']}")
             
             if updated_results:
-                save_json(RACES_FILE, races)
-                # Also sync to current race day
-                sync_files_to_current_race_day()
+                current["races"] = races
+                save_current_day_data(current)
                 print(f"✅ Successfully updated {len(updated_results)} races with results")
                 return jsonify({"success": True, "results": updated_results}), 200
             else:
@@ -312,7 +332,8 @@ def set_race_result_manual(race_id):
         except ValueError:
             return jsonify({"error": "Invalid race ID format"}), 400
             
-        races = load_json(RACES_FILE, [])
+        current = load_current_day_data()
+        races = current.get("races", [])
         winner_number = request.json.get('winner')
 
         if winner_number is None:
@@ -331,10 +352,8 @@ def set_race_result_manual(race_id):
             return jsonify({"error": "Race not found"}), 404
         
         # Save updated races
-        save_json(RACES_FILE, races)
-        
-        # Also sync to current race day
-        sync_files_to_current_race_day()
+        current["races"] = races
+        save_current_day_data(current)
         
         print(f"✅ Race result updated and synced to current race day")
         return jsonify({"success": True, "message": f"Race {race_id} winner set to horse #{winner_number}"}), 200
@@ -405,9 +424,10 @@ def calculate_daily_scores_enhanced() -> Dict[str, Dict]:
     print("🧮 Calculating daily scores...")
     
     users = load_json(USERS_FILE, [])
-    current_races = load_json(RACES_FILE, [])
-    current_bets = load_json(BETS_FILE, {})
-    current_bankers = load_json(BANKERS_FILE, {})
+    current = load_current_day_data()
+    current_races = current.get("races", [])
+    current_bets = current.get("bets", {})
+    current_bankers = current.get("bankers", {})
     
     user_scores = {}
 
@@ -499,7 +519,8 @@ def save_completed_race_day_enhanced(race_date: str, user_scores: Dict) -> bool:
     print(f"💾 Saving completed race day: {race_date}")
     
     try:
-        current_races = load_json(RACES_FILE, [])
+        current = load_current_day_data()
+        current_races = current.get("races", [])
         
         race_day_data = {
             "date": race_date,
@@ -536,7 +557,7 @@ def save_completed_race_day_enhanced(race_date: str, user_scores: Dict) -> bool:
             race_day_data["races"].append(race_data)
         
         # Save to individual race day file
-        race_day_file = os.path.join(RACE_DAYS_DIR, f'{race_date}.json')
+        race_day_file = os.path.join(ALL_RACES_DIR, f'{race_date}.json')
         save_json(race_day_file, race_day_data)
         print(f"  ✅ Saved race day data to: {os.path.basename(race_day_file)}")
         
@@ -554,7 +575,7 @@ def update_race_days_index_enhanced(race_date: str, race_day_data: Dict, user_sc
     print("📚 Updating race days index...")
     
     try:
-        index_data = load_json(RACE_DAYS_INDEX_FILE, {
+        index_data = load_json(ALL_RACES_INDEX_FILE, {
             "availableDates": [],
             "lastUpdated": "",
             "totalRaceDays": 0,
@@ -587,7 +608,7 @@ def update_race_days_index_enhanced(race_date: str, race_day_data: Dict, user_sc
         index_data["totalRaceDays"] = len(index_data["availableDates"])
         index_data["lastUpdated"] = datetime.now().isoformat()
         
-        save_json(RACE_DAYS_INDEX_FILE, index_data)
+        save_json(ALL_RACES_INDEX_FILE, index_data)
         print(f"  ✅ Updated index: {index_data['totalRaceDays']} total race days")
         
     except Exception as e:
@@ -665,8 +686,8 @@ def reset_data_legacy():
 @app.route('/api/race-days', methods=['GET'])
 def get_race_days():
     """Get all race days from the new historical system"""
-    # Load from the new index file
-    index_data = load_json(RACE_DAYS_INDEX_FILE, {"availableDates": []})
+    # Load from the new index file (all_races)
+    index_data = load_json(ALL_RACES_INDEX_FILE, {"availableDates": [], "currentDate": None})
     current_race_day = get_current_race_day()
     
     # Convert index format to legacy format for backward compatibility
@@ -679,17 +700,9 @@ def get_race_days():
             "is_current": race_day_entry["date"] == current_race_day
         })
     
-    # Add current day if not in historical list
-    current_day_exists = any(day["date"] == current_race_day for day in race_days_list)
-    if not current_day_exists:
-        # Get current day race count
-        current_races = load_json(RACES_FILE, [])
-        race_days_list.insert(0, {
-            "date": current_race_day,
-            "completed": False,
-            "race_count": len(current_races),
-            "is_current": True
-        })
+    # Mark which entry is current based on index pointer
+    for day in race_days_list:
+        day["is_current"] = (day.get("date") == current_race_day)
     
     # Sort by date (newest first)
     race_days_list.sort(key=lambda x: x["date"], reverse=True)
@@ -712,14 +725,8 @@ def set_current_race_day_endpoint():
     if not race_day:
         return jsonify({"error": "Race day is required"}), 400
     
-    # Sync current data to storage before switching
-    sync_files_to_current_race_day()
-    
     # Set new current race day
     set_current_race_day(race_day)
-    
-    # Sync new race day data to files
-    sync_current_race_day_to_files()
     
     return jsonify({"success": True, "current_race_day": race_day})
 
@@ -776,66 +783,7 @@ def complete_legacy_race_day(race_day):
     
     return jsonify({"success": True, "daily_scores": race_day_data.get("final_scores", {})})
 
-@app.route('/api/race-days/create-dummy', methods=['POST'])
-def create_dummy_race_days():
-    """Create dummy race days for testing"""
-    from datetime import timedelta
-    
-    base_date = datetime.now()
-    dummy_days = []
-    
-    # Create 5 dummy race days
-    for i in range(5):
-        date = (base_date - timedelta(days=i)).strftime('%Y-%m-%d')
-        
-        # Create dummy races
-        races = []
-        for race_num in range(1, 4):  # 3 races per day
-            horses = []
-            for horse_num in range(1, 6):  # 5 horses per race
-                horses.append({
-                    "number": horse_num,
-                    "name": f"Horse {horse_num} Day {i+1}",
-                    "odds": round(2.0 + horse_num * 0.5 + i * 0.2, 1),
-                    "points": (3 if (2.0 + horse_num * 0.5 + i * 0.2) > 10 else (2 if (2.0 + horse_num * 0.5 + i * 0.2) > 5 else 1))
-                })
-            
-            races.append({
-                "id": f"dummy_R{race_num}_{date.replace('-', '')}",
-                "name": f"Dummy Race {race_num} - {date}",
-                "time": f"{12 + race_num}:00",
-                "horses": horses,
-                "winner": 1 if i > 0 else None,  # Set winners for past days
-                "status": "completed" if i > 0 else "upcoming"
-            })
-        
-        # Create dummy bets and bankers
-        users = load_json(USERS_FILE, [])
-        dummy_bets = {}
-        dummy_bankers = {}
-        
-        for user in users:
-            user_id = user['id']
-            dummy_bets[user_id] = {}
-            for race in races:
-                dummy_bets[user_id][race['id']] = (int(user_id) % 5) + 1  # Cycle through horse numbers
-            
-            # Set first race as banker
-            if races:
-                dummy_bankers[user_id] = races[0]['id']
-        
-        race_day_data = {
-            "date": date,
-            "races": races,
-            "bets": dummy_bets,
-            "bankers": dummy_bankers,
-            "completed": i > 0  # Mark past days as completed
-        }
-        
-        save_race_day_data(date, race_day_data)
-        dummy_days.append(date)
-    
-    return jsonify({"success": True, "created_days": dummy_days})
+# Removed test endpoint: /api/race-days/create-dummy
 
 # ================================================================================
 # TASK 3: HISTORICAL DATA API ENDPOINTS
@@ -845,7 +793,7 @@ def create_dummy_race_days():
 def get_historical_race_days():
     """Get available race days from index with enhanced information"""
     try:
-        index_data = load_json(RACE_DAYS_INDEX_FILE, {
+        index_data = load_json(ALL_RACES_INDEX_FILE, {
             "availableDates": [],
             "totalRaceDays": 0,
             "lastUpdated": ""
@@ -868,9 +816,8 @@ def get_historical_race_days():
 def get_specific_race_day(race_date):
     """Get complete data for a specific race day"""
     try:
-        race_day_file = os.path.join(RACE_DAYS_DIR, f'{race_date}.json')
-        
-        if not load_json(race_day_file, {}).get("date"): # Check if file exists and is not empty
+        race_day_file = os.path.join(ALL_RACES_DIR, f'{race_date}.json')
+        if not load_json(race_day_file, {}).get("date"):
             return jsonify({
                 "success": False,
                 "error": f"Race day {race_date} not found"
@@ -894,7 +841,7 @@ def get_user_history(user_id):
     """Get user's complete historical performance across all race days"""
     try:
         # Load race days index
-        index_data = load_json(RACE_DAYS_INDEX_FILE, {"availableDates": []})
+        index_data = load_json(ALL_RACES_INDEX_FILE, {"availableDates": []})
         
         user_history = {
             "userId": user_id,
@@ -1028,7 +975,7 @@ def get_enhanced_leaderboard():
         users = load_json(USERS_FILE, [])
         
         # Load race days index to get all available dates
-        index_data = load_json(RACE_DAYS_INDEX_FILE, {"availableDates": []})
+        index_data = load_json(ALL_RACES_INDEX_FILE, {"availableDates": []})
         available_dates = [day["date"] for day in index_data.get("availableDates", []) if day.get("status") == "completed"]
         
         # Calculate total scores for each user from all completed race days
@@ -1131,9 +1078,10 @@ def get_enhanced_leaderboard():
 def get_current_race_day_status():
     """Get current race day status and progress"""
     try:
-        current_races = load_json(RACES_FILE, [])
-        current_bets = load_json(BETS_FILE, {})
-        current_bankers = load_json(BANKERS_FILE, {})
+        current_data = load_current_day_data()
+        current_races = current_data.get("races", [])
+        current_bets = current_data.get("bets", {})
+        current_bankers = current_data.get("bankers", {})
         
         # Calculate current day statistics
         total_races = len(current_races)
@@ -1305,7 +1253,7 @@ def get_backend_status():
         bankers = load_json(BANKERS_FILE, {})
         
         # Historical data stats
-        index_data = load_json(RACE_DAYS_INDEX_FILE, {"availableDates": []})
+        index_data = load_json(ALL_RACES_INDEX_FILE, {"availableDates": []})
         historical_days = len(index_data.get("availableDates", []))
         
         # Current race day info
@@ -1328,14 +1276,14 @@ def get_backend_status():
             "directories": {
                 "dataDir": DATA_DIR,
                 "currentDir": CURRENT_DIR,
-                "raceDaysDir": RACE_DAYS_DIR
+                "raceDaysDir": ALL_RACES_DIR
             },
             "fileStructure": {
                 "users": USERS_FILE,
                 "currentRaces": RACES_FILE,
                 "currentBets": BETS_FILE,
                 "currentBankers": BANKERS_FILE,
-                "raceDaysIndex": RACE_DAYS_INDEX_FILE
+                "raceDaysIndex": ALL_RACES_INDEX_FILE
             }
         }
         

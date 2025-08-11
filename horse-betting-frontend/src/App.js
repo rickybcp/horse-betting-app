@@ -1400,28 +1400,7 @@ const HorseBettingApp = () => {
     }
   }, [showMessage, loadAllData]);
 
-  const createDummyRaceDays = useCallback(async () => {
-    setLoadingRaceDays(true);
-    try {
-      const response = await fetch(`${API_BASE}/race-days/create-dummy`, {
-        method: 'POST',
-        signal: AbortSignal.timeout(15000)
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      showMessage(`Created ${data.created_days.length} dummy race days`, 'success');
-      
-      // Refresh race days list
-      await fetchRaceDays();
-    } catch (error) {
-      console.error('Error creating dummy race days:', error);
-      showMessage('Error creating dummy race days', 'error');
-    } finally {
-      setLoadingRaceDays(false);
-    }
-  }, [showMessage, fetchRaceDays]);
+  // Removed: createDummyRaceDays (test functionality)
 
   // Load all data on component mount
   useEffect(() => {
@@ -1779,24 +1758,7 @@ const HorseBettingApp = () => {
                 {loadingRaceDays && <RefreshCw className="w-4 h-4 animate-spin" />}
                 
                 {/* Admin buttons for race day management */}
-                <div className="flex gap-2 ml-4">
-                  <button
-                    onClick={createDummyRaceDays}
-                    disabled={loadingRaceDays}
-                    className="px-3 py-1 bg-yellow-500 bg-opacity-80 hover:bg-opacity-100 rounded text-xs font-medium transition-colors disabled:opacity-50"
-                    title="Create dummy race days for testing"
-                  >
-                    Create Test Days
-                  </button>
-                  <button
-                    onClick={fetchRaceDays}
-                    disabled={loadingRaceDays}
-                    className="px-3 py-1 bg-white bg-opacity-20 hover:bg-opacity-30 rounded text-xs font-medium transition-colors disabled:opacity-50"
-                    title="Refresh race days"
-                  >
-                    Refresh Days
-                  </button>
-                </div>
+                <div className="flex gap-2 ml-4"></div>
               </div>
             </div>
             
@@ -1813,21 +1775,8 @@ const HorseBettingApp = () => {
                   <span>Server disconnected</span>
                 </div>
               )}
-              {!loading && serverConnected && (
-                <div className="flex items-center gap-2 text-sm bg-green-500 bg-opacity-20 px-3 py-1 rounded-full">
-                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                  <span>Connected</span>
-                </div>
-              )}
-              <button
-                onClick={forceRefreshAllData}
-                disabled={loading}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  loading 
-                    ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-white bg-opacity-20 hover:bg-opacity-30 text-white'
-                }`}
-              >
+              {/* Connected pill removed (already indicated top-left) */}
+              <button onClick={forceRefreshAllData} disabled={loading} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-white bg-opacity-20 hover:bg-opacity-30 text-white'}`}>
                 <RefreshCw className={`w-4 h-4 inline mr-2 ${loading ? 'animate-spin' : ''}`} />
                 Refresh
               </button>
@@ -1863,22 +1812,7 @@ const HorseBettingApp = () => {
               </div>
             )}
 
-            {/* Cache Status */}
-            {!isAnyDataLoading() && serverConnected && (
-              <div className="mt-4 text-center">
-                <div className="inline-flex items-center gap-2 text-xs bg-white bg-opacity-10 px-3 py-1 rounded-full">
-                  <span>💾</span>
-                  <span>Cache: {Object.values(dataCache).filter(cache => isCacheValid(Object.keys(dataCache).find(key => dataCache[key] === cache))).length}/4 valid</span>
-                  <button
-                    onClick={forceRefreshAllData}
-                    className="ml-2 px-2 py-1 bg-white bg-opacity-20 hover:bg-opacity-30 rounded text-xs transition-colors"
-                    title="Force refresh all data"
-                  >
-                    🔄
-                  </button>
-                </div>
-              </div>
-            )}
+            {/* Cache status removed per simplification */}
           </div>
 
           {/* Tab Navigation */}
