@@ -21,4 +21,8 @@ venv.bak/
 Thumbs.db
 
 # Logs
-*.log 
+*.log
+
+# Data files
+data/
+*.json 

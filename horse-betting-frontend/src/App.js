@@ -958,6 +958,19 @@ const HorseBettingApp = () => {
     }));
   }, []);
 
+  // Clear cache for a specific key or all cache
+  const clearCache = useCallback((cacheKey = null) => {
+    if (cacheKey) {
+      setDataCache(prev => {
+        const newCache = { ...prev };
+        delete newCache[cacheKey];
+        return newCache;
+      });
+    } else {
+      setDataCache({});
+    }
+  }, []);
+
   // State for confirmation modal
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmModalContent, setConfirmModalContent] = useState('');
@@ -1034,9 +1047,11 @@ const HorseBettingApp = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
+      console.log('Fetched races data:', data);
       setRaces(data);
       updateCache('races', data);
       setServerConnected(true);
+      console.log('Races state updated, current races:', data);
     } catch (error) {
       console.error('Error fetching races:', error);
       if (retryCount < 2 && error.name !== 'AbortError') {
@@ -1308,6 +1323,11 @@ const HorseBettingApp = () => {
     fetchRaceDays(); // Also load race days on mount
   }, [loadAllData, fetchRaceDays]);
 
+  // Debug: Log when races state changes
+  useEffect(() => {
+    console.log('Races state changed:', races);
+  }, [races]);
+
   // Check if betting is still allowed for a race
   const isBettingAllowed = useCallback((raceTime) => {
     // For testing: always allow betting regardless of time
@@ -1432,8 +1452,12 @@ const HorseBettingApp = () => {
           return nextBankers;
         });
         showMessage('Banker set successfully!', 'success');
-        // Optionally reconcile with server in background
-        // fetchBankers(0, true);
+        
+        // Refresh data to ensure UI is updated
+        await Promise.all([
+          fetchBets(0, true),
+          fetchBankers(0, true)
+        ]);
       } else {
         showMessage('Error setting banker', 'error');
       }
@@ -1444,7 +1468,7 @@ const HorseBettingApp = () => {
         showMessage('Error connecting to server', 'error');
       }
     }
-  }, [bets, showMessage, updateCache]);
+  }, [bets, showMessage, updateCache, fetchBets, fetchBankers]);
 
   // Add new user
   const addUser = useCallback(async () => {
@@ -1494,7 +1518,12 @@ const HorseBettingApp = () => {
       });
 
       if (response.ok) {
-        fetchRaces();
+        // Refresh all data to ensure UI is updated
+        await Promise.all([
+          fetchRaces(0, true),
+          fetchBets(0, true),
+          fetchBankers(0, true)
+        ]);
         showMessage('Race result updated!', 'success');
         setServerConnected(true);
       } else {
@@ -1504,7 +1533,7 @@ const HorseBettingApp = () => {
       showMessage('Error connecting to server', 'error');
       setServerConnected(false);
     }
-  }, [fetchRaces, showMessage]);
+  }, [fetchRaces, fetchBets, fetchBankers, showMessage]);
 
   // Scrape new races
   const scrapeRaces = useCallback(async () => {
@@ -1516,7 +1545,7 @@ const HorseBettingApp = () => {
 
       const data = await response.json();
       if (data.success) {
-        fetchRaces();
+        fetchRaces(0, true); // Force refresh to get updated race data
         showMessage(`Successfully scraped ${data.races.length} races!`, 'success');
         setServerConnected(true);
       } else {
@@ -1540,7 +1569,10 @@ const HorseBettingApp = () => {
 
       const data = await response.json();
       if (data.success) {
-        fetchRaces();
+        console.log('Scraping results successful:', data.results);
+        // Clear race cache to ensure fresh data
+        clearCache('races');
+        fetchRaces(0, true); // Force refresh to get updated race data
         const resultCount = Object.keys(data.results).length;
         showMessage(`Results scraped successfully! ${resultCount} races updated.`, 'success');
         setServerConnected(true);
@@ -1564,10 +1596,10 @@ const HorseBettingApp = () => {
       });
 
       if (response.ok) {
-        fetchUsers();
-        fetchRaces();
-        fetchBets();
-        fetchBankers();
+        fetchUsers(0, true); // Force refresh to get updated user data
+        fetchRaces(0, true); // Force refresh to get updated race data
+        fetchBets(0, true); // Force refresh to get updated bet data
+        fetchBankers(0, true); // Force refresh to get updated banker data
         showMessage('Successfully reset for new day!', 'success');
         setServerConnected(true);
       } else {
@@ -1607,7 +1639,7 @@ const HorseBettingApp = () => {
       />
       <ConnectionStatus serverConnected={serverConnected} retryConnection={() => {
         setServerConnected(false);
-        fetchUsers(); // Attempt to re-establish connection by fetching users
+        fetchUsers(0, true); // Attempt to re-establish connection by fetching users
       }} />
       <div className="max-w-4xl mx-auto p-4">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">

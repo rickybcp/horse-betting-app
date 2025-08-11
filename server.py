@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Any, Tuple
 from utils.smspariaz_scraper import scrape_horses_from_smspariaz
 from utils.mtc_scraper import scrape_mtc_next_race_day
+from utils.results_scraper import scrape_results_with_fallback
 
 app = Flask(__name__)
 CORS(app, origins="*", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], allow_headers=["Content-Type", "Authorization"])
@@ -87,15 +88,18 @@ def init_default_data():
 # Initialize default data on startup
 init_default_data()
 
+# Configuration for current race day
+CURRENT_RACE_DAY = "2025-08-09"  # Default to August 9th race day
+
 def get_current_race_day():
-    """Get the current active race day (always today's date)"""
-    return datetime.now().strftime('%Y-%m-%d')
+    """Get the current active race day (configurable, defaults to August 9th)"""
+    return CURRENT_RACE_DAY
 
 def set_current_race_day(race_day):
-    """Set the current active race day (deprecated - always uses today's date)"""
-    # In the new system, we always use today's date as current
-    # This function is kept for backward compatibility but does nothing
-    pass
+    """Set the current active race day"""
+    global CURRENT_RACE_DAY
+    CURRENT_RACE_DAY = race_day
+    print(f"Current race day set to: {CURRENT_RACE_DAY}")
 
 def get_race_day_data(race_day):
     """Get all data for a specific race day from the new historical system"""
@@ -253,62 +257,86 @@ def scrape_mtc_endpoint():
 
 @app.route('/api/races/results', methods=['POST'])
 def scrape_results_endpoint():
-    races = load_json(RACES_FILE, [])
-    updated_results = {}
-    
-    # Simulate updating results for races that are past their time and don't have a winner
-    now = datetime.now()
-    for race in races:
-        if not race.get('winner') and race.get('status') != 'completed':
-            try:
-                race_time_str = race['time']
-                # Create a dummy date for comparison, only using time
-                race_datetime_today = datetime.strptime(race_time_str, '%H:%M').replace(year=now.year, month=now.month, day=now.day)
-                
-                if now > race_datetime_today: # If race time has passed
-                    if race['horses']:
-                        # Assign a random horse as winner for simulation
-                        import random
-                        winner_horse = random.choice(race['horses'])
-                        race['winner'] = winner_horse['number']
+    """Scrape actual race results from SMS Pariaz website"""
+    try:
+        print("🚀 Starting results scraping...")
+        
+        # Use the new results scraper
+        scraped_results = scrape_results_with_fallback()
+        
+        if scraped_results:
+            # Update races with scraped results
+            races = load_json(RACES_FILE, [])
+            updated_results = {}
+            
+            for race in races:
+                # Try to match scraped results with current races by race ID
+                race_id = race['id']
+                if race_id in scraped_results and not race.get('winner'):
+                    result_data = scraped_results[race_id]
+                    if 'winner_number' in result_data:
+                        race['winner'] = result_data['winner_number']
                         race['status'] = 'completed'
-                        updated_results[race['id']] = race['winner']
-            except ValueError:
-                print(f"Could not parse race time: {race['time']}")
-                continue # Skip to next race if time parsing fails
-    
-    save_json(RACES_FILE, races)
-    
-    # Also sync to current race day
-    sync_files_to_current_race_day()
-    
-    return jsonify({"success": True, "results": updated_results}), 200
+                        updated_results[race_id] = result_data['winner_number']
+                        print(f"🏆 Updated race {race_id} with winner: horse #{result_data['winner_number']}")
+            
+            if updated_results:
+                save_json(RACES_FILE, races)
+                # Also sync to current race day
+                sync_files_to_current_race_day()
+                print(f"✅ Successfully updated {len(updated_results)} races with results")
+                return jsonify({"success": True, "results": updated_results}), 200
+            else:
+                print("⚠️ No races were updated with scraped results")
+                return jsonify({"success": True, "results": {}, "message": "No races updated"}), 200
+        else:
+            print("⚠️ No results were scraped")
+            return jsonify({"success": False, "error": "No results found to scrape"}), 200
+            
+    except Exception as e:
+        print(f"❌ Error in results scraping: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/api/races/<race_id>/result', methods=['POST'])
 def set_race_result_manual(race_id):
-    races = load_json(RACES_FILE, [])
-    winner_number = request.json.get('winner')
+    """Manually set the winner for a specific race"""
+    try:
+        # Convert race_id to integer for comparison
+        try:
+            race_id = int(race_id)
+        except ValueError:
+            return jsonify({"error": "Invalid race ID format"}), 400
+            
+        races = load_json(RACES_FILE, [])
+        winner_number = request.json.get('winner')
 
-    if winner_number is None:
-        return jsonify({"error": "Winner number is required"}), 400
+        if winner_number is None:
+            return jsonify({"error": "Winner number is required"}), 400
 
-    found = False
-    for race in races:
-        if race['id'] == race_id:
-            race['winner'] = winner_number
-            race['status'] = 'completed'
-            found = True
-            break
-    
-    if not found:
-        return jsonify({"error": "Race not found"}), 404
-    
-    save_json(RACES_FILE, races)
-    
-    # Also sync to current race day
-    sync_files_to_current_race_day()
-    
-    return jsonify({"success": True}), 200
+        found = False
+        for race in races:
+            if race['id'] == race_id:
+                race['winner'] = winner_number
+                race['status'] = 'completed'
+                found = True
+                print(f"🏆 Manually set race {race_id} winner to horse #{winner_number}")
+                break
+        
+        if not found:
+            return jsonify({"error": "Race not found"}), 404
+        
+        # Save updated races
+        save_json(RACES_FILE, races)
+        
+        # Also sync to current race day
+        sync_files_to_current_race_day()
+        
+        print(f"✅ Race result updated and synced to current race day")
+        return jsonify({"success": True, "message": f"Race {race_id} winner set to horse #{winner_number}"}), 200
+        
+    except Exception as e:
+        print(f"❌ Error setting race result: {e}")
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/race-day/complete', methods=['POST'])
 def complete_race_day():
