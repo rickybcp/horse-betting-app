@@ -538,12 +538,21 @@ const AdminTab = ({ newUserName, setNewUserName, addUser, loading, scrapeRaces, 
   const fetchFileContent = useCallback(async (filepath) => {
     setLoadingFile(true);
     try {
+      // Store current scroll position
+      const scrollPos = window.scrollY;
+      
       const response = await fetch(`${API_BASE}/admin/files/${encodeURIComponent(filepath)}`);
       if (!response.ok) throw new Error('Failed to fetch file');
       const data = await response.json();
       setSelectedFile(data.metadata);
       setFileContent(data.data);
       setEditingContent(JSON.stringify(data.data, null, 2));
+      
+      // Restore scroll position after a short delay
+      setTimeout(() => {
+        window.scrollTo(0, scrollPos);
+      }, 100);
+      
     } catch (error) {
       console.error('Error fetching file:', error);
       setSelectedFile(null);
@@ -560,7 +569,12 @@ const AdminTab = ({ newUserName, setNewUserName, addUser, loading, scrapeRaces, 
     setSavingFile(true);
     try {
       // Validate JSON
-      const parsedContent = JSON.parse(editingContent);
+      let parsedContent;
+      try {
+        parsedContent = JSON.parse(editingContent);
+      } catch (parseError) {
+        throw new Error('Invalid JSON format. Please check your syntax.');
+      }
       
       // Save to backend
       const response = await fetch(`${API_BASE}/admin/files/${encodeURIComponent(selectedFile.path)}`, {
@@ -568,7 +582,7 @@ const AdminTab = ({ newUserName, setNewUserName, addUser, loading, scrapeRaces, 
         headers: { 
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(parsedContent, null, 2)
+        body: JSON.stringify(parsedContent)
       });
       
       if (!response.ok) {
@@ -586,19 +600,16 @@ const AdminTab = ({ newUserName, setNewUserName, addUser, loading, scrapeRaces, 
       // Refresh file list to show updated size/date
       fetchBackendFiles();
       
-      alert(`✅ File saved successfully!\n\nBackup created automatically.\nLast modified: ${new Date(result.metadata.lastModified).toLocaleString()}`);
+      // Show success message without alert (better UX)
+      showMessage(`File ${selectedFile.path} saved successfully!`, 'success');
       
     } catch (error) {
       console.error('Save error:', error);
-      if (error.message.includes('JSON')) {
-        alert('❌ Invalid JSON format. Please check your syntax.');
-      } else {
-        alert(`❌ Failed to save file: ${error.message}`);
-      }
+      showMessage(`Failed to save file: ${error.message}`, 'error');
     } finally {
       setSavingFile(false);
     }
-  }, [selectedFile, editingContent, fetchBackendFiles]);
+  }, [selectedFile, editingContent, fetchBackendFiles, showMessage]);
 
   // Download file
   const downloadFile = useCallback((filepath, content) => {
@@ -751,7 +762,19 @@ const AdminTab = ({ newUserName, setNewUserName, addUser, loading, scrapeRaces, 
               <div className="ml-auto flex gap-2">
                 {!isEditing ? (
                   <button
-                    onClick={() => setIsEditing(true)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setIsEditing(true);
+                      // Prevent scroll to top
+                      setTimeout(() => {
+                        const textarea = document.querySelector('textarea');
+                        if (textarea) {
+                          textarea.focus();
+                          textarea.scrollTop = 0;
+                        }
+                      }, 100);
+                    }}
                     className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors"
                   >
                     Edit
@@ -759,14 +782,20 @@ const AdminTab = ({ newUserName, setNewUserName, addUser, loading, scrapeRaces, 
                 ) : (
                   <>
                     <button
-                      onClick={saveFileContent}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        saveFileContent();
+                      }}
                       disabled={savingFile}
                       className="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition-colors disabled:opacity-50"
                     >
                       {savingFile ? 'Saving...' : 'Save'}
                     </button>
                     <button
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                         setIsEditing(false);
                         setEditingContent(JSON.stringify(fileContent, null, 2));
                       }}
@@ -794,8 +823,15 @@ const AdminTab = ({ newUserName, setNewUserName, addUser, loading, scrapeRaces, 
                 <textarea
                   value={editingContent}
                   onChange={(e) => setEditingContent(e.target.value)}
-                  className="w-full h-64 p-2 border rounded font-mono text-xs"
+                  onFocus={(e) => {
+                    // Prevent scroll to top when focusing
+                    e.target.scrollTop = 0;
+                  }}
+                  className="w-full h-64 p-2 border rounded font-mono text-xs resize-none"
                   placeholder="JSON content..."
+                  spellCheck={false}
+                  autoComplete="off"
+                  autoCorrect="off"
                 />
               ) : (
                 <pre className="bg-gray-50 p-3 rounded text-xs overflow-auto max-h-64 border">
