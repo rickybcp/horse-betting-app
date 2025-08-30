@@ -219,13 +219,35 @@ def scrape_horses_from_smspariaz():
         
         logger.info(f"Successfully extracted {len(races_data)} races")
         
+        # Create the proper day structure format expected by the application
+        current_date = datetime.now().strftime('%Y-%m-%d')
+        day_data = {
+            "date": current_date,
+            "status": "upcoming",
+            "races": races_data,
+            "bets": {},
+            "bankers": {},
+            "userScores": []
+        }
+        
+        logger.info(f"✓ Created day data structure for {current_date}")
+        
     except Exception as e:
         logger.error(f"Error during scraping: {e}")
-        races_data = []
+        # Return empty structure on error
+        current_date = datetime.now().strftime('%Y-%m-%d')
+        day_data = {
+            "date": current_date,
+            "status": "upcoming", 
+            "races": [],
+            "bets": {},
+            "bankers": {},
+            "userScores": []
+        }
         
     finally:
         if driver:
             driver.quit()
             logger.info("✓ WebDriver closed")
     
-    return races_data
+    return day_data

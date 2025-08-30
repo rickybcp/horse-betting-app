@@ -235,16 +235,27 @@ def set_banker():
 @app.route('/api/races/scrape', methods=['POST'])
 def scrape_races_endpoint():
     try:
+        # Automatically set current race day to today's date
+        today = datetime.now().strftime('%Y-%m-%d')
+        set_current_race_day(today)
+        print(f"📅 Set current race day to: {today}")
+        
         scraped_data = scrape_horses_from_smspariaz()
+        
+        # The scraper now returns the full day structure
+        # We can either replace the entire current day data or merge races
         current = load_current_day_data()
-        current["races"] = scraped_data
+        
+        # Update the current day data with scraped races
+        current["races"] = scraped_data["races"]
+        current["status"] = scraped_data["status"]
         
         # Initialize user scores for new races
         update_current_user_scores()
         
         save_current_day_data(current)
         
-        return jsonify({"success": True, "races": scraped_data}), 200
+        return jsonify({"success": True, "races": scraped_data["races"], "date": today}), 200
     except Exception as e:
         print(f"Error in /api/races/scrape: {e}")
         return jsonify({"success": False, "error": str(e)}), 500

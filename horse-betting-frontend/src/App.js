@@ -458,18 +458,43 @@ const UserBetsTab = ({ users, selectedUser, setSelectedUser, races, bets, banker
 );
 
 // --- Admin Tab Component with Data Management ---
-const AdminTab = ({ newUserName, setNewUserName, addUser, loading, scrapeRaces, scrapeResults, resetForNewDay, races, setRaceResult, users, bets, bankers, serverConnected }) => {
+const AdminTab = ({ 
+  newUserName, 
+  setNewUserName, 
+  addUser, 
+  loading, 
+  scrapeRaces, 
+  scrapeResults, 
+  resetForNewDay, 
+  races, 
+  setRaceResult, 
+  users, 
+  bets, 
+  bankers, 
+  serverConnected,
+  showMessage,
+  // Admin state variables
+  backendFiles,
+  setBackendFiles,
+  selectedFile,
+  setSelectedFile,
+  fileContent,
+  setFileContent,
+  editingContent,
+  setEditingContent,
+  isEditing,
+  setIsEditing,
+  backendStatus,
+  setBackendStatus,
+  loadingFiles,
+  setLoadingFiles,
+  loadingFile,
+  setLoadingFile,
+  savingFile,
+  setSavingFile
+}) => {
   // Admin panel state
   const [adminView, setAdminView] = useState('overview');
-  const [backendFiles, setBackendFiles] = useState([]);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [fileContent, setFileContent] = useState(null);
-  const [editingContent, setEditingContent] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
-  const [backendStatus, setBackendStatus] = useState(null);
-  const [loadingFiles, setLoadingFiles] = useState(false);
-  const [loadingFile, setLoadingFile] = useState(false);
-  const [savingFile, setSavingFile] = useState(false);
 
   // Helper to calculate score for display in admin panel if needed
   const calculatePoints = useCallback((odds) => {
@@ -1083,6 +1108,17 @@ const HorseBettingApp = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmModalContent, setConfirmModalContent] = useState('');
   const [onConfirmAction, setOnConfirmAction] = useState(null);
+
+  // Admin state variables
+  const [backendFiles, setBackendFiles] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileContent, setFileContent] = useState(null);
+  const [editingContent, setEditingContent] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [backendStatus, setBackendStatus] = useState(null);
+  const [loadingFiles, setLoadingFiles] = useState(false);
+  const [loadingFile, setLoadingFile] = useState(false);
+  const [savingFile, setSavingFile] = useState(false);
 
   // Show message to user
   const showMessage = useCallback((msg, type = 'info') => {
@@ -2000,6 +2036,26 @@ const HorseBettingApp = () => {
                       bets={bets}
                       bankers={bankers}
                       serverConnected={serverConnected}
+                      showMessage={showMessage}
+                      // Admin state variables passed as props
+                      backendFiles={backendFiles}
+                      setBackendFiles={setBackendFiles}
+                      selectedFile={selectedFile}
+                      setSelectedFile={setSelectedFile}
+                      fileContent={fileContent}
+                      setFileContent={setFileContent}
+                      editingContent={editingContent}
+                      setEditingContent={setEditingContent}
+                      isEditing={isEditing}
+                      setIsEditing={setIsEditing}
+                      backendStatus={backendStatus}
+                      setBackendStatus={setBackendStatus}
+                      loadingFiles={loadingFiles}
+                      setLoadingFiles={setLoadingFiles}
+                      loadingFile={loadingFile}
+                      setLoadingFile={setLoadingFile}
+                      savingFile={savingFile}
+                      setSavingFile={setSavingFile}
                     />
                   )
                 )}
