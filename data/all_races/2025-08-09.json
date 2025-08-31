@@ -351,27 +351,19 @@
   },
   "userScores": [
     {
-      "userId": "1",
-      "dailyScore": 1
-    },
-    {
-      "userId": "2",
-      "dailyScore": 1
+      "userId": "4",
+      "dailyScore": 4
     },
     {
       "userId": "3",
       "dailyScore": 2
     },
     {
-      "userId": "4",
-      "dailyScore": 4
+      "userId": "1",
+      "dailyScore": 1
     },
     {
       "userId": "5",
-      "dailyScore": 2
-    },
-    {
-      "userId": "6",
       "dailyScore": 2
     },
     {
@@ -379,7 +371,15 @@
       "dailyScore": 5
     },
     {
+      "userId": "6",
+      "dailyScore": 2
+    },
+    {
       "userId": "9",
+      "dailyScore": 0
+    },
+    {
+      "userId": "11",
       "dailyScore": 0
     },
     {
@@ -387,8 +387,8 @@
       "dailyScore": 2
     },
     {
-      "userId": "11",
-      "dailyScore": 0
+      "userId": "2",
+      "dailyScore": 1
     }
   ]
 }

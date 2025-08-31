@@ -1,0 +1,312 @@
+{
+  "date": "2025-08-16",
+  "status": "upcoming",
+  "races": [
+    {
+      "id": "smspariaz_R1_20250816",
+      "name": "THE COLBERT HOLDINGS CHALLENGE CUP -  Benchmark 41 - 990m",
+      "time": "12:30",
+      "horses": [
+        {
+          "number": 1,
+          "name": "WARRIOR CAPTAIN",
+          "odds": 3.5,
+          "points": 1
+        },
+        {
+          "number": 2,
+          "name": "BROADWAY ALLEY",
+          "odds": 2.05,
+          "points": 1
+        },
+        {
+          "number": 3,
+          "name": "CLOUD SEEDER",
+          "odds": 16.0,
+          "points": 3
+        },
+        {
+          "number": 4,
+          "name": "NOT IN DOUBT",
+          "odds": 3.0,
+          "points": 1
+        }
+      ],
+      "winner": null,
+      "status": "upcoming"
+    },
+    {
+      "id": "smspariaz_R2_20250816",
+      "name": "THE EMBOSS 22ND ANNIVERSARY CHALLENGE CUP -  [0-26] - 1500m",
+      "time": "13:05",
+      "horses": [
+        {
+          "number": 1,
+          "name": "SAND PATH",
+          "odds": 5.0,
+          "points": 1
+        },
+        {
+          "number": 2,
+          "name": "COURTLY",
+          "odds": 1.6,
+          "points": 1
+        },
+        {
+          "number": 3,
+          "name": "RAINWATER",
+          "odds": 4.5,
+          "points": 1
+        },
+        {
+          "number": 4,
+          "name": "MALINOIS",
+          "odds": 50.0,
+          "points": 3
+        },
+        {
+          "number": 5,
+          "name": "SMUTS",
+          "odds": 25.0,
+          "points": 3
+        },
+        {
+          "number": 6,
+          "name": "ROMANUS",
+          "odds": 14.0,
+          "points": 3
+        }
+      ],
+      "winner": null,
+      "status": "upcoming"
+    },
+    {
+      "id": "smspariaz_R3_20250816",
+      "name": "THE COLBERT PROPERTIES CHALLENGE CUP -  Benchmark 31 - 990m",
+      "time": "13:40",
+      "horses": [
+        {
+          "number": 1,
+          "name": "LOVE ON TIME",
+          "odds": 8.0,
+          "points": 2
+        },
+        {
+          "number": 2,
+          "name": "VARTACUS",
+          "odds": 12.0,
+          "points": 3
+        },
+        {
+          "number": 3,
+          "name": "WALKING ON WINGS",
+          "odds": 13.0,
+          "points": 3
+        },
+        {
+          "number": 4,
+          "name": "SHORT CUT",
+          "odds": 4.2,
+          "points": 1
+        },
+        {
+          "number": 5,
+          "name": "CRESCENT",
+          "odds": 1.75,
+          "points": 1
+        },
+        {
+          "number": 6,
+          "name": "RIVER HAWK",
+          "odds": 12.0,
+          "points": 3
+        }
+      ],
+      "winner": null,
+      "status": "upcoming"
+    },
+    {
+      "id": "smspariaz_R4_20250816",
+      "name": "THE EMBOSS REUNION CHALLENGE CUP - Benchmark 46 - 1500m",
+      "time": "14:15",
+      "horses": [
+        {
+          "number": 1,
+          "name": "WUGUG",
+          "odds": 2.5,
+          "points": 1
+        },
+        {
+          "number": 2,
+          "name": "CANARY ISLAND",
+          "odds": 40.0,
+          "points": 3
+        },
+        {
+          "number": 3,
+          "name": "BON BOYAGE",
+          "odds": 3.7,
+          "points": 1
+        },
+        {
+          "number": 4,
+          "name": "HIGH KEY",
+          "odds": 3.65,
+          "points": 1
+        },
+        {
+          "number": 5,
+          "name": "TAKING SILK",
+          "odds": 50.0,
+          "points": 3
+        },
+        {
+          "number": 6,
+          "name": "BABYLON",
+          "odds": 6.5,
+          "points": 2
+        }
+      ],
+      "winner": null,
+      "status": "upcoming"
+    },
+    {
+      "id": "smspariaz_R5_20250816",
+      "name": "THE COLBERT HOSPITALITY CHALLENGE CUP - Benchmark 51 - 1365m",
+      "time": "14:50",
+      "horses": [
+        {
+          "number": 1,
+          "name": "QUATRO FIVE SIX",
+          "odds": 4.0,
+          "points": 1
+        },
+        {
+          "number": 2,
+          "name": "BUGALUGS",
+          "odds": 3.55,
+          "points": 1
+        },
+        {
+          "number": 3,
+          "name": "LICKERIO",
+          "odds": 50.0,
+          "points": 3
+        },
+        {
+          "number": 4,
+          "name": "ELMO",
+          "odds": 2.2,
+          "points": 1
+        },
+        {
+          "number": 5,
+          "name": "BACKPACKER",
+          "odds": 40.0,
+          "points": 3
+        },
+        {
+          "number": 6,
+          "name": "ZIVA LA WINTER",
+          "odds": 9.0,
+          "points": 2
+        }
+      ],
+      "winner": null,
+      "status": "upcoming"
+    },
+    {
+      "id": "smspariaz_R6_20250816",
+      "name": "THE EMBOSS MAURITIUS CHALLENGE CUP - Benchmark 66 - 1400m",
+      "time": "15:25",
+      "horses": [
+        {
+          "number": 1,
+          "name": "HOLY WARRIOR",
+          "odds": 50.0,
+          "points": 3
+        },
+        {
+          "number": 2,
+          "name": "GLOBAL GLORY",
+          "odds": 2.4,
+          "points": 1
+        },
+        {
+          "number": 3,
+          "name": "LUNAFACATION",
+          "odds": 14.0,
+          "points": 3
+        },
+        {
+          "number": 4,
+          "name": "HUBBLE",
+          "odds": 13.0,
+          "points": 3
+        },
+        {
+          "number": 5,
+          "name": "PADRE PIO",
+          "odds": 1.85,
+          "points": 1
+        }
+      ],
+      "winner": null,
+      "status": "upcoming"
+    },
+    {
+      "id": "smspariaz_R7_20250816",
+      "name": "THE MIRABEAU CUP - Benchmark 36 - 1450m",
+      "time": "16:05",
+      "horses": [
+        {
+          "number": 1,
+          "name": "PROSPECTOR",
+          "odds": 10.0,
+          "points": 2
+        },
+        {
+          "number": 2,
+          "name": "SAN ANDREAS",
+          "odds": 2.6,
+          "points": 1
+        },
+        {
+          "number": 3,
+          "name": "PIETER BOTH",
+          "odds": 5.5,
+          "points": 2
+        },
+        {
+          "number": 4,
+          "name": "SECRET CIRCLE",
+          "odds": 11.0,
+          "points": 3
+        },
+        {
+          "number": 5,
+          "name": "AMANCIO",
+          "odds": 3.8,
+          "points": 1
+        },
+        {
+          "number": 6,
+          "name": "DOUBLE SILVER",
+          "odds": 30.0,
+          "points": 3
+        },
+        {
+          "number": 7,
+          "name": "TIMES NEW ROMAN",
+          "odds": 10.0,
+          "points": 2
+        }
+      ],
+      "winner": null,
+      "status": "upcoming"
+    }
+  ],
+  "bets": {},
+  "bankers": {},
+  "userScores": []
+}

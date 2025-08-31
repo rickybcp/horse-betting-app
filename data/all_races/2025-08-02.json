@@ -471,7 +471,7 @@
     },
     {
       "userId": "11",
-      "dailyScore": 1
+      "dailyScore": 2
     },
     {
       "userId": "6",
@@ -484,10 +484,6 @@
     {
       "userId": "8",
       "dailyScore": 1
-    },
-    {
-      "userId": "12",
-      "dailyScore": 2
     }
   ]
 }

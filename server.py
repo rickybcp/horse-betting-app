@@ -8,6 +8,7 @@ from utils.smspariaz_scraper import scrape_horses_from_smspariaz
 
 from utils.results_scraper import scrape_results_with_fallback
 from utils.cloud_storage import get_storage_manager, init_cloud_storage
+from utils.user_scores import update_user_scores, get_leaderboard_data, get_current_race_day_scores
 
 app = Flask(__name__)
 CORS(app, origins="*", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], allow_headers=["Content-Type", "Authorization"])
@@ -29,12 +30,28 @@ ALL_RACES_INDEX_FILE = os.path.join(ALL_RACES_DIR, 'index.json')  # new canonica
 # Legacy file (for backward compatibility) - DEPRECATED
 # LEGACY_RACE_DAYS_FILE = os.path.join(DATA_DIR, 'race_days.json')
 
-# Initialize cloud storage if environment variables are set
-if os.getenv('GCS_BUCKET_NAME'):
-    init_cloud_storage()
-    print("🚀 Cloud storage initialized")
+# Initialize cloud storage - REQUIRED for unified data access
+init_cloud_storage()
+storage_manager = get_storage_manager()
+
+if storage_manager.use_cloud:
+    print("🚀 Cloud storage initialized successfully")
+    print(f"   📁 Bucket: {os.getenv('GCS_BUCKET_NAME')}")
+    print(f"   🌐 Project: {os.getenv('GOOGLE_CLOUD_PROJECT')}")
 else:
-    print("💾 Using local file storage")
+    print("❌ Cloud storage initialization failed!")
+    print("   This application requires Google Cloud Storage for data consistency.")
+    print("   Please configure your environment variables:")
+    print("   - GCS_BUCKET_NAME")
+    print("   - GOOGLE_CLOUD_PROJECT") 
+    print("   - GOOGLE_APPLICATION_CREDENTIALS or GOOGLE_APPLICATION_CREDENTIALS_JSON")
+    print("   Run: python setup_cloud_storage.py for setup instructions")
+    # Don't exit in production, but warn heavily
+    # Temporarily disabled for testing - re-enable after cloud storage setup
+    # if os.getenv('FLASK_ENV') != 'production':
+    #     print("   🛑 Exiting - cloud storage required for development")
+    #     exit(1)
+    print("   ⚠️ Continuing with local storage for testing purposes")
 
 # Create data directories if they don't exist (for local fallback)
 os.makedirs(DATA_DIR, exist_ok=True)
@@ -1195,6 +1212,81 @@ def recalculate_scores_endpoint():
         return jsonify({
             "success": False,
             "error": f"Error recalculating scores: {str(e)}"
+        }), 500
+
+@app.route('/api/users/recalculate-scores', methods=['POST'])
+def recalculate_user_scores_endpoint():
+    """Recalculate and update user scores using the new user score system"""
+    try:
+        print("🧮 Recalculating user scores using new score system...")
+        
+        # Get race_date from request if provided
+        race_date = None
+        if request.json and 'raceDate' in request.json:
+            race_date = request.json['raceDate']
+        
+        # Update user scores
+        success = update_user_scores(race_date)
+        
+        if success:
+            # Get updated leaderboard data
+            leaderboard_data = get_leaderboard_data(race_date)
+            
+            return jsonify({
+                "success": True,
+                "message": f"Successfully recalculated scores{f' for {race_date}' if race_date else ' for all race days'}",
+                "leaderboard": leaderboard_data,
+                "raceDate": race_date
+            }), 200
+        else:
+            return jsonify({
+                "success": False,
+                "error": "Failed to recalculate user scores"
+            }), 500
+            
+    except Exception as e:
+        print(f"❌ Error recalculating user scores: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Error recalculating scores: {str(e)}"
+        }), 500
+
+@app.route('/api/users/leaderboard', methods=['GET'])
+def get_user_leaderboard():
+    """Get leaderboard data using the new user score system"""
+    try:
+        race_date = request.args.get('raceDate')  # Optional race date parameter
+        
+        leaderboard_data = get_leaderboard_data(race_date)
+        
+        return jsonify({
+            "success": True,
+            "leaderboard": leaderboard_data
+        }), 200
+        
+    except Exception as e:
+        print(f"❌ Error getting leaderboard: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Error getting leaderboard: {str(e)}"
+        }), 500
+
+@app.route('/api/users/current-scores', methods=['GET'])
+def get_current_scores():
+    """Get real-time scores for the current race day"""
+    try:
+        current_scores = get_current_race_day_scores()
+        
+        return jsonify({
+            "success": True,
+            "scores": current_scores
+        }), 200
+        
+    except Exception as e:
+        print(f"❌ Error getting current scores: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Error getting current scores: {str(e)}"
         }), 500
 
 @app.route('/api/admin/files', methods=['GET'])

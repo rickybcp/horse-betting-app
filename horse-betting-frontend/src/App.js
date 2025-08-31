@@ -135,7 +135,7 @@ const ConnectionStatus = ({ serverConnected, retryConnection }) => (
 );
 
 // --- Leaderboard Tab Component ---
-const LeaderboardTab = ({ users, calculateUserScore, bankers, setActiveTab, showTotalScores, setShowTotalScores, enhancedLeaderboard, loadingEnhanced }) => (
+const LeaderboardTab = ({ users, calculateUserScore, bankers, setActiveTab, showTotalScores, setShowTotalScores, enhancedLeaderboard, loadingEnhanced, recalculateScores, recalculatingScores }) => (
   <div className="space-y-4">
     <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white p-6 rounded-lg">
       <div className="flex justify-between items-center">
@@ -163,6 +163,18 @@ const LeaderboardTab = ({ users, calculateUserScore, bankers, setActiveTab, show
             }`}
           >
             Total Score
+          </button>
+          <button
+            onClick={recalculateScores}
+            disabled={recalculatingScores}
+            className={`px-3 py-1 rounded text-sm font-medium transition-colors flex items-center gap-1 ${
+              recalculatingScores
+                ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                : 'bg-white text-yellow-600 hover:bg-yellow-50'
+            }`}
+          >
+            <RefreshCw className={`w-4 h-4 ${recalculatingScores ? 'animate-spin' : ''}`} />
+            {recalculatingScores ? 'Calculating...' : 'Recalculate'}
           </button>
         </div>
       </div>
@@ -1051,6 +1063,9 @@ const HorseBettingApp = () => {
   const [showTotalScores, setShowTotalScores] = useState(false);
   const [enhancedLeaderboard, setEnhancedLeaderboard] = useState([]);
   const [loadingEnhanced, setLoadingEnhanced] = useState(false);
+  
+  // User Score Recalculation State
+  const [recalculatingScores, setRecalculatingScores] = useState(false);
 
   // Individual loading states for better UX
   const [loadingStates, setLoadingStates] = useState({
@@ -1762,6 +1777,51 @@ const HorseBettingApp = () => {
     setShowConfirmModal(true);
   }, [handleResetForNewDay]);
 
+  // Recalculate user scores
+  const recalculateScores = useCallback(async () => {
+    setRecalculatingScores(true);
+    try {
+      const response = await fetch(`${API_BASE}/users/recalculate-scores`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          // You can optionally pass a specific race date here
+          // raceDate: currentRaceDay 
+        }),
+        signal: AbortSignal.timeout(30000) // 30 second timeout for score calculation
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        // Refresh users data to get updated scores
+        await fetchUsers(0, true);
+        
+        // If we're showing total scores, refresh enhanced leaderboard
+        if (showTotalScores) {
+          await fetchEnhancedLeaderboard(0, true);
+        }
+        
+        showMessage(data.message || 'Scores recalculated successfully!', 'success');
+        setServerConnected(true);
+      } else {
+        showMessage(`Failed to recalculate scores: ${data.error}`, 'error');
+      }
+    } catch (error) {
+      console.error('Error recalculating scores:', error);
+      if (error.name === 'AbortError') {
+        showMessage('Score calculation timed out. Please try again.', 'error');
+      } else {
+        showMessage('Error connecting to server while recalculating scores', 'error');
+      }
+      setServerConnected(false);
+    } finally {
+      setRecalculatingScores(false);
+    }
+  }, [showMessage, fetchUsers, fetchEnhancedLeaderboard, showTotalScores]);
+
   return (
     <div className="min-h-screen bg-gray-100">
       <MessageDisplay message={message} />
@@ -1952,6 +2012,8 @@ const HorseBettingApp = () => {
                     setShowTotalScores={setShowTotalScores}
                     enhancedLeaderboard={enhancedLeaderboard}
                     loadingEnhanced={loadingEnhanced}
+                    recalculateScores={recalculateScores}
+                    recalculatingScores={recalculatingScores}
                   />
                 )}
                 {activeTab === 'races' && (
