@@ -332,7 +332,7 @@ const RaceDayTab = ({ races, isBettingAllowed, setActiveTab }) => (
 );
 
 // --- User Bets Tab Component ---
-const UserBetsTab = ({ users, selectedUser, setSelectedUser, races, bets, bankers, placeBet, setBanker, showMessage, isBettingAllowed, calculateUserScore, setActiveTab }) => (
+const UserBetsTab = ({ users, selectedUser, setSelectedUser, races, bets, bankers, placeBet, setBanker, showMessage, isBettingAllowed, calculateUserScore, setActiveTab, getEffectiveBets, getEffectiveBanker, hasUnsavedChanges, saveUserChanges, savingChanges }) => (
   <div className="space-y-4">
     <div className="bg-gradient-to-r from-green-500 to-green-700 text-white p-6 rounded-lg">
       <h2 className="text-2xl font-bold flex items-center gap-2">
@@ -357,9 +357,49 @@ const UserBetsTab = ({ users, selectedUser, setSelectedUser, races, bets, banker
 
     {selectedUser && races.length > 0 ? (
       <>
+        {/* Save Changes Button */}
+        {hasUnsavedChanges && (
+          <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-yellow-600" />
+                <span className="text-yellow-800 font-medium">You have unsaved changes</span>
+              </div>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  saveUserChanges(selectedUser);
+                }}
+                disabled={savingChanges}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+                  savingChanges
+                    ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                    : 'bg-green-600 text-white hover:bg-green-700'
+                }`}
+              >
+                {savingChanges ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-4 h-4" />
+                    Save Changes
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        )}
+
         {races.map(race => {
-          const userBet = bets[selectedUser]?.[race.id];
-          const isBankerRace = bankers[selectedUser] === race.id;
+          const effectiveBets = getEffectiveBets(selectedUser);
+          const userBet = effectiveBets[race.id];
+          const effectiveBanker = getEffectiveBanker(selectedUser);
+          const isBankerRace = effectiveBanker === race.id;
           
           return (
             <div key={race.id} className="bg-white p-4 rounded-lg shadow">
@@ -428,9 +468,11 @@ const UserBetsTab = ({ users, selectedUser, setSelectedUser, races, bets, banker
             <p className="text-gray-500">No races available</p>
           ) : (
             races.map(race => {
-              const userBet = bets[selectedUser]?.[race.id];
+              const effectiveBets = getEffectiveBets(selectedUser);
+              const userBet = effectiveBets[race.id];
               const horse = race.horses.find(h => h.number === userBet);
-              const isBankerRace = bankers[selectedUser] === race.id;
+              const effectiveBanker = getEffectiveBanker(selectedUser);
+              const isBankerRace = effectiveBanker === race.id;
               
               return (
                 <div key={race.id} className="flex justify-between py-1">
@@ -1066,6 +1108,12 @@ const HorseBettingApp = () => {
   
   // User Score Recalculation State
   const [recalculatingScores, setRecalculatingScores] = useState(false);
+  
+  // Batch Update State
+  const [pendingBets, setPendingBets] = useState({}); // Local changes not yet saved
+  const [pendingBankers, setPendingBankers] = useState({}); // Local banker changes
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [savingChanges, setSavingChanges] = useState(false);
 
   // Individual loading states for better UX
   const [loadingStates, setLoadingStates] = useState({
@@ -1528,105 +1576,148 @@ const HorseBettingApp = () => {
     return dailyScore;
   }, [races, bets, bankers, calculatePoints]);
 
-  // Place a bet
-  const placeBet = useCallback(async (userId, raceId, horseNumber) => {
+  // Get effective bets (combines server state + pending changes)
+  const getEffectiveBets = useCallback((userId) => {
+    const serverBets = bets[userId] || {};
+    const userPendingBets = pendingBets[userId] || {};
+    return { ...serverBets, ...userPendingBets };
+  }, [bets, pendingBets]);
+
+  // Get effective banker (server state + pending changes)
+  const getEffectiveBanker = useCallback((userId) => {
+    return pendingBankers[userId] !== undefined ? pendingBankers[userId] : bankers[userId];
+  }, [bankers, pendingBankers]);
+
+  // Place a bet (now stores locally until saved)
+  const placeBetLocal = useCallback((userId, raceId, horseNumber) => {
     if (!isBettingAllowed(races.find(r => r.id === raceId)?.time)) {
       showMessage('Betting is closed for this race!', 'error');
       return;
     }
 
-    try {
-      const response = await fetch(`${API_BASE}/bets`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: String(userId),
-          raceId: String(raceId),
-          horseNumber: Number(horseNumber)
-        }),
-        signal: AbortSignal.timeout(15000) // 15 second timeout
-      });
-
-      if (response.ok) {
-        // Optimistic update: update state and cache immediately
-        setBets(prevBets => {
-          const userKey = String(userId);
-          const raceKey = String(raceId);
-          const nextBets = {
-            ...prevBets,
-            [userKey]: { ...(prevBets[userKey] || {}), [raceKey]: Number(horseNumber) }
-          };
-          updateCache('bets', nextBets);
-          return nextBets;
-        });
-        showMessage('Bet placed successfully!', 'success');
-        // Optionally reconcile with server in background without harming perceived responsiveness
-        // fetchBets(0, true);
-      } else {
-        const errorData = await response.json();
-        showMessage(`Error placing bet: ${errorData.error || 'Unknown error'}`, 'error');
+    const userKey = String(userId);
+    const raceKey = String(raceId);
+    
+    setPendingBets(prev => ({
+      ...prev,
+      [userKey]: { 
+        ...(prev[userKey] || {}), 
+        [raceKey]: Number(horseNumber) 
       }
-    } catch (error) {
-      console.error('Bet placement error:', error);
-      if (error.name === 'AbortError') {
-        showMessage('Request timed out. Please try again.', 'error');
-      } else {
-        showMessage('Error connecting to server', 'error');
-      }
-    }
-  }, [isBettingAllowed, races, showMessage, updateCache]);
+    }));
+    
+    setHasUnsavedChanges(true);
+    showMessage('Bet updated locally. Click "Save Changes" to confirm.', 'info');
+  }, [isBettingAllowed, races, showMessage]);
 
-  // Set banker
-  const setBanker = useCallback(async (userId, raceId) => {
-    // Check if user has bet on this race
-    const userBets = bets[userId] || {};
-    const hasBetOnRace = userBets.hasOwnProperty(String(raceId));
+  // Set banker (now stores locally until saved)
+  const setBankerLocal = useCallback((userId, raceId) => {
+    // Check if user has bet on this race (including pending bets)
+    const effectiveBets = getEffectiveBets(userId);
+    const hasBetOnRace = effectiveBets.hasOwnProperty(String(raceId));
     
     if (!hasBetOnRace) {
       showMessage('You can only select a banker from races you have bet on!', 'error');
       return;
     }
 
+    setPendingBankers(prev => ({
+      ...prev,
+      [String(userId)]: String(raceId)
+    }));
+    
+    setHasUnsavedChanges(true);
+    showMessage('Banker updated locally. Click "Save Changes" to confirm.', 'info');
+  }, [getEffectiveBets, showMessage]);
+
+  // Save all pending changes for a user
+  const saveUserChanges = useCallback(async (userId) => {
+    if (!hasUnsavedChanges) return;
+    
+    setSavingChanges(true);
     try {
-      const response = await fetch(`${API_BASE}/bankers`, {
+      const userPendingBets = pendingBets[userId] || {};
+      const userPendingBanker = pendingBankers[userId];
+      
+      // Prepare batch update data
+      const batchData = {
+        bets: userPendingBets,
+        banker: userPendingBanker,
+        raceDate: currentRaceDay  // Include the race day being viewed
+      };
+      
+      console.log('🔄 Saving batch data for user', userId, 'on race day', currentRaceDay, ':', JSON.stringify(batchData, null, 2));
+      
+      const response = await fetch(`${API_BASE}/users/${userId}/batch-update`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          userId,
-          raceId
-        }),
-        signal: AbortSignal.timeout(15000) // 15 second timeout
+        body: JSON.stringify(batchData),
+        signal: AbortSignal.timeout(15000)
       });
 
       if (response.ok) {
-        // Optimistic update: update state and cache immediately
-        setBankers(prevBankers => {
-          const nextBankers = { ...prevBankers, [String(userId)]: String(raceId) };
-          updateCache('bankers', nextBankers);
-          return nextBankers;
-        });
-        showMessage('Banker set successfully!', 'success');
+        const result = await response.json();
         
-        // Refresh data to ensure UI is updated
-        await Promise.all([
-          fetchBets(0, true),
-          fetchBankers(0, true)
-        ]);
+        // Clear pending changes for this user
+        setPendingBets(prev => {
+          const newPending = { ...prev };
+          delete newPending[userId];
+          return newPending;
+        });
+        
+        setPendingBankers(prev => {
+          const newPending = { ...prev };
+          delete newPending[userId];
+          return newPending;
+        });
+        
+        // Check if there are still pending changes for other users
+        const stillHasPending = Object.keys(pendingBets).some(id => id !== userId) || 
+                              Object.keys(pendingBankers).some(id => id !== userId);
+        setHasUnsavedChanges(stillHasPending);
+        
+        // Refresh data from server to get updated state
+        if (currentRaceDay === new Date().toISOString().split('T')[0]) {
+          // For current race day, refresh the standard endpoints
+          await Promise.all([
+            fetchBets(0, true),
+            fetchBankers(0, true)
+          ]);
+        } else {
+          // For historical race days, we need to reload the historical data
+          await switchRaceDay(currentRaceDay);
+        }
+        
+        showMessage(result.message || 'Changes saved successfully!', 'success');
+        setServerConnected(true);
       } else {
-        showMessage('Error setting banker', 'error');
+        const errorData = await response.json();
+        showMessage(`Error saving changes: ${errorData.error || 'Unknown error'}`, 'error');
       }
     } catch (error) {
+      console.error('Batch update error:', error);
       if (error.name === 'AbortError') {
         showMessage('Request timed out. Please try again.', 'error');
       } else {
         showMessage('Error connecting to server', 'error');
+        setServerConnected(false);
       }
+    } finally {
+      setSavingChanges(false);
     }
-  }, [bets, showMessage, updateCache, fetchBets, fetchBankers]);
+  }, [hasUnsavedChanges, pendingBets, pendingBankers, showMessage, fetchBets, fetchBankers]);
+
+  // Legacy place bet function (for backward compatibility, now calls batch)
+  const placeBet = useCallback(async (userId, raceId, horseNumber) => {
+    placeBetLocal(userId, raceId, horseNumber);
+  }, [placeBetLocal]);
+
+  // Legacy set banker function (for backward compatibility, now calls batch)
+  const setBanker = useCallback(async (userId, raceId) => {
+    setBankerLocal(userId, raceId);
+  }, [setBankerLocal]);
 
   // Add new user
   const addUser = useCallback(async () => {
@@ -2058,6 +2149,11 @@ const HorseBettingApp = () => {
                       isBettingAllowed={isBettingAllowed}
                       calculateUserScore={calculateUserScore}
                       setActiveTab={setActiveTab}
+                      getEffectiveBets={getEffectiveBets}
+                      getEffectiveBanker={getEffectiveBanker}
+                      hasUnsavedChanges={hasUnsavedChanges}
+                      saveUserChanges={saveUserChanges}
+                      savingChanges={savingChanges}
                     />
                   )
                 )}

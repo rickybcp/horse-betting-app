@@ -161,14 +161,14 @@ def update_user_scores(race_date: Optional[str] = None) -> bool:
     If race_date is provided, only update scores for that date
     If race_date is None, recalculate all scores
     """
-    print(f"🧮 Updating user scores{f' for {race_date}' if race_date else ' (all race days)'}")
+    print(f"[SCORES] Updating user scores{f' for {race_date}' if race_date else ' (all race days)'}")
     
     # Load users
     users_file = "data/users.json"
     users = load_json_file(users_file, [])
     
     if not users:
-        print("❌ No users found")
+        print("[ERROR] No users found")
         return False
     
     updated_users = []
@@ -203,14 +203,14 @@ def update_user_scores(race_date: Optional[str] = None) -> bool:
             }
         
         updated_users.append(updated_user)
-        print(f"  ✅ {user_name}: {updated_user['totalScore']} total points")
+        print(f"  [OK] {user_name}: {updated_user['totalScore']} total points")
     
     # Save updated users
     if save_json_file(users_file, updated_users):
-        print(f"✅ Successfully updated scores for {len(updated_users)} users")
+        print(f"[OK] Successfully updated scores for {len(updated_users)} users")
         return True
     else:
-        print("❌ Failed to save updated user scores")
+        print("[ERROR] Failed to save updated user scores")
         return False
 
 
@@ -303,20 +303,20 @@ def get_current_race_day_scores() -> Dict[str, Any]:
 
 if __name__ == "__main__":
     # Test the user score system
-    print("🧪 Testing User Score System")
+    print("[TEST] Testing User Score System")
     print("=" * 50)
     
     # Test current race day scores
     current_scores = get_current_race_day_scores()
-    print(f"\n📅 Current Race Day Scores ({current_scores['date']}):")
+    print(f"\n[DATE] Current Race Day Scores ({current_scores['date']}):")
     for user in current_scores['users'][:5]:  # Top 5
         print(f"  {user['rank']}. {user['name']}: {user['score']} points")
     
     # Test total leaderboard
     total_leaderboard = get_leaderboard_data()
-    print(f"\n🏆 Total Score Leaderboard:")
+    print(f"\n[LEADERBOARD] Total Score Leaderboard:")
     for user in total_leaderboard['users'][:5]:  # Top 5
         print(f"  {user['rank']}. {user['name']}: {user['score']} points")
     
     print("\n" + "=" * 50)
-    print("✅ User Score System Test Complete")
+    print("[OK] User Score System Test Complete")

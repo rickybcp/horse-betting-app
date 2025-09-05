@@ -38,12 +38,12 @@ def scrape_race_results():
             service = Service(ChromeDriverManager().install())
             driver = webdriver.Chrome(service=service, options=chrome_options)
         except Exception as e:
-            print(f"⚠️ Standard WebDriver failed: {e}")
+            print(f"[WARN] Standard WebDriver failed: {e}")
             try:
                 # Try without service specification
                 driver = webdriver.Chrome(options=chrome_options)
             except Exception as e2:
-                print(f"⚠️ Alternative WebDriver failed: {e2}")
+                print(f"[WARN] Alternative WebDriver failed: {e2}")
                 # Try with explicit path
                 import os
                 chrome_path = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
@@ -55,7 +55,7 @@ def scrape_race_results():
         
         try:
             # Navigate to Supertote Mauritius racing page
-            print("🌐 Navigating to Supertote Mauritius racing page...")
+            print("[NAV] Navigating to Supertote Mauritius racing page...")
             driver.get("https://supertote.mu/racing")
             
             # Wait for page to load
@@ -66,11 +66,11 @@ def scrape_race_results():
             # Give additional time for dynamic content to load
             time.sleep(8)
             
-            print("🔍 Looking for race results using XPath selectors...")
+            print("[SCRAPE] Looking for race results using XPath selectors...")
             
             # Find all race list items (ol/li elements)
             race_list_items = driver.find_elements(By.XPATH, "/html/body/div/ol/li")
-            print(f"🔍 Found {len(race_list_items)} race list items")
+            print(f"[SCRAPE] Found {len(race_list_items)} race list items")
             
             # Process each race list item
             for i, race_item in enumerate(race_list_items):
@@ -81,7 +81,7 @@ def scrape_race_results():
                     race_number = race_number_text[-1] if race_number_text else ""
                     
                     if race_number and race_number.isdigit():
-                        print(f"🏁 Found Race {race_number}")
+                        print(f"[RACE] Found Race {race_number}")
                         
                         # Get winner horse number from first row, second column
                         winner_horse_number_elem = race_item.find_element(By.XPATH, ".//div[2]/table/tbody/tr[1]/td[2]")
@@ -102,48 +102,48 @@ def scrape_race_results():
                                 "race_number": race_number,
                                 "raw_text": f"Race {race_number}: {winner_horse_name} (#{winner_horse_number})"
                             }
-                            print(f"🏆 Race {race_number}: Winner is {winner_horse_name} (#{winner_horse_number})")
+                            print(f"[WINNER] Race {race_number}: Winner is {winner_horse_name} (#{winner_horse_number})")
                         else:
-                            print(f"⚠️ Race {race_number}: Missing horse name or number")
+                            print(f"[WARN] Race {race_number}: Missing horse name or number")
                     else:
-                        print(f"⚠️ Skipping item {i+1}: Invalid race number '{race_number}'")
+                        print(f"[WARN] Skipping item {i+1}: Invalid race number '{race_number}'")
                         
                 except NoSuchElementException as e:
-                    print(f"⚠️ Race item {i+1}: Missing required elements - {e}")
+                    print(f"[WARN] Race item {i+1}: Missing required elements - {e}")
                     continue
                 except Exception as e:
-                    print(f"⚠️ Error processing race item {i+1}: {e}")
+                    print(f"[WARN] Error processing race item {i+1}: {e}")
                     continue
             
             if not results:
-                print("⚠️ No race results found")
-                print("🔍 Debugging information:")
-                print(f"📄 Page title: {driver.title}")
-                print(f"📄 Page URL: {driver.current_url}")
+                print("[WARN] No race results found")
+                print("[DEBUG] Debugging information:")
+                print(f"[DEBUG] Page title: {driver.title}")
+                print(f"[DEBUG] Page URL: {driver.current_url}")
                 
                 # Try to get some page content for debugging
                 page_text = driver.find_element(By.TAG_NAME, "body").text
-                print(f"📄 Page text length: {len(page_text)} characters")
-                print(f"📄 First 500 characters: {page_text[:500]}")
+                print(f"[DEBUG] Page text length: {len(page_text)} characters")
+                print(f"[DEBUG] First 500 characters: {page_text[:500]}")
                 
                 # Look for any racing-related content
                 if "race" in page_text.lower() or "horse" in page_text.lower():
-                    print("✅ Found racing-related content in page text")
+                    print("[OK] Found racing-related content in page text")
                 else:
-                    print("❌ No racing-related content found in page text")
+                    print("[ERROR] No racing-related content found in page text")
                 
         except TimeoutException:
-            print("⏰ Timeout waiting for page to load")
+            print("[TIMEOUT] Timeout waiting for page to load")
             results = {}
         except Exception as e:
-            print(f"❌ Error during scraping: {e}")
+            print(f"[ERROR] Error during scraping: {e}")
             results = {}
             
         finally:
             driver.quit()
             
     except Exception as e:
-        print(f"❌ Failed to initialize WebDriver: {e}")
+        print(f"[ERROR] Failed to initialize WebDriver: {e}")
         results = {}
     
     return results
@@ -154,20 +154,20 @@ def scrape_results_with_fallback():
     Scrape results from Supertote Mauritius
     Returns a dictionary of race results
     """
-    print("🚀 Starting race results scraping from Supertote Mauritius...")
+    print("[SCRAPE] Starting race results scraping from Supertote Mauritius...")
     
     # Scrape real results
     real_results = scrape_race_results()
     
     if real_results:
-        print(f"✅ Successfully scraped {len(real_results)} race results")
+        print(f"[OK] Successfully scraped {len(real_results)} race results")
         return real_results
     else:
-        print("⚠️ No results were scraped")
+        print("[WARN] No results were scraped")
         return {}
 
 
 if __name__ == "__main__":
     # Test the scraper
     results = scrape_results_with_fallback()
-    print(f"\n📋 Final Results: {results}")
+    print(f"\n[RESULTS] Final Results: {results}")
