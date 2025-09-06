@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Trophy, Calendar, Settings, Star, Activity, Home } from 'lucide-react';
+import { Trophy, Calendar, Settings, Star, Activity, Home, Menu, X } from 'lucide-react';
 
 import HomePage from './components/HomePage.jsx';
 import RaceDayTab from './components/RaceDayTab.jsx';
@@ -25,6 +25,7 @@ const HorseBettingApp = () => {
   const [availableRaceDays, setAvailableRaceDays] = useState([]);
   const [selectedRaceDay, setSelectedRaceDay] = useState(null);
   const [selectedUserId, setSelectedUserId] = useState(null); // Start with no user selected
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Admin tab state
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
@@ -230,6 +231,11 @@ const HorseBettingApp = () => {
     }
   }, [isAdminAuthenticated]);
 
+  const handleTabChange = useCallback((tabName) => {
+    setActiveTab(tabName);
+    setIsMobileMenuOpen(false);
+  }, []);
+
   const clearAllUserData = useCallback(async () => {
     if (window.confirm("Are you sure you want to delete ALL user data (bets, bankers, users)? This cannot be undone!")) {
       try {
@@ -334,27 +340,90 @@ const HorseBettingApp = () => {
         <h1 className="text-4xl font-extrabold text-center text-indigo-800 mb-8 tracking-tight">Payen family's Lekours</h1>
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="flex-1">
-            <div className="flex justify-center mb-6 overflow-x-auto whitespace-nowrap">
-              <button onClick={() => setActiveTab('home')} className={`py-3 px-6 rounded-t-lg transition-colors duration-200 font-semibold ${activeTab === 'home' ? 'bg-white text-indigo-700 shadow-md' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}>
-                <Home className="inline-block w-5 h-5 mr-2" />
-                Home
-              </button>
-              <button onClick={() => setActiveTab('races')} className={`py-3 px-6 rounded-t-lg transition-colors duration-200 font-semibold ${activeTab === 'races' ? 'bg-white text-indigo-700 shadow-md' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}>
-                <Activity className="inline-block w-5 h-5 mr-2" />
-                Races
-              </button>
-              <button onClick={() => setActiveTab('bets')} className={`py-3 px-6 rounded-t-lg transition-colors duration-200 font-semibold ${activeTab === 'bets' ? 'bg-white text-indigo-700 shadow-md' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}>
-                <Star className="inline-block w-5 h-5 mr-2" />
-                Your Bets
-              </button>
-              <button onClick={() => setActiveTab('leaderboard')} className={`py-3 px-6 rounded-t-lg transition-colors duration-200 font-semibold ${activeTab === 'leaderboard' ? 'bg-white text-indigo-700 shadow-md' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}>
-                <Trophy className="inline-block w-5 h-5 mr-2" />
-                Leaderboard
-              </button>
-              <button onClick={handleAdminTabClick} className={`py-3 px-6 rounded-t-lg transition-colors duration-200 font-semibold ${activeTab === 'admin' ? 'bg-white text-indigo-700 shadow-md' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}>
-                <Settings className="inline-block w-5 h-5 mr-2" />
-                Admin
-              </button>
+            {/* Mobile Navigation */}
+            <div className="lg:hidden mb-6">
+              <div className="flex items-center justify-between bg-white rounded-lg shadow-md p-4">
+                <span className="text-lg font-semibold text-indigo-700">
+                  {activeTab === 'home' && 'Home'}
+                  {activeTab === 'races' && 'Races'}
+                  {activeTab === 'bets' && 'Your Bets'}
+                  {activeTab === 'leaderboard' && 'Leaderboard'}
+                  {activeTab === 'admin' && 'Admin'}
+                </span>
+                <button
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                  className="p-2 rounded-lg bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition-colors"
+                >
+                  {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                </button>
+              </div>
+              
+              {/* Mobile Dropdown Menu */}
+              {isMobileMenuOpen && (
+                <div className="mt-2 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+                  <button 
+                    onClick={() => handleTabChange('home')} 
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-indigo-50 transition-colors ${activeTab === 'home' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700'}`}
+                  >
+                    <Home className="w-5 h-5" />
+                    Home
+                  </button>
+                  <button 
+                    onClick={() => handleTabChange('races')} 
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-indigo-50 transition-colors ${activeTab === 'races' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700'}`}
+                  >
+                    <Activity className="w-5 h-5" />
+                    Races
+                  </button>
+                  <button 
+                    onClick={() => handleTabChange('bets')} 
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-indigo-50 transition-colors ${activeTab === 'bets' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700'}`}
+                  >
+                    <Star className="w-5 h-5" />
+                    Your Bets
+                  </button>
+                  <button 
+                    onClick={() => handleTabChange('leaderboard')} 
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-indigo-50 transition-colors ${activeTab === 'leaderboard' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700'}`}
+                  >
+                    <Trophy className="w-5 h-5" />
+                    Leaderboard
+                  </button>
+                  <button 
+                    onClick={handleAdminTabClick} 
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-indigo-50 transition-colors ${activeTab === 'admin' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700'}`}
+                  >
+                    <Settings className="w-5 h-5" />
+                    Admin
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex justify-center mb-6">
+              <div className="flex bg-gray-100 rounded-lg p-1">
+                <button onClick={() => handleTabChange('home')} className={`py-3 px-6 rounded-md transition-colors duration-200 font-semibold ${activeTab === 'home' ? 'bg-white text-indigo-700 shadow-sm' : 'text-gray-600 hover:text-indigo-700'}`}>
+                  <Home className="inline-block w-5 h-5 mr-2" />
+                  Home
+                </button>
+                <button onClick={() => handleTabChange('races')} className={`py-3 px-6 rounded-md transition-colors duration-200 font-semibold ${activeTab === 'races' ? 'bg-white text-indigo-700 shadow-sm' : 'text-gray-600 hover:text-indigo-700'}`}>
+                  <Activity className="inline-block w-5 h-5 mr-2" />
+                  Races
+                </button>
+                <button onClick={() => handleTabChange('bets')} className={`py-3 px-6 rounded-md transition-colors duration-200 font-semibold ${activeTab === 'bets' ? 'bg-white text-indigo-700 shadow-sm' : 'text-gray-600 hover:text-indigo-700'}`}>
+                  <Star className="inline-block w-5 h-5 mr-2" />
+                  Your Bets
+                </button>
+                <button onClick={() => handleTabChange('leaderboard')} className={`py-3 px-6 rounded-md transition-colors duration-200 font-semibold ${activeTab === 'leaderboard' ? 'bg-white text-indigo-700 shadow-sm' : 'text-gray-600 hover:text-indigo-700'}`}>
+                  <Trophy className="inline-block w-5 h-5 mr-2" />
+                  Leaderboard
+                </button>
+                <button onClick={handleAdminTabClick} className={`py-3 px-6 rounded-md transition-colors duration-200 font-semibold ${activeTab === 'admin' ? 'bg-white text-indigo-700 shadow-sm' : 'text-gray-600 hover:text-indigo-700'}`}>
+                  <Settings className="inline-block w-5 h-5 mr-2" />
+                  Admin
+                </button>
+              </div>
             </div>
 
             {activeTab === 'home' && (
