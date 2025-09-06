@@ -65,6 +65,20 @@ class DataService:
             db.session.rollback()
             return False
 
+    def update_user(self, user_id: str, name: str) -> bool:
+        """Update a user's name in the database."""
+        try:
+            user = User.query.get(user_id)
+            if user:
+                user.name = name
+                db.session.commit()
+                return True
+            return False
+        except Exception as e:
+            logger.error(f"Error updating user {user_id}: {e}")
+            db.session.rollback()
+            return False
+
     # --- Race Day Management ---
     
     def get_race_day_index(self) -> Dict[str, Any]:
@@ -222,8 +236,12 @@ class DataService:
         try:
             # Check if user and race exist
             user_exists = User.query.get(user_id) is not None
-            race_exists = Race.query.get(race_id) is not None
-            if not user_exists or not race_exists:
+            race = Race.query.get(race_id)
+            if not user_exists or not race:
+                return False
+            
+            # Check if race is completed - no betting allowed on completed races
+            if race.status == 'completed':
                 return False
 
             # If setting as banker, remove any existing banker for this user on the same race date

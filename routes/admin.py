@@ -4,6 +4,22 @@ from services import data_service
 
 admin_bp = Blueprint('admin', __name__)
 
+@admin_bp.route('/users', methods=['PUT'])
+def update_user():
+    """Updates a user's name."""
+    data = request.json
+    user_id = data.get('userId')
+    name = data.get('name')
+    
+    if not user_id or not name:
+        return jsonify({"error": "User ID and name are required"}), 400
+    
+    success = data_service.update_user(user_id, name)
+    if success:
+        return jsonify({"success": True, "message": f"User {user_id} updated successfully."}), 200
+    else:
+        return jsonify({"success": False, "error": "User not found or update failed."}), 404
+
 @admin_bp.route('/users', methods=['DELETE'])
 def delete_user():
     """Deletes a user and all their associated data."""

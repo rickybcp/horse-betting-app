@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Trophy, Calendar, Settings, Star, Activity } from 'lucide-react';
+import { Trophy, Calendar, Settings, Star, Activity, Home } from 'lucide-react';
 
+import HomePage from './components/HomePage.jsx';
 import RaceDayTab from './components/RaceDayTab.jsx';
 import UserBetsTab from './components/UserBetsTab.jsx';
 import LeaderboardTab from './components/LeaderboardTab.jsx';
@@ -11,7 +12,7 @@ const API_BASE = process.env.NODE_ENV === 'development'
   : "https://horse-betting-backend.onrender.com/api";
 
 const HorseBettingApp = () => {
-  const [activeTab, setActiveTab] = useState('races');
+  const [activeTab, setActiveTab] = useState('home');
   const [users, setUsers] = useState([]);
   const [bets, setBets] = useState([]);
   const [bankers, setBankers] = useState({});
@@ -26,6 +27,9 @@ const HorseBettingApp = () => {
   const [selectedUserId, setSelectedUserId] = useState(null); // Start with no user selected
 
   // Admin tab state
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [adminPassword, setAdminPassword] = useState('');
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [backendFiles, setBackendFiles] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileContent, setFileContent] = useState('');
@@ -142,6 +146,90 @@ const HorseBettingApp = () => {
     }
   }, [newUserName, setUsers, setNewUserName, showMessage]);
 
+  const handleUpdateUser = useCallback(async (userId, newName) => {
+    if (!newName.trim()) {
+      showMessage('Please enter a valid user name.', 'info');
+      return;
+    }
+    try {
+      const response = await fetch(`${API_BASE}/admin/users`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, name: newName })
+      });
+      const data = await response.json();
+      if (data.success) {
+        setUsers(prevUsers => 
+          prevUsers.map(user => 
+            user.id === userId ? { ...user, name: newName } : user
+          )
+        );
+        showMessage('User updated successfully!', 'success');
+      } else {
+        showMessage(data.error, 'error');
+      }
+    } catch (error) {
+      showMessage(`Error updating user: ${error.message}`, 'error');
+    }
+  }, [showMessage]);
+
+  const handleDeleteUser = useCallback(async (userId) => {
+    if (!window.confirm('Are you sure you want to delete this user? This will also delete all their bets and scores. This action cannot be undone.')) {
+      return;
+    }
+    try {
+      const response = await fetch(`${API_BASE}/admin/users`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      });
+      const data = await response.json();
+      if (data.success) {
+        setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
+        // Clear selected user if it was deleted
+        if (selectedUserId === userId) {
+          setSelectedUserId(null);
+        }
+        showMessage('User deleted successfully!', 'success');
+      } else {
+        showMessage(data.error, 'error');
+      }
+    } catch (error) {
+      showMessage(`Error deleting user: ${error.message}`, 'error');
+    }
+  }, [showMessage, selectedUserId]);
+
+  const handleAdminLogin = useCallback(async () => {
+    if (!adminPassword.trim()) {
+      showMessage('Please enter admin password.', 'info');
+      return;
+    }
+    
+    // Simple password check - in production, this should be more secure
+    if (adminPassword === 'admin123') {
+      setIsAdminAuthenticated(true);
+      setShowAdminLogin(false);
+      setAdminPassword('');
+      showMessage('Admin access granted!', 'success');
+    } else {
+      showMessage('Invalid admin password.', 'error');
+    }
+  }, [adminPassword, showMessage]);
+
+  const handleAdminLogout = useCallback(() => {
+    setIsAdminAuthenticated(false);
+    setAdminPassword('');
+    showMessage('Admin access revoked.', 'info');
+  }, [showMessage]);
+
+  const handleAdminTabClick = useCallback(() => {
+    if (isAdminAuthenticated) {
+      setActiveTab('admin');
+    } else {
+      setShowAdminLogin(true);
+    }
+  }, [isAdminAuthenticated]);
+
   const clearAllUserData = useCallback(async () => {
     if (window.confirm("Are you sure you want to delete ALL user data (bets, bankers, users)? This cannot be undone!")) {
       try {
@@ -247,6 +335,10 @@ const HorseBettingApp = () => {
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="flex-1">
             <div className="flex justify-center mb-6 overflow-x-auto whitespace-nowrap">
+              <button onClick={() => setActiveTab('home')} className={`py-3 px-6 rounded-t-lg transition-colors duration-200 font-semibold ${activeTab === 'home' ? 'bg-white text-indigo-700 shadow-md' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}>
+                <Home className="inline-block w-5 h-5 mr-2" />
+                Home
+              </button>
               <button onClick={() => setActiveTab('races')} className={`py-3 px-6 rounded-t-lg transition-colors duration-200 font-semibold ${activeTab === 'races' ? 'bg-white text-indigo-700 shadow-md' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}>
                 <Activity className="inline-block w-5 h-5 mr-2" />
                 Races
@@ -259,11 +351,15 @@ const HorseBettingApp = () => {
                 <Trophy className="inline-block w-5 h-5 mr-2" />
                 Leaderboard
               </button>
-              <button onClick={() => setActiveTab('admin')} className={`py-3 px-6 rounded-t-lg transition-colors duration-200 font-semibold ${activeTab === 'admin' ? 'bg-white text-indigo-700 shadow-md' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}>
+              <button onClick={handleAdminTabClick} className={`py-3 px-6 rounded-t-lg transition-colors duration-200 font-semibold ${activeTab === 'admin' ? 'bg-white text-indigo-700 shadow-md' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}>
                 <Settings className="inline-block w-5 h-5 mr-2" />
                 Admin
               </button>
             </div>
+
+            {activeTab === 'home' && (
+              <HomePage users={users} showMessage={showMessage} />
+            )}
 
             {activeTab === 'races' && (
               <RaceDayTab 
@@ -297,12 +393,16 @@ const HorseBettingApp = () => {
               <LeaderboardTab users={users} showMessage={showMessage} />
             )}
 
-            {activeTab === 'admin' && (
+            {activeTab === 'admin' && isAdminAuthenticated && (
               <AdminTab
                 newUserName={newUserName}
                 setNewUserName={setNewUserName}
                 handleAddUser={handleAddUser}
+                handleUpdateUser={handleUpdateUser}
+                handleDeleteUser={handleDeleteUser}
+                users={users}
                 clearAllUserData={clearAllUserData}
+                handleAdminLogout={handleAdminLogout}
                 backendFiles={backendFiles}
                 setBackendFiles={setBackendFiles}
                 selectedFile={selectedFile}
@@ -322,6 +422,48 @@ const HorseBettingApp = () => {
                 showMessage={showMessage}
                 fetchAllData={fetchAllData}
               />
+            )}
+
+            {/* Admin Login Modal */}
+            {showAdminLogin && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
+                  <h3 className="text-xl font-bold mb-4 text-indigo-700">Admin Access Required</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Admin Password
+                      </label>
+                      <input
+                        type="password"
+                        value={adminPassword}
+                        onChange={(e) => setAdminPassword(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && handleAdminLogin()}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        placeholder="Enter admin password"
+                        autoFocus
+                      />
+                    </div>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={handleAdminLogin}
+                        className="flex-1 bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors"
+                      >
+                        Login
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowAdminLogin(false);
+                          setAdminPassword('');
+                        }}
+                        className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </div>

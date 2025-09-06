@@ -52,8 +52,8 @@ const UserBetsTab = ({ races, bets, bankers, users, selectedUserId, setSelectedU
             <span className="font-semibold">How to manage bets:</span>
           </p>
           <ul className="list-disc list-inside space-y-1">
-            <li><strong>Place/Change Bet:</strong> Click on any horse to place or change the bet (only for upcoming races)</li>
-            <li><strong>Set Banker:</strong> Click the <Star className="w-4 h-4 inline mx-1" /> to set/remove banker (1.5x multiplier)</li>
+            <li><strong>Place/Change Bet:</strong> Click on any horse to place or change the bet (disabled for completed races)</li>
+            <li><strong>Set Banker:</strong> Click the <Star className="w-4 h-4 inline mx-1" /> to set/remove banker (2x multiplier for daily score)</li>
             <li><strong>Current Bets:</strong> Selected horses are highlighted in blue</li>
             <li><strong>Winners:</strong> Winning bets show in green with "WON!" text</li>
             <li><strong>Completed Races:</strong> Betting is disabled for completed races</li>
@@ -118,11 +118,11 @@ const UserBetsTab = ({ races, bets, bankers, users, selectedUserId, setSelectedU
                     )}
                     <button
                       onClick={() => handleSetBanker(race.id)}
-                      disabled={!selectedUserId}
+                      disabled={!selectedUserId || race.status === 'completed'}
                       className={`p-2 rounded-full transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
                         isBanker ? 'text-yellow-500 bg-yellow-100' : 'text-gray-400 hover:text-yellow-500'
                       }`}
-                      title={isBanker ? 'Remove banker' : 'Set as banker (1.5x multiplier)'}
+                      title={race.status === 'completed' ? 'Cannot set banker on completed race' : (isBanker ? 'Remove banker' : 'Set as banker (2x multiplier for daily score)')}
                     >
                       <Star className={`w-6 h-6 ${isBanker ? 'fill-yellow-500' : ''} transition-colors duration-200`} />
                     </button>
@@ -147,7 +147,7 @@ const UserBetsTab = ({ races, bets, bankers, users, selectedUserId, setSelectedU
                       <button
                         key={horse.number}
                         onClick={() => handleSetBet(race.id, horse.number)}
-                        disabled={!selectedUserId}
+                        disabled={!selectedUserId || race.status === 'completed'}
                         className={`w-full p-3 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transform hover:scale-[1.02] ${
                           wonBet
                             ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg border-2 border-green-400 hover:from-green-600 hover:to-green-700'
@@ -190,9 +190,9 @@ const UserBetsTab = ({ races, bets, bankers, users, selectedUserId, setSelectedU
                                   <span className="text-xs font-bold">WINNER</span>
                                 </div>
                               )}
-                              {!isSelected && race.status !== 'completed' && selectedUserId && (
-                                <span className="text-xs text-gray-500">
-                                  Click to bet
+                              {!isSelected && selectedUserId && (
+                                <span className={`text-xs ${race.status === 'completed' ? 'text-red-500' : 'text-gray-500'}`}>
+                                  {race.status === 'completed' ? 'Betting disabled' : 'Click to bet'}
                                 </span>
                               )}
                             </div>

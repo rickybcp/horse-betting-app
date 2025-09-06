@@ -23,7 +23,13 @@ def place_bet():
     if success:
         return jsonify({"success": True, "message": f"Bet placed for user {user_id} on horse {horse_number} in race {race_id}"}), 200
     else:
-        return jsonify({"success": False, "error": "Failed to place bet"}), 500
+        # Check if race is completed to provide specific error message
+        from models import Race
+        race = Race.query.get(race_id)
+        if race and race.status == 'completed':
+            return jsonify({"success": False, "error": "Cannot place bet on completed race"}), 400
+        else:
+            return jsonify({"success": False, "error": "Failed to place bet"}), 500
 
 @betting_bp.route('/banker', methods=['POST'])
 def place_banker_bet():
@@ -40,7 +46,13 @@ def place_banker_bet():
     if success:
         return jsonify({"success": True, "message": f"Banker bet placed for user {user_id} on horse {horse_number} in race {race_id}"}), 200
     else:
-        return jsonify({"success": False, "error": "Failed to place banker bet"}), 500
+        # Check if race is completed to provide specific error message
+        from models import Race
+        race = Race.query.get(race_id)
+        if race and race.status == 'completed':
+            return jsonify({"success": False, "error": "Cannot place banker bet on completed race"}), 400
+        else:
+            return jsonify({"success": False, "error": "Failed to place banker bet"}), 500
 
 @betting_bp.route('/bets', methods=['GET'])
 def get_all_bets():
