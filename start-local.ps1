@@ -34,8 +34,14 @@ try {
 }
 
 Write-Host ""
+Write-Host "Setting up environment variables..." -ForegroundColor Yellow
+$env:GCS_BUCKET_NAME = "horse-betting-data-123"
+$env:GOOGLE_CLOUD_PROJECT = "horse-betting-app-123" 
+$env:GOOGLE_APPLICATION_CREDENTIALS = "service-account-key.json"
+Write-Host "✓ Environment variables set" -ForegroundColor Green
+
 Write-Host "Starting Backend Server..." -ForegroundColor Yellow
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$PSScriptRoot'; & '$pythonPath' server.py"
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$PSScriptRoot'; `$env:GCS_BUCKET_NAME='horse-betting-data-123'; `$env:GOOGLE_CLOUD_PROJECT='horse-betting-app-123'; `$env:GOOGLE_APPLICATION_CREDENTIALS='service-account-key.json'; & '$pythonPath' server.py"
 
 Write-Host "Waiting for backend to start..." -ForegroundColor Yellow
 Start-Sleep -Seconds 5

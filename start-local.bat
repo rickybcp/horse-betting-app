@@ -2,8 +2,14 @@
 echo Starting Horse Betting App locally...
 echo.
 
+echo Setting up environment variables...
+set GCS_BUCKET_NAME=horse-betting-data-123
+set GOOGLE_CLOUD_PROJECT=horse-betting-app-123
+set GOOGLE_APPLICATION_CREDENTIALS=service-account-key.json
+echo Environment variables set
+
 echo Starting Backend Server...
-start "Backend Server" cmd /k "cd /d %~dp0 && python server.py"
+start "Backend Server" cmd /k "cd /d %~dp0 && set GCS_BUCKET_NAME=horse-betting-data-123 && set GOOGLE_CLOUD_PROJECT=horse-betting-app-123 && set GOOGLE_APPLICATION_CREDENTIALS=service-account-key.json && python server.py"
 
 echo Waiting for backend to start...
 timeout /t 3 /nobreak >nul

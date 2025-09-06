@@ -1,228 +1,328 @@
+# services/data_service.py
 """
-Data Service for Horse Betting App
-Centralized service for all data-related logic including file I/O,
-user score calculations, and race day management.
+Data service with fixed imports - no more circular dependencies.
+This version imports models and database directly, not from server.py.
 """
 
-import os
-import json
 import logging
-import re
-from typing import Dict, List, Any, Optional
-from datetime import datetime, timedelta
+import uuid
+import os
+from typing import Dict, List, Any, Tuple
+from datetime import datetime
 
-# Import CloudStorageManager from the utils directory
-from utils.cloud_storage import get_storage_manager, init_cloud_storage
+# Import database and models directly (no circular import)
+from database import db
+from models import User, Race, Horse, Bet, UserScore
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# A helper function to get the scrapers
+def get_scrapers():
+    """Import and return the scraper functions."""
+    from utils.smspariaz_scraper import scrape_horses_from_smspariaz
+    from utils.results_scraper import scrape_results_with_fallback
+    return scrape_horses_from_smspariaz, scrape_results_with_fallback
+
 class DataService:
     """
-    Manages all data operations for the application.
+    Manages all application data operations using SQLAlchemy.
+    Now with proper imports and no circular dependencies.
     """
-    DATA_DIR = 'data'
-    ALL_RACES_DIR = os.path.join(DATA_DIR, 'all_races')
-    ALL_RACES_INDEX_FILE = os.path.join(ALL_RACES_DIR, 'index.json')
-    USERS_FILE = os.path.join(DATA_DIR, 'users.json')
 
-    def __init__(self):
-        # Initialize the storage manager
-        self.storage_manager = get_storage_manager()
-
-    def init_cloud_storage_and_local_dirs(self):
-        """
-        Initializes cloud storage and creates local data directories.
-        """
-        # Create data directories if they don't exist
-        os.makedirs(self.DATA_DIR, exist_ok=True)
-        os.makedirs(self.ALL_RACES_DIR, exist_ok=True)
-        logger.info("✓ Data directories initialized.")
+    # --- User Management ---
     
-    def init_default_data(self):
-        """
-        Initializes default data files if they don't exist.
-        This runs on app startup to ensure required files are present.
-        """
-        # Ensure the users.json file exists
-        if not self.storage_manager.file_exists(self.USERS_FILE):
-            self.save_users([])
-            logger.info("✓ Created default users.json file.")
+    def get_all_users(self) -> List[Dict[str, Any]]:
+        """Get all users from the database."""
+        users = User.query.all()
+        return [{"id": user.id, "name": user.name} for user in users]
 
-        # Ensure the all_races/index.json file exists
-        if not self.storage_manager.file_exists(self.ALL_RACES_INDEX_FILE):
-            self.save_race_day_index({"raceDays": []})
-            logger.info("✓ Created default all_races/index.json file.")
-    
-    def get_current_race_day_data(self) -> Dict[str, Any]:
-        """
-        Gets the current active race day data from the storage.
-        """
-        index_data = self.get_race_day_index()
-        current_day_record = next(
-            (day for day in index_data.get("raceDays", []) if day.get("current")), None
-        )
-        
-        if current_day_record:
-            filepath = os.path.join(self.ALL_RACES_DIR, f"{current_day_record['date']}.json")
-            data = self.storage_manager.load_file(filepath, {})
-            # Ensure required fields are present
-            data.setdefault('bets', {})
-            data.setdefault('bankers', {})
-            data.setdefault('userScores', [])
-            return data
-        
-        return {
-            "date": datetime.now().strftime('%Y-%m-%d'),
-            "races": [],
-            "status": "upcoming",
-            "bets": {},
-            "bankers": {},
-            "userScores": []
-        }
+    def add_user(self, name: str) -> Dict[str, Any]:
+        """Add a new user to the database."""
+        user_id = str(uuid.uuid4())
+        new_user = User(id=user_id, name=name)
+        db.session.add(new_user)
+        db.session.commit()
+        return {"id": user_id, "name": name}
 
-    def save_current_race_day_data(self, data: Dict[str, Any]) -> bool:
-        """
-        Saves the current race day data.
-        """
-        date_str = data.get("date")
-        if not date_str:
-            logger.error("❌ Cannot save race day data without a valid date.")
+    def delete_user(self, user_id: str) -> bool:
+        """Deletes a user and all their associated data."""
+        try:
+            # Delete user's bets and scores first to avoid foreign key constraints
+            Bet.query.filter_by(user_id=user_id).delete()
+            UserScore.query.filter_by(user_id=user_id).delete()
+
+            # Now delete the user
+            user = User.query.get(user_id)
+            if user:
+                db.session.delete(user)
+                db.session.commit()
+                return True
             return False
-        
-        filepath = os.path.join(self.ALL_RACES_DIR, f"{date_str}.json")
-        return self.storage_manager.save_file(filepath, data)
+        except Exception as e:
+            logger.error(f"Error deleting user {user_id}: {e}")
+            db.session.rollback()
+            return False
 
+    # --- Race Day Management ---
+    
     def get_race_day_index(self) -> Dict[str, Any]:
-        """
-        Loads the index of all race days from storage.
-        """
-        return self.storage_manager.load_file(self.ALL_RACES_INDEX_FILE, {"raceDays": []})
-
-    def save_race_day_index(self, data: Dict[str, Any]) -> bool:
-        """
-        Saves the race day index to storage.
-        """
-        return self.storage_manager.save_file(self.ALL_RACES_INDEX_FILE, data)
+        """Get the list of all race days from the database."""
+        race_dates = db.session.query(Race.date).group_by(Race.date).order_by(Race.date.desc()).all()
+        return {"raceDays": [{"date": d[0]} for d in race_dates]}
         
-    def get_race_day_data(self, date: str) -> Dict[str, Any]:
-        """
-        Gets a specific race day's data from storage.
-        """
-        filepath = os.path.join(self.ALL_RACES_DIR, f"{date}.json")
-        data = self.storage_manager.load_file(filepath, {})
-        data.setdefault('bets', {})
-        data.setdefault('bankers', {})
-        data.setdefault('userScores', [])
-        return data
+    def get_race_day_data(self, race_date: str) -> Dict[str, Any]:
+        """Get all data for a specific race day from the database."""
+        races = Race.query.filter_by(date=race_date).order_by(Race.race_number).all()
         
-    def get_leaderboard_data(self) -> Dict[str, Any]:
-        """
-        Aggregates scores from all race days to create a leaderboard.
-        """
-        index_data = self.get_race_day_index()
-        race_day_records = index_data.get("raceDays", [])
-        
-        all_user_scores = {}
-        for record in race_day_records:
-            date_str = record["date"]
-            day_data = self.get_race_day_data(date_str)
+        if not races:
+            return {}
             
-            for user_score in day_data.get("userScores", []):
-                user_id = user_score["userId"]
-                score = user_score["score"]
-                
-                if user_id not in all_user_scores:
-                    all_user_scores[user_id] = {
-                        "userId": user_id,
-                        "name": user_score["name"],
-                        "totalScore": 0,
-                        "rank": 0
-                    }
-                all_user_scores[user_id]["totalScore"] += score
-        
-        leaderboard = list(all_user_scores.values())
-        leaderboard.sort(key=lambda x: x["totalScore"], reverse=True)
-        
-        for i, user in enumerate(leaderboard):
-            user["rank"] = i + 1
-            
-        return {"users": leaderboard, "type": "total"}
+        races_data = []
+        for race in races:
+            horses_data = []
+            for horse in Horse.query.filter_by(race_id=race.id).all():
+                horses_data.append({
+                    "number": horse.horse_number,
+                    "name": horse.name,
+                    "odds": horse.odds
+                })
 
-    def update_user_scores(self, race_day_data: Dict[str, Any]) -> None:
-        """
-        Recalculates scores for all users for a given race day.
-        """
-        users = self.load_users()
-        race_day_data["userScores"] = []
+            bets_data = {bet.user_id: bet.horse_number for bet in Bet.query.filter_by(race_id=race.id).all()}
+            bankers_data = [
+                {"userId": bet.user_id, "horseNumber": bet.horse_number}
+                for bet in Bet.query.filter_by(race_id=race.id, is_banker=True).all()
+            ]
 
-        for user in users:
-            user_id = user['id']
-            daily_score = self.calculate_user_score_for_race_day(race_day_data, user_id)
-            race_day_data["userScores"].append({
-                "userId": user_id,
-                "name": user['name'],
-                "score": daily_score
+            races_data.append({
+                "id": race.id,
+                "raceNumber": race.race_number,
+                "status": race.status,
+                "winner": race.winner_horse_number,
+                "horses": horses_data,
+                "bets": bets_data,
+                "bankers": bankers_data
             })
 
-        # Sort by score
-        race_day_data["userScores"].sort(key=lambda x: x.get('score', 0), reverse=True)
-
-        # Add rankings
-        for i, user_score in enumerate(race_day_data["userScores"]):
-            user_score['rank'] = i + 1
-            
-    def update_current_user_scores(self) -> None:
-        """
-        Recalculate scores for the current race day and save the data.
-        """
-        current_race_day_data = self.get_current_race_day_data()
-        self.update_user_scores(current_race_day_data)
-        self.save_current_race_day_data(current_race_day_data)
+        user_scores = UserScore.query.filter_by(race_date=race_date).all()
+        user_scores_data = []
+        for score in user_scores:
+            user = User.query.get(score.user_id)
+            if user:
+                user_scores_data.append({
+                    "userId": score.user_id,
+                    "name": user.name,
+                    "score": score.score
+                })
         
-    def calculate_user_score_for_race_day(self, race_day_data: Dict[str, Any], user_id: str) -> int:
-        """
-        Calculates a single user's total score for a race day.
-        """
-        total_score = 0
-        user_bets = race_day_data.get('bets', {}).get(user_id, {})
-        user_bankers = race_day_data.get('bankers', {}).get(user_id, [])
-        races = race_day_data.get('races', [])
+        return {
+            "date": race_date,
+            "races": races_data,
+            "userScores": user_scores_data
+        }
 
-        for race in races:
-            race_id = race['id']
-            winner = race.get('winner')
-            if winner:
-                # Check for correct bet on the race winner
-                bet = user_bets.get(str(race_id))
-                if bet and bet == winner:
-                    is_banker = False
-                    for banker_bet in user_bankers:
-                        if banker_bet.get('raceId') == race_id and banker_bet.get('horseNumber') == winner:
-                            is_banker = True
-                            break
-                    
-                    if is_banker:
-                        total_score += 5  # Banker bet
-                    else:
-                        total_score += 3  # Standard bet
+    def save_current_race_day_data(self, day_data: Dict[str, Any]) -> bool:
+        """Saves a race day structure to the database, first clearing existing data for that day."""
+        try:
+            race_date = day_data.get('date')
+            if not race_date:
+                logger.error("No date provided in day data.")
+                return False
 
-        return total_score
+            # Delete existing data for this race day
+            existing_races = Race.query.filter_by(date=race_date).all()
+            for race in existing_races:
+                # Delete related bets and horses
+                Bet.query.filter_by(race_id=race.id).delete()
+                Horse.query.filter_by(race_id=race.id).delete()
+                db.session.delete(race)
 
-    def load_users(self) -> List[Dict[str, Any]]:
-        """
-        Loads the list of all users.
-        """
-        users = self.storage_manager.load_file(self.USERS_FILE, [])
-        # Ensure each user has a unique ID and a name
+            db.session.commit()
+            
+            # Insert new data
+            for race_data in day_data.get('races', []):
+                new_race = Race(
+                    id=race_data['id'],
+                    date=race_date,
+                    race_number=race_data['raceNumber'],
+                    status=race_data['status'],
+                    winner_horse_number=race_data.get('winner')
+                )
+                db.session.add(new_race)
+
+                for horse_data in race_data.get('horses', []):
+                    new_horse = Horse(
+                        id=str(uuid.uuid4()),
+                        race_id=new_race.id,
+                        horse_number=horse_data['number'],
+                        name=horse_data['name'],
+                        odds=horse_data['odds']
+                    )
+                    db.session.add(new_horse)
+
+                if 'bets' in race_data:
+                    for user_id, horse_number in race_data['bets'].items():
+                        new_bet = Bet(
+                            id=str(uuid.uuid4()),
+                            user_id=user_id,
+                            race_id=new_race.id,
+                            horse_number=horse_number,
+                            is_banker=False
+                        )
+                        db.session.add(new_bet)
+            
+            db.session.commit()
+            return True
+        except Exception as e:
+            logger.error(f"Error saving race day data: {e}")
+            db.session.rollback()
+            return False
+            
+    def save_race_result(self, race_id: str, winner_horse_number: int) -> bool:
+        """Updates the winner of a single race and sets its status to completed."""
+        try:
+            race = Race.query.filter_by(id=race_id).first()
+            if race:
+                race.winner_horse_number = winner_horse_number
+                race.status = 'completed'
+                db.session.commit()
+                return True
+            return False
+        except Exception as e:
+            logger.error(f"Error saving race result: {e}")
+            db.session.rollback()
+            return False
+
+    def delete_race_day(self, race_date: str) -> bool:
+        """Deletes a race day and all its associated data (races, horses, bets, scores)."""
+        try:
+            races_to_delete = Race.query.filter_by(date=race_date).all()
+            race_ids = [race.id for race in races_to_delete]
+
+            # Delete dependent data first
+            Bet.query.filter(Bet.race_id.in_(race_ids)).delete(synchronize_session=False)
+            Horse.query.filter(Horse.race_id.in_(race_ids)).delete(synchronize_session=False)
+            UserScore.query.filter_by(race_date=race_date).delete(synchronize_session=False)
+            
+            # Then delete the races themselves
+            Race.query.filter_by(date=race_date).delete(synchronize_session=False)
+
+            db.session.commit()
+            return True
+        except Exception as e:
+            logger.error(f"Error deleting race day {race_date}: {e}")
+            db.session.rollback()
+            return False
+            
+    # --- Betting Management ---
+
+    def place_bet(self, user_id: str, race_id: str, horse_number: int, is_banker: bool) -> bool:
+        """Places a bet for a user on a specific horse in a race."""
+        try:
+            # Check if user and race exist
+            user_exists = User.query.get(user_id) is not None
+            race_exists = Race.query.get(race_id) is not None
+            if not user_exists or not race_exists:
+                return False
+
+            # Check if bet already exists
+            existing_bet = Bet.query.filter_by(user_id=user_id, race_id=race_id).first()
+            if existing_bet:
+                existing_bet.horse_number = horse_number
+                existing_bet.is_banker = is_banker
+            else:
+                new_bet = Bet(
+                    id=str(uuid.uuid4()),
+                    user_id=user_id,
+                    race_id=race_id,
+                    horse_number=horse_number,
+                    is_banker=is_banker
+                )
+                db.session.add(new_bet)
+            
+            db.session.commit()
+            return True
+        except Exception as e:
+            logger.error(f"Error placing bet: {e}")
+            db.session.rollback()
+            return False
+            
+    # --- User Score Management ---
+
+    def calculate_current_user_scores(self) -> List[Dict[str, Any]]:
+        """Calculate and update user scores for the current race day."""
+        current_date = datetime.now().strftime('%Y-%m-%d')
+        
+        users = User.query.all()
+        scores = []
+        
         for user in users:
-            user.setdefault('id', 'temp_id')
-            user.setdefault('name', 'Unknown User')
-        return users
-    
-    def save_users(self, users: List[Dict[str, Any]]) -> bool:
-        """
-        Saves the list of users.
-        """
-        return self.storage_manager.save_file(self.USERS_FILE, users)
+            total_score = 0
+            
+            # Get all bets for the user on the current day with a join to Race
+            user_bets = Bet.query.join(Race).filter(
+                Bet.user_id == user.id,
+                Race.date == current_date
+            ).all()
+
+            for bet in user_bets:
+                race = Race.query.get(bet.race_id)
+
+                if race and race.status == 'completed' and race.winner_horse_number == bet.horse_number:
+                    horse = Horse.query.filter_by(race_id=race.id, horse_number=bet.horse_number).first()
+                    if horse:
+                        points = 0
+                        if horse.odds > 10:
+                            points = 3
+                        elif horse.odds > 5:
+                            points = 2
+                        else:
+                            points = 1
+                        
+                        if bet.is_banker:
+                            points *= 2
+                            
+                        total_score += points
+            
+            # Update or create UserScore record
+            user_score = UserScore.query.filter_by(user_id=user.id, race_date=current_date).first()
+            if user_score:
+                user_score.score = total_score
+            else:
+                user_score = UserScore(id=str(uuid.uuid4()), user_id=user.id, race_date=current_date, score=total_score)
+                db.session.add(user_score)
+            
+            scores.append({"userId": user.id, "name": user.name, "score": total_score})
+            
+        db.session.commit()
+        
+        # Sort scores to determine rank
+        scores.sort(key=lambda x: x['score'], reverse=True)
+        
+        for i, score_entry in enumerate(scores):
+            score_entry['rank'] = i + 1
+        
+        return scores
+
+    def get_leaderboard_data(self) -> Dict[str, Any]:
+        """Get leaderboard data from the database."""
+        scores = self.calculate_current_user_scores()
+        
+        return {
+            "users": scores,
+            "date": datetime.now().strftime('%Y-%m-%d'),
+            "type": "current"
+        }
+
+    # --- Scraping Logic ---
+
+    def scrape_new_races(self) -> Dict[str, Any]:
+        """Scrapes horse data for a new race day and returns it."""
+        scrape_horses_from_smspariaz, _ = get_scrapers()
+        return scrape_horses_from_smspariaz()
+
+    def scrape_race_results(self) -> Dict[str, Any]:
+        """Scrapes results for completed races and returns them."""
+        _, scrape_results_with_fallback = get_scrapers()
+        return scrape_results_with_fallback()

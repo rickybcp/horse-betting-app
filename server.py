@@ -1,69 +1,71 @@
-# server.py (Updated - Services and Data Service)
+# server.py (Fixed - No Circular Imports)
+"""
+Main Flask application with clean database initialization.
+No more circular imports!
+"""
+
 from flask import Flask, jsonify
 from flask_cors import CORS
 import os
 import sys
-from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+# Import our database initialization
+from database import db, init_db, create_tables
 
-from utils.cloud_storage import init_cloud_storage
-
-# Import the new route blueprints and services
-from routes.users import users_bp
-from routes.races import races_bp
-from routes.admin import admin_bp
-from routes.race_days import race_days_bp
-from routes.betting import betting_bp
-
-from services.data_service import DataService
-
-app = Flask(__name__)
-
-# Ensure stdout/stderr use UTF-8 to avoid encoding errors on Windows consoles
+# Ensure stdout/stderr use UTF-8 to avoid encoding errors
 try:
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
     sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 except Exception:
     pass
 
-CORS(app, origins="*", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], allow_headers=["Content-Type", "Authorization"])
+def create_app():
+    """Application factory pattern for better testing and organization."""
+    app = Flask(__name__)
 
-# Register the route blueprints
-app.register_blueprint(users_bp, url_prefix='/api')
-app.register_blueprint(races_bp, url_prefix='/api')
-app.register_blueprint(admin_bp, url_prefix='/api/admin')
-app.register_blueprint(race_days_bp, url_prefix='/api/race-days')
-app.register_blueprint(betting_bp, url_prefix='/api')
+    # --- Database Configuration ---
+    # Use a simple SQLite database for development
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///horse_betting.db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Data file paths
-DATA_DIR = 'data'
+    # Initialize database
+    init_db(app)
+    
+    # Configure CORS
+    CORS(app, origins="*", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], 
+         allow_headers=["Content-Type", "Authorization"])
 
-# Initialize the data service
-data_service = DataService()
-data_service.init_cloud_storage_and_local_dirs()
-data_service.init_default_data() # Initialize data files on server start
+    # Import models after database is initialized (this registers them with SQLAlchemy)
+    from models import User, Race, Horse, Bet, UserScore
 
-@app.route('/')
-def index():
-    """
-    Returns the main application status.
-    """
-    return jsonify({"status": "OK", "message": "Horse racing betting API is running."})
+    # Import and register route blueprints AFTER database setup
+    from routes.users import users_bp
+    from routes.races import races_bp
+    from routes.admin import admin_bp
+    from routes.race_days import race_days_bp
+    from routes.betting import betting_bp
+
+    # Register the route blueprints
+    app.register_blueprint(users_bp, url_prefix='/api')
+    app.register_blueprint(races_bp, url_prefix='/api')
+    app.register_blueprint(admin_bp, url_prefix='/api/admin')
+    app.register_blueprint(race_days_bp, url_prefix='/api/race-days')
+    app.register_blueprint(betting_bp, url_prefix='/api')
+
+    @app.route('/')
+    def index():
+        """Returns the main application status."""
+        return jsonify({"status": "OK", "message": "Horse racing betting API is running."})
+
+    return app
+
+# Create the application instance
+app = create_app()
 
 if __name__ == '__main__':
-    # Initialize the cloud storage manager before starting the app
-    print(f"🔧 Initializing cloud storage...")
-    print(f"   Project ID: {os.getenv('GOOGLE_CLOUD_PROJECT', 'NOT SET')}")
-    print(f"   Bucket Name: {os.getenv('GCS_BUCKET_NAME', 'NOT SET')}")
-    print(f"   Credentials: {os.getenv('GOOGLE_APPLICATION_CREDENTIALS', 'NOT SET')}")
-    
-    init_cloud_storage(
-        bucket_name=os.getenv("GCS_BUCKET_NAME"),
-        project_id=os.getenv("GOOGLE_CLOUD_PROJECT")
-    )
-    
+    # Create the database tables
+    create_tables(app)
+
     # Get port from environment variable (for Render deployment) or use 5000
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
