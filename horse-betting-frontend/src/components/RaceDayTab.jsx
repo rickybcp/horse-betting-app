@@ -10,7 +10,6 @@ const SkeletonCard = () => (
 
 const RaceDayTab = ({ races, currentRaceDay, availableRaceDays, selectedRaceDay, fetchAllData, fetchRaceDayData, loading }) => {
   const [editingRaceWinner, setEditingRaceWinner] = useState(null);
-  const [refreshingScores, setRefreshingScores] = useState(false);
   const [raceDayScores, setRaceDayScores] = useState([]);
   const [loadingScores, setLoadingScores] = useState(false);
 
@@ -62,36 +61,6 @@ const RaceDayTab = ({ races, currentRaceDay, availableRaceDays, selectedRaceDay,
     }
   };
 
-  const handleRefreshScores = async () => {
-    setRefreshingScores(true);
-    try {
-      const response = await fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:5000/api' : "https://horse-betting-backend.onrender.com/api"}/races/refresh-scores`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          race_date: selectedRaceDay || new Date().toISOString().split('T')[0]
-        })
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Scores refreshed:', data.message);
-        // Refresh the current race day data and scores
-        if (selectedRaceDay) {
-          fetchRaceDayData(selectedRaceDay);
-          fetchRaceDayScores(selectedRaceDay);
-        } else {
-          fetchAllData();
-        }
-      } else {
-        console.error('Failed to refresh scores');
-      }
-    } catch (error) {
-      console.error('Error refreshing scores:', error);
-    } finally {
-      setRefreshingScores(false);
-    }
-  };
 
   // Fetch scores when selected race day changes
   useEffect(() => {
@@ -139,17 +108,6 @@ const RaceDayTab = ({ races, currentRaceDay, availableRaceDays, selectedRaceDay,
             </select>
             <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
           </div>
-          
-          {/* Refresh Scores Button */}
-          <button 
-            onClick={handleRefreshScores}
-            disabled={refreshingScores}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-            title={`Refresh Scores for ${selectedRaceDay || 'Current Day'}`}
-          >
-            <Trophy className="w-4 h-4" />
-            {refreshingScores ? 'Refreshing...' : 'Refresh Scores'}
-          </button>
           
           <button 
             onClick={() => selectedRaceDay ? fetchRaceDayData(selectedRaceDay) : fetchAllData()} 

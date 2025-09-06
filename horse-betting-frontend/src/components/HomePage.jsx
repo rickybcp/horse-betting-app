@@ -15,10 +15,10 @@ const HomePage = ({ users, showMessage }) => {
               Welcome to Lekours
             </h1>
             <p className="text-xl text-gray-600 mb-2">
-              The Ultimate Horse Racing Prediction Game
+              Payen family's Horse Racing Betting Game
             </p>
             <p className="text-gray-500">
-              Test your intuition, compete with friends, and climb the leaderboard!
+              Get your tuyo ready, test your gut intuition, compete with best zougader, and climb to the top of the leaderboard!
             </p>
           </div>
 
@@ -53,10 +53,10 @@ const HomePage = ({ users, showMessage }) => {
                 <div className="bg-indigo-100 rounded-full p-2 mt-1">
                   <span className="text-indigo-600 font-bold text-sm">3</span>
                 </div>
-                <div>
-                  <h3 className="font-semibold">Set Your Banker</h3>
-                  <p className="text-sm">Choose one race as your "banker" for 2x points. You can only have one banker per race day.</p>
-                </div>
+              <div>
+                <h3 className="font-semibold">Set Your Banker</h3>
+                <p className="text-sm">Choose one race as your "banker". If it wins, your daily total is multiplied by 2! You can only have one banker per race day.</p>
+              </div>
               </div>
               
               <div className="flex items-start gap-3">
@@ -79,21 +79,30 @@ const HomePage = ({ users, showMessage }) => {
             </h2>
             <div className="space-y-3 text-gray-700">
               <div className="flex items-center justify-between">
-                <span className="font-medium">Correct Bet (Regular Race)</span>
-                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">+1 Point</span>
+                <span className="font-medium">Correct Bet (Odds 10+)</span>
+                <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-semibold">+3 Points</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="font-medium">Correct Bet (Banker Race)</span>
-                <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold">+2 Points</span>
+                <span className="font-medium">Correct Bet (Odds 5-9.99)</span>
+                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">+2 Points</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="font-medium">Correct Bet (Odds &lt;5)</span>
+                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">+1 Point</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="font-medium">Incorrect Bet</span>
                 <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-semibold">0 Points</span>
               </div>
             </div>
-            <p className="text-sm text-gray-600 mt-3">
-              <strong>Daily Total:</strong> Sum of all your points for that race day
-            </p>
+            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+              <p className="text-sm text-gray-700">
+                <strong>Daily Total:</strong> Sum of all your points for that race day
+              </p>
+              <p className="text-sm text-gray-700 mt-1">
+                <strong>Banker Bonus:</strong> If your banker wins, your daily total is multiplied by 2!
+              </p>
+            </div>
           </div>
 
           {/* Fair Play Policy */}

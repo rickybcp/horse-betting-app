@@ -331,7 +331,7 @@ const HorseBettingApp = () => {
   return (
     <div className="min-h-screen bg-gray-100 font-sans antialiased text-gray-800">
       <div className="container mx-auto p-4 sm:p-8">
-        <h1 className="text-4xl font-extrabold text-center text-indigo-800 mb-8 tracking-tight">Horse Betting</h1>
+        <h1 className="text-4xl font-extrabold text-center text-indigo-800 mb-8 tracking-tight">Payen family's Lekours</h1>
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="flex-1">
             <div className="flex justify-center mb-6 overflow-x-auto whitespace-nowrap">
