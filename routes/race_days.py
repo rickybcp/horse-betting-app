@@ -48,6 +48,15 @@ def get_current_leaderboard():
     scores = data_service.calculate_current_user_scores()
     return jsonify({"success": True, "scores": scores})
 
+@race_days_bp.route('/<race_date>/scores', methods=['GET'])
+def get_race_day_scores(race_date):
+    """Get scores for a specific race day."""
+    try:
+        scores = data_service.calculate_historical_user_scores(race_date)
+        return jsonify({"success": True, "scores": scores})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
 @race_days_bp.route('/historical', methods=['GET'])
 def get_historical_race_days():
     """Get historical race days."""

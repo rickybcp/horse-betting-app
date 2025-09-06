@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, Clock, Star, Users } from 'lucide-react';
+import { Trophy, Users } from 'lucide-react';
 
 const API_BASE = process.env.NODE_ENV === 'development'
   ? 'http://localhost:5000/api'
@@ -7,8 +7,6 @@ const API_BASE = process.env.NODE_ENV === 'development'
 
 const LeaderboardTab = ({ users, showMessage }) => {
   const [leaderboardData, setLeaderboardData] = useState([]);
-  const [activeLeaderboardTab, setActiveLeaderboardTab] = useState('overall');
-  const [historicalDays, setHistoricalDays] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Helper to get user name from user ID
@@ -21,34 +19,20 @@ const LeaderboardTab = ({ users, showMessage }) => {
   const fetchLeaderboardData = async () => {
     setLoading(true);
     try {
-      if (activeLeaderboardTab === 'overall') {
-        const response = await fetch(`${API_BASE}/race-days/leaderboard`);
-        const data = await response.json();
-        if (data && data.success) {
-          const list = Array.isArray(data.leaderboard) ? data.leaderboard : [];
-          setLeaderboardData(list);
-        } else {
-          setLeaderboardData([]);
-          if (data && data.error) showMessage(data.error, 'error');
-        }
-      } else if (activeLeaderboardTab === 'current') {
-        const response = await fetch(`${API_BASE}/race-days/leaderboard/current`);
-        const data = await response.json();
-        if (data && data.success) {
-          const scores = Array.isArray(data.scores) ? data.scores : [];
-          // Join with user names
-          const scoresWithNames = scores.map(score => ({
-            ...score,
-            userName: getUserName(score.userId),
-            totalScore: score.dailyScore // Rename for consistent display
-          }));
-          // Sort by score
-          scoresWithNames.sort((a, b) => b.dailyScore - a.dailyScore);
-          setLeaderboardData(scoresWithNames);
-        } else {
-          setLeaderboardData([]);
-          if (data && data.error) showMessage(data.error, 'error');
-        }
+      const response = await fetch(`${API_BASE}/race-days/leaderboard`);
+      const data = await response.json();
+      if (data && data.success) {
+        const list = Array.isArray(data.leaderboard) ? data.leaderboard : [];
+        // Ensure each entry has totalScore field
+        const normalizedList = list.map(entry => ({
+          ...entry,
+          totalScore: entry.score || 0,
+          userName: entry.name || getUserName(entry.userId)
+        }));
+        setLeaderboardData(normalizedList);
+      } else {
+        setLeaderboardData([]);
+        if (data && data.error) showMessage(data.error, 'error');
       }
     } catch (error) {
       showMessage(`Error fetching leaderboard data: ${error.message}`, 'error');
@@ -58,25 +42,9 @@ const LeaderboardTab = ({ users, showMessage }) => {
     }
   };
 
-  const fetchHistoricalDays = async () => {
-    try {
-      const response = await fetch(`${API_BASE}/race-days/historical`);
-      const data = await response.json();
-      if (data.success) {
-        setHistoricalDays(data.historical_race_days);
-      }
-    } catch (error) {
-      console.error('Error fetching historical days:', error);
-    }
-  };
-
   useEffect(() => {
     fetchLeaderboardData();
-  }, [activeLeaderboardTab, users]);
-
-  useEffect(() => {
-    fetchHistoricalDays();
-  }, []);
+  }, [users]);
 
   // Skeleton component for loading state
   const SkeletonLeaderboard = () => (
@@ -106,29 +74,10 @@ const LeaderboardTab = ({ users, showMessage }) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-center space-x-4 text-sm font-semibold text-gray-600">
-        <button
-          onClick={() => setActiveLeaderboardTab('overall')}
-          className={`py-2 px-4 rounded-full transition-colors duration-200 ${
-            activeLeaderboardTab === 'overall' ? 'bg-indigo-500 text-white shadow-lg' : 'bg-gray-200 hover:bg-gray-300'
-          }`}
-        >
-          Overall
-        </button>
-        <button
-          onClick={() => setActiveLeaderboardTab('current')}
-          className={`py-2 px-4 rounded-full transition-colors duration-200 ${
-            activeLeaderboardTab === 'current' ? 'bg-indigo-500 text-white shadow-lg' : 'bg-gray-200 hover:bg-gray-300'
-          }`}
-        >
-          Today's Scores
-        </button>
-      </div>
-
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 text-indigo-700">
           <Trophy className="w-6 h-6" />
-          {activeLeaderboardTab === 'overall' ? 'Overall Leaderboard' : "Today's Scores"}
+          Overall Leaderboard
         </h2>
         {loading ? (
           <SkeletonLeaderboard />
@@ -151,7 +100,7 @@ const LeaderboardTab = ({ users, showMessage }) => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="font-bold text-xl text-indigo-600">{Math.round(entry.totalScore)}</span>
+                    <span className="font-bold text-xl text-indigo-600">{Math.round(entry.totalScore || entry.score || 0)}</span>
                     <span className="text-sm text-gray-500 ml-1">pts</span>
                   </div>
                 </li>
@@ -163,22 +112,6 @@ const LeaderboardTab = ({ users, showMessage }) => {
         )}
       </div>
 
-      {activeLeaderboardTab === 'overall' && Array.isArray(historicalDays) && historicalDays.length > 0 && (
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 text-indigo-700">
-            <Clock className="w-6 h-6" />
-            Historical Race Days
-          </h2>
-          <ul className="space-y-2">
-            {historicalDays.map((day, index) => (
-              <li key={index} className="p-3 bg-gray-50 rounded-lg flex justify-between items-center text-gray-700">
-                <span>{day.date}</span>
-                <span className="text-sm text-gray-500">{day.status}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   );
 };

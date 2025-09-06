@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 from utils.smspariaz_scraper import scrape_horses_from_smspariaz
-from utils.results_scraper import scrape_results_with_fallback
+# from utils.results_scraper import scrape_results_with_fallback
 from services.data_service import DataService
 
 class ScrapingService:

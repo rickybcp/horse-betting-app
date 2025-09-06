@@ -21,6 +21,9 @@ const HorseBettingApp = () => {
   const [message, setMessage] = useState({ text: '', type: '' });
   const [showMessageBox, setShowMessageBox] = useState(false);
   const [currentRaceDay, setCurrentRaceDay] = useState(null);
+  const [availableRaceDays, setAvailableRaceDays] = useState([]);
+  const [selectedRaceDay, setSelectedRaceDay] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState(null); // Start with no user selected
 
   // Admin tab state
   const [backendFiles, setBackendFiles] = useState([]);
@@ -51,21 +54,65 @@ const HorseBettingApp = () => {
       const betsData = await betsRes.json();
       if (Array.isArray(betsData)) setBets(betsData);
 
-      const bankersRes = await fetch(`${API_BASE}/bankers`);
+      // Fetch bankers for current race day if available
+      const bankersUrl = selectedRaceDay 
+        ? `${API_BASE}/bankers?race_date=${selectedRaceDay}`
+        : `${API_BASE}/bankers`;
+      const bankersRes = await fetch(bankersUrl);
       const bankersData = await bankersRes.json();
       if (typeof bankersData === 'object' && bankersData !== null) setBankers(bankersData);
+
+      // Fetch available race days
+      const raceDaysRes = await fetch(`${API_BASE}/race-days/index`);
+      const raceDaysData = await raceDaysRes.json();
+      if (raceDaysData.raceDays && Array.isArray(raceDaysData.raceDays)) {
+        setAvailableRaceDays(raceDaysData.raceDays.map(day => day.date));
+      }
 
       const currentDayRes = await fetch(`${API_BASE}/race-days/current`);
       const currentDayData = await currentDayRes.json();
       setCurrentRaceDay(currentDayData.data);
-      if (currentDayData.data && Array.isArray(currentDayData.data.races)) {
-        setRaces(currentDayData.data.races);
-      } else {
-        setRaces([]);
+      
+      // Only set races and selected race day if no specific race day is already selected
+      if (!selectedRaceDay) {
+        if (currentDayData.data) {
+          setSelectedRaceDay(currentDayData.data.date);
+          if (Array.isArray(currentDayData.data.races)) {
+            setRaces(currentDayData.data.races);
+          }
+        } else {
+          setRaces([]);
+        }
       }
     } catch (error) {
       showMessage(`Connection to server failed: ${error.message}`, 'error');
       console.error('Error in fetchAllData:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [showMessage, selectedRaceDay]);
+
+  const fetchRaceDayData = useCallback(async (raceDate) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_BASE}/race-days/${raceDate}`);
+      const data = await response.json();
+      
+      if (data && data.races && Array.isArray(data.races)) {
+        setRaces(data.races);
+        setSelectedRaceDay(raceDate);
+        
+        // Fetch bankers for this specific race date
+        const bankersRes = await fetch(`${API_BASE}/bankers?race_date=${raceDate}`);
+        const bankersData = await bankersRes.json();
+        if (typeof bankersData === 'object' && bankersData !== null) setBankers(bankersData);
+      } else {
+        setRaces([]);
+        showMessage('No races found for this date', 'info');
+      }
+    } catch (error) {
+      showMessage(`Error fetching race day: ${error.message}`, 'error');
+      console.error('Error in fetchRaceDayData:', error);
     } finally {
       setLoading(false);
     }
@@ -114,46 +161,75 @@ const HorseBettingApp = () => {
 
   const handleSetBet = useCallback(async (raceId, horseNumber) => {
     try {
-      const response = await fetch(`${API_BASE}/bets`, {
+      const response = await fetch(`${API_BASE}/bet`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: 1, raceId, horse: horseNumber })
+        body: JSON.stringify({ userId: String(selectedUserId), raceId, horseNumber })
       });
       const data = await response.json();
       if (data.success) {
-        const updatedBets = bets.filter(bet => !(bet.userId === 1 && bet.raceId === raceId));
-        setBets([...updatedBets, data.bet]);
-        showMessage('Bet placed!', 'success');
+        // Refresh bets data to get updated state
+        const betsRes = await fetch(`${API_BASE}/bets`);
+        const betsData = await betsRes.json();
+        if (Array.isArray(betsData)) setBets(betsData);
+        
+        showMessage('Bet updated!', 'success');
       } else {
         showMessage(data.error, 'error');
       }
     } catch (error) {
       showMessage(`Error placing bet: ${error.message}`, 'error');
     }
-  }, [bets, showMessage, setBets]);
+  }, [selectedUserId, showMessage, setBets]);
 
   const handleSetBanker = useCallback(async (raceId) => {
     try {
-      const response = await fetch(`${API_BASE}/bankers`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: 1, raceId })
-      });
-      const data = await response.json();
-      if (data.success) {
-        setBankers(data.bankers);
-        showMessage('Banker updated!', 'success');
+      // Check if user already has a banker bet for this race
+      const currentBet = bets.find(bet => String(bet.userId) === String(selectedUserId) && bet.raceId === raceId);
+      
+      if (currentBet) {
+        // If there's already a bet, make it a banker bet
+        const response = await fetch(`${API_BASE}/banker`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: String(selectedUserId), raceId, horseNumber: currentBet.horse })
+        });
+        const data = await response.json();
+        if (data.success) {
+          // Refresh bets and bankers data
+          const betsRes = await fetch(`${API_BASE}/bets`);
+          const betsData = await betsRes.json();
+          if (Array.isArray(betsData)) setBets(betsData);
+          
+          const bankersUrl = selectedRaceDay 
+            ? `${API_BASE}/bankers?race_date=${selectedRaceDay}`
+            : `${API_BASE}/bankers`;
+          const bankersRes = await fetch(bankersUrl);
+          const bankersData = await bankersRes.json();
+          if (typeof bankersData === 'object' && bankersData !== null) setBankers(bankersData);
+          
+          showMessage('Banker updated!', 'success');
+        } else {
+          showMessage(data.error, 'error');
+        }
       } else {
-        showMessage(data.error, 'error');
+        showMessage('Please place a bet first before setting as banker', 'info');
       }
     } catch (error) {
       showMessage(`Error setting banker: ${error.message}`, 'error');
     }
-  }, [setBankers, showMessage]);
+  }, [selectedUserId, bets, setBets, setBankers, showMessage]);
 
   useEffect(() => {
     fetchAllData();
   }, [fetchAllData]);
+
+  // Auto-select first user when users are loaded
+  useEffect(() => {
+    if (users.length > 0 && !selectedUserId) {
+      setSelectedUserId(users[0].id);
+    }
+  }, [users, selectedUserId]);
 
   const MessageBox = ({ text, type }) => {
     const bgColor = type === 'error' ? 'bg-red-500' : type === 'success' ? 'bg-green-500' : 'bg-blue-500';
@@ -190,11 +266,31 @@ const HorseBettingApp = () => {
             </div>
 
             {activeTab === 'races' && (
-              <RaceDayTab races={races} currentRaceDay={currentRaceDay} fetchAllData={fetchAllData} loading={loading} />
+              <RaceDayTab 
+                races={races} 
+                currentRaceDay={currentRaceDay} 
+                availableRaceDays={availableRaceDays}
+                selectedRaceDay={selectedRaceDay}
+                fetchAllData={fetchAllData} 
+                fetchRaceDayData={fetchRaceDayData}
+                loading={loading} 
+              />
             )}
 
             {activeTab === 'bets' && (
-              <UserBetsTab races={races} bets={bets} bankers={bankers} handleSetBet={handleSetBet} handleSetBanker={handleSetBanker} />
+              <UserBetsTab 
+                races={races} 
+                bets={bets} 
+                bankers={bankers} 
+                users={users}
+                selectedUserId={selectedUserId}
+                setSelectedUserId={setSelectedUserId}
+                availableRaceDays={availableRaceDays}
+                selectedRaceDay={selectedRaceDay}
+                fetchRaceDayData={fetchRaceDayData}
+                handleSetBet={handleSetBet} 
+                handleSetBanker={handleSetBanker} 
+              />
             )}
 
             {activeTab === 'leaderboard' && (

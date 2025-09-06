@@ -1,5 +1,5 @@
-import React from 'react';
-import { Calendar, RefreshCw } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Calendar, RefreshCw, ChevronDown, Trophy, Edit3, Check, X, Users } from 'lucide-react';
 
 const SkeletonCard = () => (
   <div className="bg-white p-4 rounded-lg shadow animate-pulse">
@@ -8,7 +8,101 @@ const SkeletonCard = () => (
   </div>
 );
 
-const RaceDayTab = ({ races, currentRaceDay, fetchAllData, loading }) => {
+const RaceDayTab = ({ races, currentRaceDay, availableRaceDays, selectedRaceDay, fetchAllData, fetchRaceDayData, loading }) => {
+  const [editingRaceWinner, setEditingRaceWinner] = useState(null);
+  const [refreshingScores, setRefreshingScores] = useState(false);
+  const [raceDayScores, setRaceDayScores] = useState([]);
+  const [loadingScores, setLoadingScores] = useState(false);
+
+  const handleSetWinner = async (raceId, winnerHorseNumber) => {
+    try {
+      const response = await fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:5000/api' : "https://horse-betting-backend.onrender.com/api"}/races/${raceId}/winner`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ winnerHorseNumber })
+      });
+      
+      if (response.ok) {
+        setEditingRaceWinner(null);
+        // Refresh the current race day data
+        if (selectedRaceDay) {
+          fetchRaceDayData(selectedRaceDay);
+        } else {
+          fetchAllData();
+        }
+      } else {
+        console.error('Failed to set winner');
+      }
+    } catch (error) {
+      console.error('Error setting winner:', error);
+    }
+  };
+
+  const fetchRaceDayScores = async (raceDate) => {
+    if (!raceDate) return;
+    
+    console.log('fetchRaceDayScores called with:', raceDate);
+    setLoadingScores(true);
+    try {
+      const response = await fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:5000/api' : "https://horse-betting-backend.onrender.com/api"}/race-days/${raceDate}/scores`);
+      console.log('Response status:', response.status);
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Scores data received:', data);
+        setRaceDayScores(data.scores || []);
+      } else {
+        console.log('Response not ok:', response.status);
+        setRaceDayScores([]);
+      }
+    } catch (error) {
+      console.error('Error fetching race day scores:', error);
+      setRaceDayScores([]);
+    } finally {
+      setLoadingScores(false);
+    }
+  };
+
+  const handleRefreshScores = async () => {
+    setRefreshingScores(true);
+    try {
+      const response = await fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:5000/api' : "https://horse-betting-backend.onrender.com/api"}/races/refresh-scores`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          race_date: selectedRaceDay || new Date().toISOString().split('T')[0]
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Scores refreshed:', data.message);
+        // Refresh the current race day data and scores
+        if (selectedRaceDay) {
+          fetchRaceDayData(selectedRaceDay);
+          fetchRaceDayScores(selectedRaceDay);
+        } else {
+          fetchAllData();
+        }
+      } else {
+        console.error('Failed to refresh scores');
+      }
+    } catch (error) {
+      console.error('Error refreshing scores:', error);
+    } finally {
+      setRefreshingScores(false);
+    }
+  };
+
+  // Fetch scores when selected race day changes
+  useEffect(() => {
+    if (selectedRaceDay) {
+      console.log('Fetching scores for race day:', selectedRaceDay);
+      fetchRaceDayScores(selectedRaceDay);
+    } else {
+      setRaceDayScores([]);
+    }
+  }, [selectedRaceDay]);
+
   if (loading) {
     return (
       <div className="bg-white p-6 rounded-b-lg shadow-lg">
@@ -24,40 +118,236 @@ const RaceDayTab = ({ races, currentRaceDay, fetchAllData, loading }) => {
 
   return (
     <div className="bg-white p-6 rounded-b-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 text-indigo-700">
-        <Calendar className="w-6 h-6" />
-        Race Day: {currentRaceDay?.date || 'N/A'}
-        <button onClick={fetchAllData} className="ml-auto p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition-colors duration-200">
-          <RefreshCw className="w-4 h-4 text-gray-600" />
-        </button>
-      </h2>
+      {/* Header with race day selector */}
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold flex items-center gap-2 text-indigo-700">
+          <Calendar className="w-6 h-6" />
+          Races
+        </h2>
+        <div className="flex items-center gap-3">
+          {/* Race Day Selector */}
+          <div className="relative">
+            <select 
+              value={selectedRaceDay || ''} 
+              onChange={(e) => fetchRaceDayData(e.target.value)}
+              className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              <option value="">Select Race Day</option>
+              {availableRaceDays.map(day => (
+                <option key={day} value={day}>{day}</option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+          </div>
+          
+          {/* Refresh Scores Button */}
+          <button 
+            onClick={handleRefreshScores}
+            disabled={refreshingScores}
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+            title={`Refresh Scores for ${selectedRaceDay || 'Current Day'}`}
+          >
+            <Trophy className="w-4 h-4" />
+            {refreshingScores ? 'Refreshing...' : 'Refresh Scores'}
+          </button>
+          
+          <button 
+            onClick={() => selectedRaceDay ? fetchRaceDayData(selectedRaceDay) : fetchAllData()} 
+            className="p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition-colors duration-200"
+            title="Refresh"
+          >
+            <RefreshCw className="w-4 h-4 text-gray-600" />
+          </button>
+        </div>
+      </div>
+
+      {/* Current race day indicator */}
+      {selectedRaceDay && (
+        <div className="mb-4 p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+          <p className="text-indigo-800 font-medium">
+            Viewing races for: <span className="font-bold">{selectedRaceDay}</span>
+            {currentRaceDay?.date === selectedRaceDay && (
+              <span className="ml-2 text-xs bg-indigo-200 text-indigo-800 px-2 py-1 rounded-full">Current</span>
+            )}
+          </p>
+        </div>
+      )}
+
+      {/* Race Day Scores Section - Moved to top */}
+      {selectedRaceDay && (
+        <div className="mb-8 bg-white p-6 rounded-lg shadow-lg">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold flex items-center gap-2 text-indigo-700">
+              <Trophy className="w-5 h-5" />
+              Race Day Scores - {selectedRaceDay}
+            </h3>
+            {loadingScores && (
+              <div className="text-sm text-gray-500">Loading scores...</div>
+            )}
+          </div>
+          
+          {raceDayScores.length > 0 ? (
+            <div className="space-y-3">
+              {raceDayScores.map((score, index) => (
+                <div key={score.userId} className={`flex items-center justify-between p-3 rounded-lg ${
+                  index === 0 ? 'bg-yellow-50 border-2 border-yellow-200' : 
+                  index === 1 ? 'bg-gray-50 border border-gray-200' : 
+                  index === 2 ? 'bg-amber-50 border border-amber-200' : 
+                  'bg-gray-50 border border-gray-100'
+                }`}>
+                  <div className="flex items-center gap-3">
+                    <span className={`font-bold text-lg ${
+                      index === 0 ? 'text-yellow-600' : 
+                      index === 1 ? 'text-gray-600' : 
+                      index === 2 ? 'text-amber-600' : 
+                      'text-gray-500'
+                    }`}>
+                      {index + 1}.
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <Users className="w-4 h-4 text-gray-500" />
+                      <span className="font-semibold text-gray-800">{score.name}</span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-bold text-lg text-indigo-600">{score.score}</span>
+                    <span className="text-sm text-gray-500 ml-1">pts</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-6">
+              <Trophy className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+              <p className="text-gray-500">No scores available for this race day</p>
+              <p className="text-sm text-gray-400">Scores will appear after races are completed</p>
+            </div>
+          )}
+        </div>
+      )}
+
       {races.length > 0 ? (
-        <ul className="space-y-4">
+        <div className="space-y-4">
           {races.map(race => (
-            <li key={race.id} className="bg-gray-50 p-4 rounded-lg shadow-sm">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-bold text-lg text-indigo-600">Race {race.id}</span>
-                <span className={`text-sm font-semibold px-2 py-1 rounded-full ${race.status === 'completed' ? 'bg-green-200 text-green-800' : 'bg-yellow-200 text-yellow-800'}`}>
-                  {race.status}
-                </span>
+            <div key={race.id} className="bg-gray-50 p-4 rounded-lg shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-lg text-indigo-600">Race {race.raceNumber || race.id}</span>
+                  {race.winner && (
+                    <div className="flex items-center gap-1 text-yellow-600">
+                      <Trophy className="w-4 h-4" />
+                      <span className="text-xs font-medium">Winner: #{race.winner}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  {race.time && (
+                    <span className="text-sm text-gray-600 bg-white px-2 py-1 rounded">{race.time}</span>
+                  )}
+                  {/* Edit winner button */}
+                  <button
+                    onClick={() => setEditingRaceWinner(editingRaceWinner === race.id ? null : race.id)}
+                    className="p-1 text-gray-400 hover:text-indigo-600 transition-colors"
+                    title="Set race winner"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                  </button>
+                  <span className={`text-sm font-semibold px-2 py-1 rounded-full ${
+                    race.status === 'completed' ? 'bg-green-200 text-green-800' : 
+                    race.status === 'in_progress' ? 'bg-blue-200 text-blue-800' :
+                    'bg-yellow-200 text-yellow-800'
+                  }`}>
+                    {race.status}
+                  </span>
+                </div>
               </div>
-              <div className="text-sm text-gray-600">Time: {race.time} | Track: {race.track}</div>
-              <div className="mt-4">
-                <h4 className="font-semibold text-gray-700 mb-2">Horses</h4>
-                <ul className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {race.horses.map(horse => (
-                    <li key={horse.number} className="p-2 rounded-md bg-gray-100 hover:bg-indigo-100 transition-colors cursor-pointer">
-                      <div className="font-medium text-gray-800">Horse #{horse.number}</div>
-                      <div className="text-sm text-gray-600">{horse.name}</div>
-                    </li>
-                  ))}
-                </ul>
+              
+              {race.name && (
+                <div className="text-sm text-gray-700 mb-3 font-medium">{race.name}</div>
+              )}
+              
+              {/* Winner selection mode */}
+              {editingRaceWinner === race.id && (
+                <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-blue-800">Select the winning horse:</span>
+                    <button
+                      onClick={() => setEditingRaceWinner(null)}
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {race.horses.map(horse => (
+                      <button
+                        key={horse.number}
+                        onClick={() => handleSetWinner(race.id, horse.number)}
+                        className="flex items-center gap-2 px-3 py-2 bg-white border border-blue-300 rounded-md hover:bg-blue-100 transition-colors"
+                      >
+                        <span className="font-bold text-blue-600">#{horse.number}</span>
+                        <span className="text-sm">{horse.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Horses displayed vertically */}
+              <div className="space-y-2">
+                {race.horses.map(horse => {
+                  const isWinner = race.winner === horse.number;
+                  return (
+                    <div 
+                      key={horse.number} 
+                      className={`flex items-center justify-between p-2 rounded-md transition-colors ${
+                        isWinner 
+                          ? 'bg-gradient-to-r from-yellow-100 to-yellow-50 border-2 border-yellow-300 shadow-md' 
+                          : 'bg-white hover:bg-indigo-50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className={`font-bold w-8 h-8 rounded-full flex items-center justify-center text-sm ${
+                          isWinner 
+                            ? 'bg-yellow-400 text-yellow-900 shadow-sm' 
+                            : 'text-indigo-600 bg-indigo-100'
+                        }`}>
+                          {horse.number}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className={`font-medium ${isWinner ? 'text-yellow-900' : 'text-gray-800'}`}>
+                            {horse.name}
+                          </span>
+                          {isWinner && (
+                            <div className="flex items-center gap-1 text-yellow-600">
+                              <Trophy className="w-4 h-4" />
+                              <span className="text-xs font-bold">WINNER</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      {horse.odds && (
+                        <span className={`text-sm px-2 py-1 rounded ${
+                          isWinner 
+                            ? 'bg-yellow-200 text-yellow-800' 
+                            : 'text-gray-600 bg-gray-100'
+                        }`}>
+                          {horse.odds}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       ) : (
-        <p className="text-center text-gray-500">No races available. Please go to the Admin tab to scrape new races.</p>
+        <div className="text-center py-10">
+          <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-500 mb-2">No races available for this date</p>
+          <p className="text-sm text-gray-400">Select a different date or go to the Admin tab to scrape new races</p>
+        </div>
       )}
     </div>
   );

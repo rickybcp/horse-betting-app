@@ -59,9 +59,21 @@ def get_all_bets():
 
 @betting_bp.route('/bankers', methods=['GET'])
 def get_all_bankers():
-    """Get all banker bets from the database."""
-    from models import Bet
-    bankers = Bet.query.filter_by(is_banker=True).all()
+    """Get all banker bets from the database, optionally filtered by race date."""
+    from models import Bet, Race
+    
+    race_date = request.args.get('race_date')
+    
+    if race_date:
+        # Filter bankers by specific race date
+        bankers = Bet.query.join(Race).filter(
+            Bet.is_banker == True,
+            Race.date == race_date
+        ).all()
+    else:
+        # Return all bankers (backward compatibility)
+        bankers = Bet.query.filter_by(is_banker=True).all()
+    
     bankers_data = {}
     for banker in bankers:
         bankers_data[banker.user_id] = banker.race_id

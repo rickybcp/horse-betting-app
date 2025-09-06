@@ -226,6 +226,21 @@ class DataService:
             if not user_exists or not race_exists:
                 return False
 
+            # If setting as banker, remove any existing banker for this user on the same race date
+            if is_banker:
+                target_race = Race.query.get(race_id)
+                if target_race:
+                    # Find all banker bets for this user on the same race date
+                    existing_bankers = Bet.query.join(Race).filter(
+                        Bet.user_id == user_id,
+                        Bet.is_banker == True,
+                        Race.date == target_race.date
+                    ).all()
+                    
+                    # Remove banker status from existing bets on same race date
+                    for banker_bet in existing_bankers:
+                        banker_bet.is_banker = False
+
             # Check if bet already exists
             existing_bet = Bet.query.filter_by(user_id=user_id, race_id=race_id).first()
             if existing_bet:
@@ -259,6 +274,7 @@ class DataService:
         
         for user in users:
             total_score = 0
+            banker_correct = False
             
             # Get all bets for the user on the current day with a join to Race
             user_bets = Bet.query.join(Race).filter(
@@ -273,17 +289,22 @@ class DataService:
                     horse = Horse.query.filter_by(race_id=race.id, horse_number=bet.horse_number).first()
                     if horse:
                         points = 0
-                        if horse.odds > 10:
+                        if horse.odds >= 10:
                             points = 3
-                        elif horse.odds > 5:
+                        elif horse.odds >= 5:
                             points = 2
                         else:
                             points = 1
-                        
-                        if bet.is_banker:
-                            points *= 2
                             
                         total_score += points
+                        
+                        # Check if this winning bet was a banker
+                        if bet.is_banker:
+                            banker_correct = True
+            
+            # Apply banker multiplier to entire daily score if banker bet was correct
+            if banker_correct:
+                total_score *= 2
             
             # Update or create UserScore record
             user_score = UserScore.query.filter_by(user_id=user.id, race_date=current_date).first()
@@ -305,14 +326,100 @@ class DataService:
         
         return scores
 
+    def calculate_historical_user_scores(self, race_date: str) -> List[Dict[str, Any]]:
+        """Calculate and update user scores for a specific historical race day."""
+        from models import User, Bet, Race, Horse, UserScore
+        from database import db
+        import uuid
+        
+        users = User.query.all()
+        scores = []
+        
+        for user in users:
+            total_score = 0
+            banker_correct = False
+            
+            # Get all bets for the user on the specified date with a join to Race
+            user_bets = Bet.query.join(Race).filter(
+                Bet.user_id == user.id,
+                Race.date == race_date
+            ).all()
+
+            for bet in user_bets:
+                race = Race.query.get(bet.race_id)
+
+                if race and race.status == 'completed' and race.winner_horse_number == bet.horse_number:
+                    horse = Horse.query.filter_by(race_id=race.id, horse_number=bet.horse_number).first()
+                    if horse:
+                        points = 0
+                        if horse.odds >= 10:
+                            points = 3
+                        elif horse.odds >= 5:
+                            points = 2
+                        else:
+                            points = 1
+                            
+                        total_score += points
+                        
+                        # Check if this winning bet was a banker
+                        if bet.is_banker:
+                            banker_correct = True
+            
+            # Apply banker multiplier to entire daily score if banker bet was correct
+            if banker_correct:
+                total_score *= 2
+            
+            # Update or create UserScore record
+            user_score = UserScore.query.filter_by(user_id=user.id, race_date=race_date).first()
+            if user_score:
+                user_score.score = total_score
+            else:
+                user_score = UserScore(id=str(uuid.uuid4()), user_id=user.id, race_date=race_date, score=total_score)
+                db.session.add(user_score)
+            
+            scores.append({"userId": user.id, "name": user.name, "score": total_score})
+            
+        db.session.commit()
+        
+        # Sort scores to determine rank
+        scores.sort(key=lambda x: x['score'], reverse=True)
+        
+        for i, score_entry in enumerate(scores):
+            score_entry['rank'] = i + 1
+        
+        return scores
+
     def get_leaderboard_data(self) -> Dict[str, Any]:
-        """Get leaderboard data from the database."""
-        scores = self.calculate_current_user_scores()
+        """Get overall leaderboard data from the database across all race days."""
+        from models import User, UserScore
+        from database import db
+        
+        # Get all users
+        users = User.query.all()
+        total_scores = []
+        
+        for user in users:
+            # Get all user scores across all race days
+            user_scores = UserScore.query.filter_by(user_id=user.id).all()
+            total_score = sum(score.score for score in user_scores)
+            
+            total_scores.append({
+                "userId": user.id,
+                "name": user.name,
+                "score": total_score
+            })
+        
+        # Sort by total score (descending)
+        total_scores.sort(key=lambda x: x['score'], reverse=True)
+        
+        # Add rank
+        for i, score_entry in enumerate(total_scores):
+            score_entry['rank'] = i + 1
         
         return {
-            "users": scores,
-            "date": datetime.now().strftime('%Y-%m-%d'),
-            "type": "current"
+            "users": total_scores,
+            "date": "all-time",
+            "type": "overall"
         }
 
     # --- Scraping Logic ---
