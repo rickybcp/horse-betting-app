@@ -103,23 +103,42 @@ def get_current_race_day():
 
 def set_current_race_day(race_day):
     """Persist the current active race day to all_races index."""
-    index_data = load_json(ALL_RACES_INDEX_FILE, {"raceDays": []})
-    # Update all race days to set current=False
-    for day in index_data.get("raceDays", []):
-        day["current"] = False
-    # Set the specified race day as current
-    current_day = next((day for day in index_data.get("raceDays", []) if day.get("date") == race_day), None)
-    if current_day:
-        current_day["current"] = True
-    else:
-        # Add new race day if it doesn't exist
-        index_data.setdefault("raceDays", []).append({
-            "id": race_day,
-            "date": race_day,
-            "current": True
-        })
-    save_json(ALL_RACES_INDEX_FILE, index_data)
-    print(f"Current race day set to: {race_day}")
+    try:
+        print(f"[DEBUG] Setting current race day to: {race_day}")
+        index_data = load_json(ALL_RACES_INDEX_FILE, {"raceDays": []})
+        print(f"[DEBUG] Loaded index data: {len(index_data.get('raceDays', []))} race days")
+        
+        # Update all race days to set current=False
+        for day in index_data.get("raceDays", []):
+            day["current"] = False
+        
+        # Set the specified race day as current
+        current_day = next((day for day in index_data.get("raceDays", []) if day.get("date") == race_day), None)
+        if current_day:
+            current_day["current"] = True
+            print(f"[DEBUG] Updated existing race day: {race_day}")
+        else:
+            # Add new race day if it doesn't exist
+            new_day = {
+                "id": race_day,
+                "date": race_day,
+                "current": True
+            }
+            index_data.setdefault("raceDays", []).append(new_day)
+            print(f"[DEBUG] Added new race day: {race_day}")
+        
+        # Save the updated index
+        success = save_json(ALL_RACES_INDEX_FILE, index_data)
+        print(f"[DEBUG] Save index result: {success}")
+        
+        if success:
+            print(f"[SUCCESS] Current race day set to: {race_day}")
+        else:
+            print(f"[ERROR] Failed to save index file for race day: {race_day}")
+            
+    except Exception as e:
+        print(f"[ERROR] Exception in set_current_race_day: {e}")
+        raise
 
 def get_race_day_data(race_day):
     """Get all data for a specific race day from all_races."""
@@ -258,25 +277,28 @@ def set_banker():
 @app.route('/api/races/scrape', methods=['POST'])
 def scrape_races_endpoint():
     try:
-        # Automatically set current race day to today's date
+        # Get today's date
         today = datetime.now().strftime('%Y-%m-%d')
-        set_current_race_day(today)
-        print(f"[DATE] Set current race day to: {today}")
+        print(f"[SCRAPE] Creating new race day for: {today}")
         
+        # Scrape the race data
         scraped_data = scrape_horses_from_smspariaz()
         
-        # The scraper now returns the full day structure
-        # We can either replace the entire current day data or merge races
-        current = load_current_day_data()
+        # Create fresh data structure for today
+        today_data = {
+            "date": today,
+            "status": scraped_data.get("status", "in_progress"),
+            "races": scraped_data["races"],
+            "bets": {},  # Start with empty bets for new race day
+            "bankers": {}  # Start with empty bankers for new race day
+        }
         
-        # Update the current day data with scraped races
-        current["races"] = scraped_data["races"]
-        current["status"] = scraped_data["status"]
+        # Save directly to today's file (no "current" concept needed)
+        save_race_day_data(today, today_data)
+        print(f"[SUCCESS] Saved race data for {today}")
         
-        # Initialize user scores for new races
-        update_current_user_scores()
-        
-        save_current_day_data(current)
+        # Update the index to mark today as current (for backward compatibility)
+        set_current_race_day(today)
         
         return jsonify({"success": True, "races": scraped_data["races"], "date": today}), 200
     except Exception as e:
