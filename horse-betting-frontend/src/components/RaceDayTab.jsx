@@ -88,34 +88,43 @@ const RaceDayTab = ({ races, currentRaceDay, availableRaceDays, selectedRaceDay,
   return (
     <div className="bg-white p-6 rounded-b-lg shadow-lg">
       {/* Header with race day selector */}
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold flex items-center gap-2 text-indigo-700">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold flex items-center gap-2 text-indigo-700 mb-4">
           <Calendar className="w-6 h-6" />
           Races
         </h2>
-        <div className="flex items-center gap-3">
+        
+        {/* Mobile-friendly controls */}
+        <div className="space-y-4">
           {/* Race Day Selector */}
           <div className="relative">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Select Race Day
+            </label>
             <select 
               value={selectedRaceDay || ''} 
               onChange={(e) => fetchRaceDayData(e.target.value)}
-              className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full appearance-none bg-white border border-gray-300 rounded-lg px-4 py-3 pr-10 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 min-h-[48px]"
             >
-              <option value="">Select Race Day</option>
+              <option value="">Choose a race day...</option>
               {availableRaceDays.map(day => (
                 <option key={day} value={day}>{day}</option>
               ))}
             </select>
-            <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
           </div>
           
-          <button 
-            onClick={() => selectedRaceDay ? fetchRaceDayData(selectedRaceDay) : fetchAllData()} 
-            className="p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition-colors duration-200"
-            title="Refresh"
-          >
-            <RefreshCw className="w-4 h-4 text-gray-600" />
-          </button>
+          {/* Refresh Button */}
+          <div className="flex justify-center">
+            <button 
+              onClick={() => selectedRaceDay ? fetchRaceDayData(selectedRaceDay) : fetchAllData()} 
+              className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200 min-h-[48px]"
+              title="Refresh"
+            >
+              <RefreshCw className="w-5 h-5" />
+              Refresh Data
+            </button>
+          </div>
         </div>
       </div>
 
@@ -236,15 +245,15 @@ const RaceDayTab = ({ races, currentRaceDay, availableRaceDays, selectedRaceDay,
                       <X className="w-4 h-4" />
                     </button>
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {race.horses.map(horse => (
                       <button
                         key={horse.number}
                         onClick={() => handleSetWinner(race.id, horse.number)}
-                        className="flex items-center gap-2 px-3 py-2 bg-white border border-blue-300 rounded-md hover:bg-blue-100 transition-colors"
+                        className="flex items-center gap-3 px-4 py-3 bg-white border border-blue-300 rounded-lg hover:bg-blue-100 transition-colors min-h-[48px] text-left"
                       >
-                        <span className="font-bold text-blue-600">#{horse.number}</span>
-                        <span className="text-sm">{horse.name}</span>
+                        <span className="font-bold text-blue-600 text-lg">#{horse.number}</span>
+                        <span className="text-sm flex-1 truncate">{horse.name}</span>
                       </button>
                     ))}
                   </div>
@@ -258,7 +267,7 @@ const RaceDayTab = ({ races, currentRaceDay, availableRaceDays, selectedRaceDay,
                   return (
                     <div 
                       key={horse.number} 
-                      className={`flex items-center justify-between p-2 rounded-md transition-colors ${
+                      className={`flex items-center justify-between p-3 rounded-lg transition-colors min-h-[56px] ${
                         isWinner 
                           ? 'bg-gradient-to-r from-yellow-100 to-yellow-50 border-2 border-yellow-300 shadow-md' 
                           : 'bg-white hover:bg-indigo-50'

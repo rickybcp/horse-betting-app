@@ -5,42 +5,51 @@ const UserBetsTab = ({ races, bets, bankers, users, selectedUserId, setSelectedU
   return (
     <div className="bg-white p-6 rounded-b-lg shadow-lg">
       {/* Header with selectors */}
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold flex items-center gap-2 text-indigo-700">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold flex items-center gap-2 text-indigo-700 mb-4">
           <Star className="w-6 h-6" />
           Betting
         </h2>
-        <div className="flex items-center gap-3">
+        
+        {/* Mobile-friendly selectors */}
+        <div className="space-y-4">
           {/* User Selector */}
           <div className="relative">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Select User
+            </label>
             <select 
               value={selectedUserId || ''} 
               onChange={(e) => {
                 const newUserId = e.target.value;
                 setSelectedUserId(newUserId);
               }}
-              className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full appearance-none bg-white border border-gray-300 rounded-lg px-4 py-3 pr-10 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 min-h-[48px]"
             >
-              <option value="">Select User</option>
+              <option value="">Choose a user...</option>
               {users.map(user => (
                 <option key={user.id} value={user.id}>{user.name}</option>
               ))}
             </select>
-            <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
           </div>
+          
           {/* Race Day Selector */}
           <div className="relative">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Select Race Day
+            </label>
             <select 
               value={selectedRaceDay || ''} 
               onChange={(e) => fetchRaceDayData(e.target.value)}
-              className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full appearance-none bg-white border border-gray-300 rounded-lg px-4 py-3 pr-10 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 min-h-[48px]"
             >
-              <option value="">Select Race Day</option>
+              <option value="">Choose a race day...</option>
               {availableRaceDays.map(day => (
                 <option key={day} value={day}>{day}</option>
               ))}
             </select>
-            <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
           </div>
         </div>
       </div>
@@ -119,7 +128,7 @@ const UserBetsTab = ({ races, bets, bankers, users, selectedUserId, setSelectedU
                     <button
                       onClick={() => handleSetBanker(race.id)}
                       disabled={!selectedUserId || race.status === 'completed'}
-                      className={`p-2 rounded-full transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
+                      className={`p-3 rounded-full transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-h-[48px] min-w-[48px] ${
                         isBanker ? 'text-yellow-500 bg-yellow-100' : 'text-gray-400 hover:text-yellow-500'
                       }`}
                       title={race.status === 'completed' ? 'Cannot set banker on completed race' : (isBanker ? 'Remove banker' : 'Set as banker (2x multiplier for daily score)')}
@@ -148,7 +157,7 @@ const UserBetsTab = ({ races, bets, bankers, users, selectedUserId, setSelectedU
                         key={horse.number}
                         onClick={() => handleSetBet(race.id, horse.number)}
                         disabled={!selectedUserId || race.status === 'completed'}
-                        className={`w-full p-3 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transform hover:scale-[1.02] ${
+                        className={`w-full p-4 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transform hover:scale-[1.02] min-h-[60px] ${
                           wonBet
                             ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg border-2 border-green-400 hover:from-green-600 hover:to-green-700'
                             : isWinner
