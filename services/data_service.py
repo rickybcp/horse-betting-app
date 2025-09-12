@@ -7,6 +7,7 @@ This version imports models and database directly, not from server.py.
 import logging
 import uuid
 import os
+import re
 from typing import Dict, List, Any, Tuple
 from datetime import datetime
 
@@ -156,11 +157,27 @@ class DataService:
             
             # Insert new data
             for race_data in day_data.get('races', []):
+                # Extract race number from race_data ID (e.g., "smspariaz_R1_20250816" -> 1) 
+                # or from race name (e.g., "Race 1" -> 1)
+                race_number = 1
+                race_id = race_data.get('id', '')
+                race_name = race_data.get('name', '')
+                
+                # Try to extract from ID first
+                match = re.search(r'R(\d+)', race_id, re.IGNORECASE)
+                if match:
+                    race_number = int(match.group(1))
+                else:
+                    # Try to extract from name as fallback
+                    match = re.search(r'Race\s+(\d+)', race_name, re.IGNORECASE)
+                    if match:
+                        race_number = int(match.group(1))
+                
                 new_race = Race(
                     id=race_data['id'],
                     date=race_date,
-                    race_number=race_data['raceNumber'],
-                    status=race_data['status'],
+                    race_number=race_number,
+                    status=race_data.get('status', 'upcoming'),
                     winner_horse_number=race_data.get('winner')
                 )
                 db.session.add(new_race)

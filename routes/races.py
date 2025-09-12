@@ -88,3 +88,12 @@ def refresh_scores():
         return jsonify({"success": True, "message": f"Scores refreshed for {len(scores)} users on {race_date}", "scores": scores, "race_date": race_date}), 200
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+
+@races_bp.route('/races/results', methods=['POST'])
+def scrape_results():
+    """Scrapes results for completed races."""
+    try:
+        results = data_service.scrape_race_results()
+        return jsonify({"success": True, "message": "Race results scraped successfully.", "data": results}), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
