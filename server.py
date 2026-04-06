@@ -8,9 +8,16 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 import os
 import sys
+from dotenv import load_dotenv
+load_dotenv()
+
+database_url = os.getenv('DATABASE_URL', '')
+# Render provides 'postgres://' but SQLAlchemy requires 'postgresql://'
+if database_url.startswith('postgres://'):
+    database_url = database_url.replace('postgres://', 'postgresql://', 1)
 
 # Import our database initialization
-from database import db, init_db, create_tables
+from database import init_db, create_tables
 
 # Ensure stdout/stderr use UTF-8 to avoid encoding errors
 try:
@@ -24,8 +31,7 @@ def create_app():
     app = Flask(__name__)
 
     # --- Database Configuration ---
-    # Use a simple SQLite database for development
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///horse_betting.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url  # noqa: F821
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     # Initialize database
@@ -62,9 +68,10 @@ def create_app():
 # Create the application instance
 app = create_app()
 
+# Create tables on startup (works with both gunicorn and direct execution)
+create_tables(app)
+
 if __name__ == '__main__':
-    # Create the database tables
-    create_tables(app)
 
     # Get port from environment variable (for Render deployment) or use 5000
     port = int(os.environ.get('PORT', 5000))
